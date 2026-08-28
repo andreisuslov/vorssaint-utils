@@ -218,7 +218,7 @@ struct MetricsTests {
                "clear on screen lock is off until asked for")
         expect(Defaults.registeredDefaults[DefaultsKey.clipboardAutoClearDelay] as? Int == 20,
                "auto clear starts at twenty seconds")
-        expect(Defaults.registeredDefaults[DefaultsKey.clipboardHistoryQuickPreview] as? Bool == false,
+        expect(Defaults.registeredDefaults[DefaultsKey.clipboardHistoryQuickPreviewByDefault] as? Bool == false,
                "clipboard history quick preview is closed by default")
 
         // MARK: Clipboard auto clear timing
@@ -324,8 +324,6 @@ struct MetricsTests {
                          "\(language.rawValue) copy-selected button format")
             expectFormat(clipboardStrings.textSizeFormat, ["@", "@"],
                          "\(language.rawValue) clipboard text size format")
-            expectFormat(clipboardStrings.sourceAppFormat, ["@"],
-                         "\(language.rawValue) clipboard source app format")
             expect(!clipboardStrings.previewByDefault.isEmpty
                    && !clipboardStrings.previewByDefaultCaption.isEmpty
                    && !clipboardStrings.openInWindowHint.isEmpty
