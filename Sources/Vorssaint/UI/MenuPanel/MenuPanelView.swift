@@ -404,6 +404,9 @@ struct MenuPanelView: View {
             footerButton(l10n.s.panelSettings,
                          systemImage: "gearshape",
                          horizontalPadding: 7) {
+                if let page = PanelInteractionState.shared.hostedSettingsPage {
+                    SettingsRouter.shared.page = page
+                }
                 appDelegate()?.openSettingsWindow()
             }
 

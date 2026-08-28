@@ -29,9 +29,13 @@ struct PanelUninstallerView: View {
             }
             return selected
         } isTargeted: { dropTargeted = $0 }
-        .onAppear { PanelInteractionState.shared.viewKeepsPopoverOpen = true }
+        .onAppear {
+            PanelInteractionState.shared.viewKeepsPopoverOpen = true
+            PanelInteractionState.shared.hostedSettingsPage = .uninstaller
+        }
         .onDisappear {
             PanelInteractionState.shared.viewKeepsPopoverOpen = false
+            PanelInteractionState.shared.hostedSettingsPage = nil
             dismissHomebrewRemovalConfirmation()
         }
         .alert(l10n.s.homebrewConfirmUninstallTitle,

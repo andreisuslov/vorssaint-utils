@@ -31,8 +31,14 @@ struct PanelClipboardView: View {
             controls
             entriesList
         }
-        .onAppear { PanelInteractionState.shared.viewKeepsPopoverOpen = true }
-        .onDisappear { PanelInteractionState.shared.viewKeepsPopoverOpen = false }
+        .onAppear {
+            PanelInteractionState.shared.viewKeepsPopoverOpen = true
+            PanelInteractionState.shared.hostedSettingsPage = .clipboard
+        }
+        .onDisappear {
+            PanelInteractionState.shared.viewKeepsPopoverOpen = false
+            PanelInteractionState.shared.hostedSettingsPage = nil
+        }
     }
 
     private var header: some View {
