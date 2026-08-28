@@ -147,7 +147,7 @@ final class ShelfService: ObservableObject {
     private var hotKeyHandler: EventHandlerRef?
     private var registeredShortcut: GlobalShortcut?
     private var mouseMonitor: Any?
-    private var shakeSamples: [(t: TimeInterval, x: CGFloat)] = []
+    private var shake = ShelfShakeDetector()
     private var lastSummon: TimeInterval = 0
     /// Screen frame of the app's menu bar icon, set by the AppDelegate. The
     /// docked shelf hangs right under it, so this service can anchor there
@@ -413,7 +413,7 @@ final class ShelfService: ObservableObject {
             switch event.type {
             case .leftMouseDown:
                 self.beginDragGesture(with: event)
-                self.shakeSamples.removeAll()
+                self.shake.reset()
             case .leftMouseUp:
                 self.closeDragGesture()
                 self.endDockedDrag()
@@ -446,7 +446,7 @@ final class ShelfService: ObservableObject {
     private func stopDragMonitor() {
         if let mouseMonitor { NSEvent.removeMonitor(mouseMonitor) }
         mouseMonitor = nil
-        shakeSamples.removeAll()
+        shake.reset()
         dragSourceBundleIdentifier = nil
         dockedWatchdog?.invalidate()
         dockedWatchdog = nil
@@ -459,35 +459,51 @@ final class ShelfService: ObservableObject {
         retractEdgePeek()
     }
 
-    /// Detects a back-and-forth shake of the pointer during a drag: enough
-    /// horizontal direction reversals and travel in a short window.
     private func handleDrag(_ event: NSEvent) {
-        let t = event.timestamp
-        shakeSamples.append((t, NSEvent.mouseLocation.x))
-        shakeSamples.removeAll { t - $0.t > 0.5 }
-        guard shakeSamples.count >= 5 else { return }
+        guard shake.record(x: NSEvent.mouseLocation.x, at: event.timestamp) else { return }
+        // Only when content is actually being dragged — not when a window is
+        // being moved (nothing droppable, so the shelf shouldn't appear).
+        guard isContentDragActive() else { return }
+        guard automaticOpenAllowed else { return }
+        DispatchQueue.main.async { [weak self] in self?.summon() }
+    }
 
-        var reversals = 0
-        var travel: CGFloat = 0
-        var lastDirection = 0
-        for i in 1..<shakeSamples.count {
-            let dx = shakeSamples[i].x - shakeSamples[i - 1].x
-            travel += abs(dx)
-            let direction = dx > 6 ? 1 : (dx < -6 ? -1 : 0)
-            if direction != 0 {
-                if lastDirection != 0, direction != lastDirection { reversals += 1 }
-                lastDirection = direction
-            }
-        }
-        if reversals >= 3, travel > 220, t - lastSummon > 1.0 {
-            // Only when content is actually being dragged — not when a window is
-            // being moved (nothing droppable, so the shelf shouldn't appear).
-            guard isContentDragActive() else { return }
-            guard automaticOpenAllowed else { return }
-            lastSummon = t
-            shakeSamples.removeAll()
-            DispatchQueue.main.async { [weak self] in self?.summon() }
-        }
+    /// The clipboard window's own drags never reach the global monitor, so
+    /// they report their pointer here instead and get the same shake rule.
+    /// The gesture is known to carry files, so the content check is skipped.
+    private var internalShake = ShelfShakeDetector()
+
+    func noteInternalContentDrag(pointerX: CGFloat, at timestamp: TimeInterval) {
+        guard UserDefaults.standard.bool(forKey: DefaultsKey.shelfShakeToOpen),
+              internalShake.record(x: pointerX, at: timestamp) else { return }
+        DispatchQueue.main.async { [weak self] in self?.summon() }
+    }
+
+    func endInternalContentDrag() {
+        internalShake.reset()
+    }
+
+    /// Puts files on the shelf without a drag, from the clipboard's action
+    /// list, and shows the shelf so the result is seen.
+    @discardableResult
+    func add(fileURLs: [URL]) -> Bool {
+        add(writers: fileURLs as [NSURL])
+    }
+
+    @discardableResult
+    func add(text: String) -> Bool {
+        add(writers: [text as NSString])
+    }
+
+    private func add(writers: [NSPasteboardWriting]) -> Bool {
+        guard !writers.isEmpty else { return false }
+        let pasteboard = NSPasteboard.withUniqueName()
+        defer { pasteboard.releaseGlobally() }
+        pasteboard.clearContents()
+        pasteboard.writeObjects(writers)
+        guard accept(pasteboard: pasteboard) else { return false }
+        summon()
+        return true
     }
 
     private func isContentDragActive() -> Bool {

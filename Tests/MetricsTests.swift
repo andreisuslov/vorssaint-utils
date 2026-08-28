@@ -419,9 +419,17 @@ struct MetricsTests {
                 == [.paste, .copy, .pin, .preview, .delete],
                "the clipboard action list offers neither editing nor Finder for an image")
         expect(ClipboardQuickActions.kinds(
+            for: ClipboardHistoryEntry(text: "", kind: .image, imageFile: "a.png"), shelfAvailable: true)
+                == [.paste, .copy, .addToShelf, .pin, .preview, .delete],
+               "the clipboard action list shelves an image when the shelf is on")
+        expect(ClipboardQuickActions.kinds(
             for: ClipboardHistoryEntry(text: "", kind: .files, filePaths: ["/tmp/a.pdf"]))
                 == [.paste, .copy, .showInFinder, .pin, .preview, .delete],
                "the clipboard action list shows a file entry in Finder")
+        expect(ClipboardQuickActions.kinds(
+            for: ClipboardHistoryEntry(text: "", kind: .files, filePaths: ["/tmp/a.pdf"]), shelfAvailable: true)
+                == [.paste, .copy, .showInFinder, .addToShelf, .pin, .preview, .delete],
+               "the clipboard action list shelves a file entry when the shelf is on")
         let linkEntry = ClipboardHistoryEntry(text: "https://example.com/a?b=c")
         expect(linkEntry.displayKind == .link
                && ClipboardHistoryEntry(text: "see https://example.com now").displayKind == .text
@@ -430,9 +438,35 @@ struct MetricsTests {
         expect(ClipboardQuickActions.kinds(for: linkEntry)
                 == [.paste, .copy, .openLink, .edit, .pin, .preview, .delete],
                "the clipboard action list opens a link entry")
+        expect(ClipboardQuickActions.kinds(for: actionTextEntry, shelfAvailable: true)
+                == [.paste, .copy, .edit, .pin, .preview, .delete]
+               && ClipboardQuickActions.kinds(for: actionTextEntry, shelfAvailable: true, textToShelf: true)
+                == [.paste, .copy, .edit, .addToShelf, .pin, .preview, .delete]
+               && ClipboardQuickActions.kinds(for: actionTextEntry, textToShelf: true)
+                == [.paste, .copy, .edit, .pin, .preview, .delete],
+               "text reaches the shelf from the action list only when both the shelf and the option are on")
         expect(ClipboardHistoryEntry(text: "one two  three\nfour").wordCount == 4
                && ClipboardHistoryEntry(text: "héllo").utf8ByteCount == 6,
                "clipboard metadata counts words and UTF-8 bytes")
+        var shakeDetector = ShelfShakeDetector()
+        var shakeFired = false
+        var shakeX: CGFloat = 0
+        for step in 0..<12 {
+            shakeX += (step % 2 == 0 ? 60 : -60)
+            if shakeDetector.record(x: shakeX, at: Double(step) * 0.03) { shakeFired = true }
+        }
+        expect(shakeFired, "a fast back-and-forth drag counts as a shake")
+        var slowDetector = ShelfShakeDetector()
+        var slowFired = false
+        for step in 0..<12 {
+            if slowDetector.record(x: CGFloat(step) * 40, at: Double(step) * 0.03) { slowFired = true }
+        }
+        expect(!slowFired, "a straight drag never counts as a shake")
+        expect(ClipboardQuickActions.movedIndex(5, by: 1, count: 6) == 0
+               && ClipboardQuickActions.movedIndex(0, by: -1, count: 6) == 5,
+               "the clipboard action selection wraps at both ends")
+        expect(ClipboardQuickActions.movedIndex(0, by: 1, count: 0) == 0,
+               "the clipboard action selection stays put with nothing to select")
         let sourceWindowStart = Date(timeIntervalSince1970: 1_000)
         let safariSource = ClipboardEntrySource(bundleID: "com.apple.Safari", name: "Safari")
         let notesSource = ClipboardEntrySource(bundleID: "com.apple.Notes", name: "Notes")
@@ -12181,7 +12215,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let values = Mirror(reflecting: FeatureStrings.clipboard(language)).children
                 .compactMap { $0.value as? String }
-            expect(values.count == 67 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 72 && values.allSatisfy { !$0.isEmpty },
                    "every clipboard string is set for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible clipboard strings (\(language.rawValue))")

@@ -1015,7 +1015,57 @@ final class ClipboardHistoryService: ObservableObject {
 
     var quickActionRows: [QuickAction] {
         guard let entry = selectedQuickEntry else { return [] }
-        return ClipboardQuickActions.kinds(for: entry).map { action($0, for: entry) }
+        return ClipboardQuickActions.kinds(
+            for: entry,
+            shelfAvailable: Self.shelfAvailable,
+            textToShelf: UserDefaults.standard.bool(forKey: DefaultsKey.clipboardShelfTextAction)
+        ).map { action($0, for: entry) }
+    }
+
+    /// The shelf only takes what it can keep, and only while it is on.
+    static var shelfAvailable: Bool {
+        AppFeature.shelf.isAvailable && UserDefaults.standard.bool(forKey: DefaultsKey.shelfEnabled)
+    }
+
+    /// The files an entry stands for on disk: the copied files themselves, or
+    /// the stored PNG of a copied image. Empty for text.
+    static func draggableFileURLs(for entry: ClipboardHistoryEntry) -> [URL] {
+        switch entry.kind {
+        case .files:
+            return entry.filePaths.map { URL(fileURLWithPath: $0) }
+                .filter { FileManager.default.fileExists(atPath: $0.path) }
+        case .image:
+            guard let name = entry.imageFile, let url = ClipboardImageStore.imageURL(named: name)
+            else { return [] }
+            return [url]
+        case .text:
+            return []
+        }
+    }
+
+    /// What a row puts on the drag pasteboard and shows under the pointer.
+    struct DragItem {
+        let writer: NSPasteboardWriting
+        let icon: NSImage
+    }
+
+    /// Files and images always drag as files; text drags as text only when
+    /// Settings says so, since a text row that grabs the pointer is a row
+    /// that no longer selects on click-and-drag.
+    static func dragItems(for entry: ClipboardHistoryEntry) -> [DragItem] {
+        switch entry.kind {
+        case .files, .image:
+            return draggableFileURLs(for: entry).map {
+                DragItem(writer: $0 as NSURL, icon: NSWorkspace.shared.icon(forFile: $0.path))
+            }
+        case .text:
+            guard shelfAvailable,
+                  UserDefaults.standard.bool(forKey: DefaultsKey.clipboardShelfTextDrag),
+                  let icon = NSImage(systemSymbolName: entry.isLink ? "link" : "text.alignleft",
+                                     accessibilityDescription: nil)
+            else { return [] }
+            return [DragItem(writer: entry.text as NSString, icon: icon)]
+        }
     }
 
     /// Icon of the app an entry came from, when that app is still installed.
@@ -1085,6 +1135,16 @@ final class ClipboardHistoryService: ObservableObject {
                 guard let url = URL(string: entry.text) else { return }
                 self?.hideHistoryWindow()
                 NSWorkspace.shared.open(url)
+            }
+        case .addToShelf:
+            return QuickAction(id: kind.rawValue,
+                               title: String(format: text.addToShelfFormat, L10n.shared.s.shelfName),
+                               symbolName: "tray.and.arrow.down", isDestructive: false, keyHint: nil) {
+                if entry.kind == .text {
+                    ShelfService.shared.add(text: entry.text)
+                } else {
+                    ShelfService.shared.add(fileURLs: Self.draggableFileURLs(for: entry))
+                }
             }
         case .showInFinder:
             return QuickAction(id: kind.rawValue, title: L10n.shared.s.cleanerRevealInFinder,

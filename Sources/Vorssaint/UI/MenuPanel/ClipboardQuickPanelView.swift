@@ -228,6 +228,7 @@ struct ClipboardQuickPanelView: View {
                 ClipboardKindGlyph(kind: entry.displayKind)
                 entryContent(entry)
             }
+            .modifier(FileDraggable(entry: entry, activate: activate))
             Spacer(minLength: 8)
             entryTrailing(entry, shortcutIndex: shortcutIndex, isHovered: isHovered)
         }
@@ -503,14 +504,24 @@ struct ClipboardQuickPanelView: View {
                 .disabled(history.recentEntries.isEmpty)
             }
             Spacer()
-            if history.selectedQuickEntryID != nil {
+            if let selected = history.selectedQuickEntry {
                 HStack(spacing: 4) {
-                    Text("⌘K")
-                        .font(.system(size: 9.5, weight: .semibold, design: .rounded))
-                    Text(text.actionsTitle)
-                        .font(.system(size: 9.5))
+                    if !ClipboardHistoryService.dragItems(for: selected).isEmpty {
+                        Image(systemName: "hand.draw")
+                            .font(.system(size: 9))
+                        Text(String(format: text.dragHintFormat, l10n.s.shelfName))
+                            .font(.system(size: 9.5))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    } else {
+                        Text("⌘K")
+                            .font(.system(size: 9.5, weight: .semibold, design: .rounded))
+                        Text(text.actionsTitle)
+                            .font(.system(size: 9.5))
+                    }
                 }
                 .foregroundStyle(.tertiary)
+                .frame(maxWidth: 260, alignment: .trailing)
             }
             HStack(spacing: 5) {
                 Image(systemName: "doc.on.clipboard")
@@ -628,6 +639,24 @@ struct ClipboardQuickPanelView: View {
         guard history.quickSelectionIsVisible, let id = history.selectedQuickEntryID else { return }
         withAnimation(.easeOut(duration: 0.12)) {
             proxy.scrollTo(id, anchor: .center)
+        }
+    }
+}
+
+/// Files and images drag out of their row as real files; text only when
+/// Settings allows it, otherwise the row is left alone.
+private struct FileDraggable: ViewModifier {
+    let entry: ClipboardHistoryEntry
+    let activate: (ClipboardHistoryEntry) -> Void
+
+    func body(content: Content) -> some View {
+        let items = ClipboardHistoryService.dragItems(for: entry)
+        if items.isEmpty {
+            content
+        } else {
+            content.overlay(
+                ClipboardFileDragSource(items: items) { _ in activate(entry) }
+            )
         }
     }
 }

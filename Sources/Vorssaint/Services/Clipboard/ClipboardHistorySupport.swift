@@ -226,6 +226,7 @@ enum ClipboardQuickActionKind: String {
     case edit
     case openLink
     case showInFinder
+    case addToShelf
     case pin
     case preview
     case delete
@@ -234,13 +235,24 @@ enum ClipboardQuickActionKind: String {
 enum ClipboardQuickActions {
     /// What an entry offers, in the order the list shows it. Editing is for
     /// text, and only a file entry has somewhere in Finder to be shown.
-    static func kinds(for entry: ClipboardHistoryEntry) -> [ClipboardQuickActionKind] {
+    /// `textToShelf` is the Settings choice that lets text entries reach the
+    /// shelf too; files and images always can while the shelf is on.
+    static func kinds(for entry: ClipboardHistoryEntry,
+                      shelfAvailable: Bool = false,
+                      textToShelf: Bool = false) -> [ClipboardQuickActionKind] {
         var kinds: [ClipboardQuickActionKind] = [.paste, .copy]
         switch entry.displayKind {
-        case .text: kinds.append(.edit)
-        case .link: kinds.append(contentsOf: [.openLink, .edit])
-        case .files: kinds.append(.showInFinder)
-        case .image: break
+        case .text:
+            kinds.append(.edit)
+            if shelfAvailable, textToShelf { kinds.append(.addToShelf) }
+        case .link:
+            kinds.append(contentsOf: [.openLink, .edit])
+            if shelfAvailable, textToShelf { kinds.append(.addToShelf) }
+        case .files:
+            kinds.append(.showInFinder)
+            if shelfAvailable { kinds.append(.addToShelf) }
+        case .image:
+            if shelfAvailable { kinds.append(.addToShelf) }
         }
         kinds.append(contentsOf: [.pin, .preview, .delete])
         return kinds

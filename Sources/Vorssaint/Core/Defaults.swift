@@ -412,6 +412,11 @@ enum DefaultsKey {
     static let clipboardHistoryQuickPreview = "clipboardHistoryQuickPreview"
     // Whether ⌥Space opens the quick window with that preview pane already up.
     static let clipboardHistoryQuickPreviewByDefault = "clipboardHistoryQuickPreviewByDefault"
+    // Text entries reach the Shelf only when asked: dragging (with shake to open) and the ⌘K action.
+    static let clipboardShelfTextDrag = "clipboardShelfTextDrag"
+    static let clipboardShelfTextAction = "clipboardShelfTextAction"
+
+    // Auto clear: wipes the system pasteboard on a delay or on sleep and lock.
     // Deliberately outside the clipboardHistory family, since it clears the
     // pasteboard without touching saved entries, and runs with capture off.
     static let clipboardAutoClearOnDelay = "clipboardAutoClearOnDelay"
@@ -1110,6 +1115,8 @@ enum Defaults {
         DefaultsKey.clipboardHistoryIgnoredApps: [String](),
         DefaultsKey.clipboardHistoryQuickPreview: false,
         DefaultsKey.clipboardHistoryQuickPreviewByDefault: false,
+        DefaultsKey.clipboardShelfTextDrag: false,
+        DefaultsKey.clipboardShelfTextAction: false,
         DefaultsKey.clipboardAutoClearOnDelay: false,
         DefaultsKey.clipboardAutoClearDelay: Defaults.defaultClipboardAutoClearDelay,
         DefaultsKey.clipboardAutoClearOnSleep: false,

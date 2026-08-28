@@ -17,6 +17,9 @@ struct ClipboardSettings: View {
     @AppStorage(DefaultsKey.clipboardHistoryShortcutEnabled) private var shortcutEnabled = true
     @AppStorage(DefaultsKey.panelUtilityClipboard) private var showInPanel = true
     @AppStorage(DefaultsKey.clipboardHistoryQuickPreviewByDefault) private var previewByDefault = false
+    @AppStorage(DefaultsKey.clipboardShelfTextDrag) private var shelfTextDrag = false
+    @AppStorage(DefaultsKey.clipboardShelfTextAction) private var shelfTextAction = false
+    @AppStorage(DefaultsKey.shelfEnabled) private var shelfEnabled = false
     @AppStorage(DefaultsKey.finderPasteImageAsFile) private var pasteImageAsFile = false
     @AppStorage(DefaultsKey.clipboardAutoClearOnDelay) private var autoClearOnDelay = false
     @AppStorage(DefaultsKey.clipboardAutoClearDelay)
@@ -72,6 +75,19 @@ struct ClipboardSettings: View {
                         }
                     }
                     .disabled(!enabled)
+                }
+
+                if AppFeature.shelf.isAvailable {
+                    Section {
+                        Toggle(String(format: text.shelfTextDragFormat, l10n.s.shelfName),
+                               isOn: $shelfTextDrag)
+                        Toggle(String(format: text.shelfTextActionFormat, l10n.s.shelfName),
+                               isOn: $shelfTextAction)
+                        Text(String(format: text.shelfTextCaptionFormat, l10n.s.shelfName))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .disabled(!enabled || !shelfEnabled)
                 }
 
                 // Its own section because it is the one setting here that keeps
