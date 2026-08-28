@@ -188,7 +188,6 @@ extension ClipboardFeatureStrings {
         openInWindowHint: "두 번 클릭하면 항목 전체를 봅니다",
         textEntryLabel: "텍스트",
         textSizeFormat: "%1$@자 · %2$@줄",
-        sourceAppFormat: "%@에서 복사",
         actionsTitle: "동작",
         linkEntryLabel: "링크",
         wordCountFormat: "%@ 단어",
@@ -196,7 +195,8 @@ extension ClipboardFeatureStrings {
         sizeLabel: "크기",
         copiedLabel: "복사됨",
         sourceLabel: "출처",
-        locationLabel: "위치"
+        locationLabel: "위치",
+        openLink: "링크 열기"
     )
 }
 
@@ -475,7 +475,6 @@ struct ClipboardFeatureStrings {
     let openInWindowHint: String
     let textEntryLabel: String
     let textSizeFormat: String
-    let sourceAppFormat: String
     let actionsTitle: String
     let linkEntryLabel: String
     let wordCountFormat: String
@@ -484,6 +483,7 @@ struct ClipboardFeatureStrings {
     let copiedLabel: String
     let sourceLabel: String
     let locationLabel: String
+    let openLink: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -544,7 +544,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Double-click to see the whole item",
         textEntryLabel: "Text",
         textSizeFormat: "%1$@ characters · %2$@ lines",
-        sourceAppFormat: "From %@",
         actionsTitle: "Actions",
         linkEntryLabel: "Link",
         wordCountFormat: "%@ words",
@@ -552,7 +551,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Size",
         copiedLabel: "Copied",
         sourceLabel: "Source",
-        locationLabel: "Location"
+        locationLabel: "Location",
+        openLink: "Open link"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -614,7 +614,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Clique duas vezes para ver o item inteiro",
         textEntryLabel: "Texto",
         textSizeFormat: "%1$@ caracteres · %2$@ linhas",
-        sourceAppFormat: "De %@",
         actionsTitle: "Ações",
         linkEntryLabel: "Link",
         wordCountFormat: "%@ palavras",
@@ -622,7 +621,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Tamanho",
         copiedLabel: "Copiado",
         sourceLabel: "Origem",
-        locationLabel: "Local"
+        locationLabel: "Local",
+        openLink: "Abrir link"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -684,7 +684,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Öğenin tamamını görmek için çift tıklayın",
         textEntryLabel: "Metin",
         textSizeFormat: "%1$@ karakter · %2$@ satır",
-        sourceAppFormat: "%@ uygulamasından",
         actionsTitle: "Eylemler",
         linkEntryLabel: "Bağlantı",
         wordCountFormat: "%@ sözcük",
@@ -692,7 +691,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Boyut",
         copiedLabel: "Kopyalandı",
         sourceLabel: "Kaynak",
-        locationLabel: "Konum"
+        locationLabel: "Konum",
+        openLink: "Bağlantıyı aç"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -754,7 +754,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Дважды щёлкните, чтобы увидеть элемент целиком",
         textEntryLabel: "Текст",
         textSizeFormat: "Символов: %1$@ · Строк: %2$@",
-        sourceAppFormat: "Из %@",
         actionsTitle: "Действия",
         linkEntryLabel: "Ссылка",
         wordCountFormat: "Слов: %@",
@@ -762,7 +761,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Размер",
         copiedLabel: "Скопировано",
         sourceLabel: "Источник",
-        locationLabel: "Расположение"
+        locationLabel: "Расположение",
+        openLink: "Открыть ссылку"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -824,7 +824,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Haz doble clic para ver el elemento completo",
         textEntryLabel: "Texto",
         textSizeFormat: "%1$@ caracteres · %2$@ líneas",
-        sourceAppFormat: "Desde %@",
         actionsTitle: "Acciones",
         linkEntryLabel: "Enlace",
         wordCountFormat: "%@ palabras",
@@ -832,7 +831,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Tamaño",
         copiedLabel: "Copiado",
         sourceLabel: "Origen",
-        locationLabel: "Ubicación"
+        locationLabel: "Ubicación",
+        openLink: "Abrir enlace"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -894,7 +894,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Doppelklicken, um den ganzen Eintrag zu sehen",
         textEntryLabel: "Text",
         textSizeFormat: "%1$@ Zeichen · %2$@ Zeilen",
-        sourceAppFormat: "Aus %@",
         actionsTitle: "Aktionen",
         linkEntryLabel: "Link",
         wordCountFormat: "%@ Wörter",
@@ -902,7 +901,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Größe",
         copiedLabel: "Kopiert",
         sourceLabel: "Quelle",
-        locationLabel: "Ort"
+        locationLabel: "Ort",
+        openLink: "Link öffnen"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -964,7 +964,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Double-cliquez pour voir l'élément en entier",
         textEntryLabel: "Texte",
         textSizeFormat: "%1$@ caractères · %2$@ lignes",
-        sourceAppFormat: "Depuis %@",
         actionsTitle: "Actions",
         linkEntryLabel: "Lien",
         wordCountFormat: "%@ mots",
@@ -972,7 +971,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Taille",
         copiedLabel: "Copié",
         sourceLabel: "Source",
-        locationLabel: "Emplacement"
+        locationLabel: "Emplacement",
+        openLink: "Ouvrir le lien"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1034,7 +1034,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Fai doppio clic per vedere l'elemento per intero",
         textEntryLabel: "Testo",
         textSizeFormat: "%1$@ caratteri · %2$@ righe",
-        sourceAppFormat: "Da %@",
         actionsTitle: "Azioni",
         linkEntryLabel: "Link",
         wordCountFormat: "%@ parole",
@@ -1042,7 +1041,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Dimensione",
         copiedLabel: "Copiato",
         sourceLabel: "Origine",
-        locationLabel: "Posizione"
+        locationLabel: "Posizione",
+        openLink: "Apri link"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1104,7 +1104,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "ダブルクリックで項目全体を表示",
         textEntryLabel: "テキスト",
         textSizeFormat: "%1$@文字 · %2$@行",
-        sourceAppFormat: "%@ からコピー",
         actionsTitle: "アクション",
         linkEntryLabel: "リンク",
         wordCountFormat: "%@ 語",
@@ -1112,7 +1111,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "サイズ",
         copiedLabel: "コピー日時",
         sourceLabel: "コピー元",
-        locationLabel: "場所"
+        locationLabel: "場所",
+        openLink: "リンクを開く"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1174,7 +1174,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "双击查看完整条目",
         textEntryLabel: "文本",
         textSizeFormat: "%1$@ 个字符 · %2$@ 行",
-        sourceAppFormat: "来自 %@",
         actionsTitle: "操作",
         linkEntryLabel: "链接",
         wordCountFormat: "%@ 个词",
@@ -1182,7 +1181,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "大小",
         copiedLabel: "复制时间",
         sourceLabel: "来源",
-        locationLabel: "位置"
+        locationLabel: "位置",
+        openLink: "打开链接"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1244,7 +1244,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "按兩下查看完整項目",
         textEntryLabel: "文字",
         textSizeFormat: "%1$@ 個字元 · %2$@ 行",
-        sourceAppFormat: "來自 %@",
         actionsTitle: "操作",
         linkEntryLabel: "連結",
         wordCountFormat: "%@ 個詞",
@@ -1252,7 +1251,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "大小",
         copiedLabel: "複製時間",
         sourceLabel: "來源",
-        locationLabel: "位置"
+        locationLabel: "位置",
+        openLink: "開啟連結"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1314,7 +1314,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "按兩下查看完整項目",
         textEntryLabel: "文字",
         textSizeFormat: "%1$@ 個字元 · %2$@ 行",
-        sourceAppFormat: "來自 %@",
         actionsTitle: "操作",
         linkEntryLabel: "連結",
         wordCountFormat: "%@ 個詞",
@@ -1322,7 +1321,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "大小",
         copiedLabel: "複製時間",
         sourceLabel: "來源",
-        locationLabel: "位置"
+        locationLabel: "位置",
+        openLink: "開啟連結"
     )
 }
 
