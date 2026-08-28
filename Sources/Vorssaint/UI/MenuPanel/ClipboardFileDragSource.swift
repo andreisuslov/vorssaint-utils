@@ -85,8 +85,7 @@ final class ClipboardFileDragView: NSView, NSDraggingSource {
     }
 
     func draggingSession(_ session: NSDraggingSession, movedTo screenPoint: NSPoint) {
-        ShelfService.shared.noteInternalContentDrag(pointerX: screenPoint.x,
-                                                    at: ProcessInfo.processInfo.systemUptime)
+        ShelfService.shared.noteInternalContentDrag(at: ProcessInfo.processInfo.systemUptime)
     }
 
     func draggingSession(_ session: NSDraggingSession, endedAt screenPoint: NSPoint,
