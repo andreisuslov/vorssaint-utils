@@ -1078,6 +1078,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             SystemMonitor.shared.setMenuPanelNeeds(.none)
         }
         if !popoverIsSwitchingAnchor {
+            // Same reason as the keep-open reset below: onDisappear is not
+            // trusted to run on close, and a stale page would send the next
+            // Settings click from the panel's lists to a tool's page.
+            PanelInteractionState.shared.hostedSettingsPage = nil
             MenuPanelFocus.shared.clearMetricFocus()
             // Non-forced stop: the shortened lease lets nettop wind down on its
             // own within a few seconds while keeping the delta baseline, so a

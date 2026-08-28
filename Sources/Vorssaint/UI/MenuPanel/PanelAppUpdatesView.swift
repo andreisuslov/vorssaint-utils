@@ -20,15 +20,11 @@ struct PanelAppUpdatesView: View {
         }
         .onAppear {
             PanelInteractionState.shared.viewKeepsPopoverOpen = true
-            PanelInteractionState.shared.hostedSettingsPage = .appUpdates
             // The panel is the fast way in, so it arrives with an answer
             // instead of an empty list waiting for a click.
             updates.checkIfNeeded()
         }
-        .onDisappear {
-            PanelInteractionState.shared.viewKeepsPopoverOpen = false
-            PanelInteractionState.shared.hostedSettingsPage = nil
-        }
+        .onDisappear { PanelInteractionState.shared.viewKeepsPopoverOpen = false }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 

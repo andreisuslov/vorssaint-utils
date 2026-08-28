@@ -21,14 +21,8 @@ struct PanelURLCleanerView: View {
             autoCleanToggle
             manualCleaner
         }
-        .onAppear {
-            PanelInteractionState.shared.viewKeepsPopoverOpen = true
-            PanelInteractionState.shared.hostedSettingsPage = .urlCleaner
-        }
-        .onDisappear {
-            PanelInteractionState.shared.viewKeepsPopoverOpen = false
-            PanelInteractionState.shared.hostedSettingsPage = nil
-        }
+        .onAppear { PanelInteractionState.shared.viewKeepsPopoverOpen = true }
+        .onDisappear { PanelInteractionState.shared.viewKeepsPopoverOpen = false }
     }
 
     private var header: some View {

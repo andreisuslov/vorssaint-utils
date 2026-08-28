@@ -404,9 +404,9 @@ struct MenuPanelView: View {
             footerButton(l10n.s.panelSettings,
                          systemImage: "gearshape",
                          horizontalPadding: 7) {
-                if let page = PanelInteractionState.shared.hostedSettingsPage {
-                    SettingsRouter.shared.page = page
-                }
+                // The hosted utility's own page, or the general one from the
+                // panel's lists: the router is sticky, so it is set every time.
+                SettingsRouter.shared.page = PanelInteractionState.shared.hostedSettingsPage ?? .general
                 appDelegate()?.openSettingsWindow()
             }
 
@@ -628,9 +628,29 @@ struct UtilitiesSection: View {
         .onChange(of: hostedUtilityKeepsPopoverOpen) { _, keepsOpen in
             PanelInteractionState.shared.viewKeepsPopoverOpen = keepsOpen
         }
+        .onChange(of: hostedSettingsPage) { _, page in
+            PanelInteractionState.shared.hostedSettingsPage = page
+        }
         .onDisappear {
             PanelInteractionState.shared.viewKeepsPopoverOpen = false
+            PanelInteractionState.shared.hostedSettingsPage = nil
         }
+    }
+
+    /// The Settings page that belongs to whichever tool the section is
+    /// showing, derived from the same flags as `isHostingUtility` so every
+    /// hosted tool is covered by the one list.
+    private var hostedSettingsPage: SettingsPage? {
+        if showUninstaller { return .uninstaller }
+        if showCleanerPanel { return .cleaner }
+        if showURLCleaner { return .urlCleaner }
+        if showHomebrewPanel { return .homebrew }
+        if showMediaPanel { return .media }
+        if showClipboardPanel { return .clipboard }
+        if showRecentCapturesPanel { return .screenshot }
+        if showWindowLayoutPanel { return .windowLayout }
+        if showAppUpdatesPanel { return .appUpdates }
+        return nil
     }
 
     /// True while the section is showing one of the tools instead of its own
