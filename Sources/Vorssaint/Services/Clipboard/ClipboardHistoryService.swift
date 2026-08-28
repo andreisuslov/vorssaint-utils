@@ -39,9 +39,9 @@ final class ClipboardHistoryService: ObservableObject {
     @Published private(set) var quickSelectionIndex = 0
     @Published private(set) var quickSelectionIsVisible = false
     @Published private(set) var quickWindowPresentationID = UUID()
-    @Published private(set) var quickPreviewPresented = UserDefaults.standard.bool(
-        forKey: DefaultsKey.clipboardHistoryQuickPreview
-    )
+    /// Decided each time the window opens, from the Settings choice; Space
+    /// and the toolbar button change it for that one showing.
+    @Published private(set) var quickPreviewPresented = false
 
     private var timer: Timer?
     private var lastChangeCount = 0
@@ -1010,7 +1010,6 @@ final class ClipboardHistoryService: ObservableObject {
     func setQuickPreviewPresented(_ presented: Bool) {
         guard presented != quickPreviewPresented else { return }
         quickPreviewPresented = presented
-        UserDefaults.standard.set(presented, forKey: DefaultsKey.clipboardHistoryQuickPreview)
         guard let panel, panel.isVisible else { return }
         resize(panel,
                to: presented ? Self.quickPanelPreviewSize : Self.quickPanelCompactSize,
@@ -1032,10 +1031,10 @@ final class ClipboardHistoryService: ObservableObject {
         quickQuery = ""
         clearQuickBatchSelection()
         resetQuickSelection()
-        // Before position(), which reads the size the preview state asks for.
-        if UserDefaults.standard.bool(forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault) {
-            setQuickPreviewPresented(true)
-        }
+        // Assigned, not set through the setter: position() below reads the
+        // flag for the size, and the panel is resized there in one go.
+        quickPreviewPresented = UserDefaults.standard
+            .bool(forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault)
         position(panel)
         installKeyMonitor(for: panel)
         installDismissMonitors(for: panel)
@@ -1361,7 +1360,7 @@ enum ClipboardImageStore {
         return name
     }
 
-    /// The stored PNG itself, for dragging a copied image out as a file.
+    /// The stored PNG itself, for the preview's size line.
     static func imageURL(named name: String) -> URL? {
         guard let directory else { return nil }
         let url = directory.appendingPathComponent(name)
@@ -1458,9 +1457,9 @@ enum ClipboardImageStore {
     }
 
     static func fileSizeString(atPath path: String) -> String? {
-        guard let values = try? URL(fileURLWithPath: path).resourceValues(forKeys: [.fileSizeKey]),
-              let bytes = values.fileSize, bytes >= 0 else { return nil }
-        return ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
+        fileSizeBytes(atPath: path).map {
+            ByteCountFormatter.string(fromByteCount: Int64($0), countStyle: .file)
+        }
     }
 
     static func cleanup(keeping names: Set<String>) {

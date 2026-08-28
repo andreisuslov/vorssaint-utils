@@ -108,10 +108,7 @@ struct ClipboardHistoryEntry: Codable, Equatable, Identifiable {
     }
 
     var isLink: Bool {
-        guard kind == .text, !text.contains(where: \.isWhitespace),
-              let url = URL(string: text), let scheme = url.scheme?.lowercased()
-        else { return false }
-        return (scheme == "http" || scheme == "https") && url.host != nil
+        kind == .text && ClipboardHistorySensitiveText.isWebURL(text)
     }
 
     var wordCount: Int {
@@ -618,7 +615,7 @@ enum ClipboardHistorySensitiveText {
         return groups.allSatisfy { $0.allSatisfy(\.isHexDigit) }
     }
 
-    private static func isWebURL(_ text: String) -> Bool {
+    static func isWebURL(_ text: String) -> Bool {
         guard let url = URL(string: text.trimmingCharacters(in: .whitespacesAndNewlines)),
               let scheme = url.scheme?.lowercased(),
               (scheme == "http" || scheme == "https"),

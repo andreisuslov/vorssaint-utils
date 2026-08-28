@@ -218,7 +218,7 @@ struct MetricsTests {
                "clear on screen lock is off until asked for")
         expect(Defaults.registeredDefaults[DefaultsKey.clipboardAutoClearDelay] as? Int == 20,
                "auto clear starts at twenty seconds")
-        expect(Defaults.registeredDefaults[DefaultsKey.clipboardHistoryQuickPreview] as? Bool == false,
+        expect(Defaults.registeredDefaults[DefaultsKey.clipboardHistoryQuickPreviewByDefault] as? Bool == false,
                "clipboard history quick preview is closed by default")
 
         // MARK: Clipboard auto clear timing
@@ -324,8 +324,6 @@ struct MetricsTests {
                          "\(language.rawValue) copy-selected button format")
             expectFormat(clipboardStrings.textSizeFormat, ["@", "@"],
                          "\(language.rawValue) clipboard text size format")
-            expectFormat(clipboardStrings.sourceAppFormat, ["@"],
-                         "\(language.rawValue) clipboard source app format")
             expect(!clipboardStrings.previewByDefault.isEmpty
                    && !clipboardStrings.previewByDefaultCaption.isEmpty
                    && !clipboardStrings.textEntryLabel.isEmpty,
@@ -12165,7 +12163,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let values = Mirror(reflecting: FeatureStrings.clipboard(language)).children
                 .compactMap { $0.value as? String }
-            expect(values.count == 65 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 64 && values.allSatisfy { !$0.isEmpty },
                    "every clipboard string is set for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible clipboard strings (\(language.rawValue))")

@@ -2,7 +2,6 @@
 // Copyright (C) 2026 Vorssaint
 
 import SwiftUI
-import UniformTypeIdentifiers
 
 /// On-demand inspector for the selected clipboard entry. It keeps the full
 /// content selectable and editable without permanently taking space from the
@@ -141,8 +140,10 @@ struct ClipboardEntryPreviewSidebar: View {
             return "\(label) · PNG · \(entry.imageDimensionsLabel)"
         case .files:
             if entry.filePaths.count == 1, let path = entry.filePaths.first {
-                let kind = UTType(filenameExtension: (path as NSString).pathExtension)?
-                    .localizedDescription
+                // The filesystem's own answer, so a folder says "Folder" and a
+                // file with no extension still gets its Get Info kind.
+                let kind = (try? URL(fileURLWithPath: path)
+                    .resourceValues(forKeys: [.localizedTypeDescriptionKey]))?.localizedTypeDescription
                 let dimensions = ClipboardImageStore.imageDimensionsLabel(atPath: path)
                 let details = [kind, dimensions].compactMap { $0 }
                 return details.isEmpty ? label : details.joined(separator: " · ")
