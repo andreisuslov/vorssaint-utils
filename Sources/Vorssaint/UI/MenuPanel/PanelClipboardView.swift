@@ -141,7 +141,8 @@ struct PanelClipboardView: View {
             // Deliberately not selectable: clicking a selectable Text swaps in
             // the selection renderer, which lays the whole preview out and
             // ignores the line limit, so a long entry paints over the rows
-            // below it. The history window shows the full, selectable text.
+            // below it. Double-clicking the row opens the full, selectable text
+            // in the history window instead.
             Text(entry.preview)
                 .font(.system(size: 10.5))
                 .lineLimit(3)
@@ -257,6 +258,8 @@ struct PanelClipboardView: View {
                 .controlSize(.mini)
                 .help(text.delete)
                 Spacer()
+                ClipboardKindCapsule(entry: entry, text: text)
+                    .frame(maxWidth: 96)
                 Text(entry.copiedAt, style: .time)
                     .font(.system(size: 9.5))
                     .foregroundStyle(.tertiary)

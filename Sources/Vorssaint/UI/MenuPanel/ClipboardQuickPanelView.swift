@@ -212,7 +212,10 @@ struct ClipboardQuickPanelView: View {
             .buttonStyle(.plain)
             .help(isBatchSelected ? text.unselectMultiple : text.selectMultiple)
 
-            entryContent(entry)
+            HStack(alignment: .center, spacing: 9) {
+                ClipboardKindGlyph(kind: entry.displayKind)
+                entryContent(entry)
+            }
             Spacer(minLength: 8)
             entryTrailing(entry, shortcutIndex: shortcutIndex, isHovered: isHovered)
         }
@@ -344,6 +347,11 @@ struct ClipboardQuickPanelView: View {
             }
         } else {
             VStack(alignment: .trailing, spacing: 3) {
+                Text(ClipboardKindPresentation.label(entry, text: text))
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(ClipboardKindPresentation.tint(entry.displayKind))
+                    .lineLimit(1)
+                    .frame(maxWidth: 90, alignment: .trailing)
                 Text(entry.copiedAt, style: .time)
                     .font(.system(size: 9.5))
                     .foregroundStyle(.tertiary)

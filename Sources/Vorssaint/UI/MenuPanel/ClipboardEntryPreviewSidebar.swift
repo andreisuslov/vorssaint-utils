@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Vorssaint
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// On-demand inspector for the selected clipboard entry. It keeps the full
 /// content selectable and editable without permanently taking space from the
@@ -21,6 +22,8 @@ struct ClipboardEntryPreviewSidebar: View {
             sidebarHeader
             Divider()
             if let entry {
+                metadata(entry)
+                Divider()
                 if editingEntryID == entry.id {
                     textEditor(entry)
                 } else {
@@ -58,6 +61,125 @@ struct ClipboardEntryPreviewSidebar: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
+    }
+
+    /// What the item is, how big it is, when it was copied, where from and
+    /// where it lives. Every line is derived from the entry, so nothing here
+    /// goes stale; a line with nothing to say is left out.
+    private func metadata(_ entry: ClipboardHistoryEntry) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            metaRow(text.typeLabel) {
+                HStack(spacing: 5) {
+                    ClipboardKindGlyph(kind: entry.displayKind, size: 16)
+                    Text(typeDescription(entry))
+                        .lineLimit(2)
+                }
+            }
+            if let size = sizeDescription(entry) {
+                metaRow(text.sizeLabel) { Text(size) }
+            }
+            metaRow(text.copiedLabel) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(entry.copiedAt.formatted(date: .abbreviated, time: .shortened))
+                    Text(entry.copiedAt, style: .relative)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            if let source = entry.source {
+                metaRow(text.sourceLabel) {
+                    HStack(spacing: 5) {
+                        if let icon = ClipboardHistoryService.sourceIcon(for: source) {
+                            Image(nsImage: icon)
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                        }
+                        Text(source.name)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+                    .help(source.bundleID)
+                }
+            }
+            if let location = locationDescription(entry) {
+                metaRow(text.locationLabel) {
+                    Text(location)
+                        .lineLimit(2)
+                        .truncationMode(.middle)
+                        .textSelection(.enabled)
+                        .help(location)
+                }
+            }
+        }
+        .font(.system(size: 10.5))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 10)
+    }
+
+    private func metaRow<Value: View>(_ label: String,
+                                      @ViewBuilder value: () -> Value) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(label)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.tertiary)
+                .frame(width: 58, alignment: .trailing)
+            value()
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func typeDescription(_ entry: ClipboardHistoryEntry) -> String {
+        let label = ClipboardKindPresentation.label(entry, text: text)
+        switch entry.displayKind {
+        case .text, .link:
+            let counts = String(format: text.textSizeFormat,
+                                Self.count(entry.characterCount), Self.count(entry.lineCount))
+            let words = String(format: text.wordCountFormat, Self.count(entry.wordCount))
+            return "\(label) · \(counts) · \(words)"
+        case .image:
+            return "\(label) · PNG · \(entry.imageDimensionsLabel)"
+        case .files:
+            if entry.filePaths.count == 1, let path = entry.filePaths.first {
+                let kind = UTType(filenameExtension: (path as NSString).pathExtension)?
+                    .localizedDescription
+                let dimensions = ClipboardImageStore.imageDimensionsLabel(atPath: path)
+                let details = [kind, dimensions].compactMap { $0 }
+                return details.isEmpty ? label : details.joined(separator: " · ")
+            }
+            return label
+        }
+    }
+
+    private func sizeDescription(_ entry: ClipboardHistoryEntry) -> String? {
+        switch entry.kind {
+        case .text:
+            return ByteCountFormatter.string(fromByteCount: Int64(entry.utf8ByteCount), countStyle: .file)
+        case .image:
+            guard let name = entry.imageFile, let url = ClipboardImageStore.imageURL(named: name)
+            else { return nil }
+            return ClipboardImageStore.fileSizeString(atPath: url.path)
+        case .files:
+            return ClipboardImageStore.totalFileSizeString(paths: entry.filePaths)
+        }
+    }
+
+    private func locationDescription(_ entry: ClipboardHistoryEntry) -> String? {
+        switch entry.displayKind {
+        case .link:
+            return URL(string: entry.text)?.host
+        case .files:
+            guard let first = entry.filePaths.first else { return nil }
+            if entry.filePaths.count == 1 { return (first as NSString).abbreviatingWithTildeInPath }
+            let folder = (first as NSString).deletingLastPathComponent
+            return (folder as NSString).abbreviatingWithTildeInPath
+        case .text, .image:
+            return nil
+        }
+    }
+
+    private static func count(_ value: Int) -> String {
+        NumberFormatter.localizedString(from: NSNumber(value: value), number: .decimal)
     }
 
     private func contentScrollView(_ entry: ClipboardHistoryEntry) -> some View {

@@ -182,7 +182,19 @@ extension ClipboardFeatureStrings {
         autoClearOnSleep: "Mac이 잠자기에 들어갈 때 클립보드 지우기",
         autoClearOnDisplaySleep: "디스플레이가 꺼질 때 클립보드 지우기",
         autoClearOnScreenLock: "화면이 잠길 때 클립보드 지우기",
-        autoClearCaption: "시스템 클립보드만 지웁니다. 이미 저장된 항목은 기록에 남습니다."
+        autoClearCaption: "시스템 클립보드만 지웁니다. 이미 저장된 항목은 기록에 남습니다.",
+        previewByDefault: "미리보기 패널과 함께 열기",
+        previewByDefaultCaption: "클립보드 창을 열면 선택한 항목의 전체 내용이 목록 옆에 표시됩니다.",
+        textEntryLabel: "텍스트",
+        textSizeFormat: "%1$@자 · %2$@줄",
+        sourceAppFormat: "%@에서 복사",
+        linkEntryLabel: "링크",
+        wordCountFormat: "%@ 단어",
+        typeLabel: "유형",
+        sizeLabel: "크기",
+        copiedLabel: "복사됨",
+        sourceLabel: "출처",
+        locationLabel: "위치"
     )
 }
 
@@ -456,6 +468,18 @@ struct ClipboardFeatureStrings {
     let autoClearOnDisplaySleep: String
     let autoClearOnScreenLock: String
     let autoClearCaption: String
+    let previewByDefault: String
+    let previewByDefaultCaption: String
+    let textEntryLabel: String
+    let textSizeFormat: String
+    let sourceAppFormat: String
+    let linkEntryLabel: String
+    let wordCountFormat: String
+    let typeLabel: String
+    let sizeLabel: String
+    let copiedLabel: String
+    let sourceLabel: String
+    let locationLabel: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -510,7 +534,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "Clear clipboard on computer sleep",
         autoClearOnDisplaySleep: "Clear clipboard on display sleep",
         autoClearOnScreenLock: "Clear clipboard on screen lock",
-        autoClearCaption: "Clears the system clipboard only. Items already saved stay in the history."
+        autoClearCaption: "Clears the system clipboard only. Items already saved stay in the history.",
+        previewByDefault: "Open with the preview pane",
+        previewByDefaultCaption: "The clipboard window opens with the selected item shown in full beside the list.",
+        textEntryLabel: "Text",
+        textSizeFormat: "%1$@ characters · %2$@ lines",
+        sourceAppFormat: "From %@",
+        linkEntryLabel: "Link",
+        wordCountFormat: "%@ words",
+        typeLabel: "Type",
+        sizeLabel: "Size",
+        copiedLabel: "Copied",
+        sourceLabel: "Source",
+        locationLabel: "Location"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -566,7 +602,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "Limpar o clipboard quando o Mac dormir",
         autoClearOnDisplaySleep: "Limpar o clipboard quando a tela apagar",
         autoClearOnScreenLock: "Limpar o clipboard ao bloquear a tela",
-        autoClearCaption: "Limpa apenas o clipboard do sistema. Os itens já guardados continuam no histórico."
+        autoClearCaption: "Limpa apenas o clipboard do sistema. Os itens já guardados continuam no histórico.",
+        previewByDefault: "Abrir com o painel de prévia",
+        previewByDefaultCaption: "A janela da área de transferência abre com o item selecionado exibido por completo ao lado da lista.",
+        textEntryLabel: "Texto",
+        textSizeFormat: "%1$@ caracteres · %2$@ linhas",
+        sourceAppFormat: "De %@",
+        linkEntryLabel: "Link",
+        wordCountFormat: "%@ palavras",
+        typeLabel: "Tipo",
+        sizeLabel: "Tamanho",
+        copiedLabel: "Copiado",
+        sourceLabel: "Origem",
+        locationLabel: "Local"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -622,7 +670,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "Mac uykuya geçince panoyu temizle",
         autoClearOnDisplaySleep: "Ekran uykuya geçince panoyu temizle",
         autoClearOnScreenLock: "Ekran kilitlenince panoyu temizle",
-        autoClearCaption: "Yalnızca sistem panosunu temizler. Kaydedilmiş ögeler geçmişte kalır."
+        autoClearCaption: "Yalnızca sistem panosunu temizler. Kaydedilmiş ögeler geçmişte kalır.",
+        previewByDefault: "Önizleme paneliyle aç",
+        previewByDefaultCaption: "Pano penceresi, seçili öğeyi listenin yanında tam olarak göstererek açılır.",
+        textEntryLabel: "Metin",
+        textSizeFormat: "%1$@ karakter · %2$@ satır",
+        sourceAppFormat: "%@ uygulamasından",
+        linkEntryLabel: "Bağlantı",
+        wordCountFormat: "%@ sözcük",
+        typeLabel: "Tür",
+        sizeLabel: "Boyut",
+        copiedLabel: "Kopyalandı",
+        sourceLabel: "Kaynak",
+        locationLabel: "Konum"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -678,7 +738,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "Очищать буфер обмена при переходе в режим сна",
         autoClearOnDisplaySleep: "Очищать буфер обмена при выключении экрана",
         autoClearOnScreenLock: "Очищать буфер обмена при блокировке экрана",
-        autoClearCaption: "Очищается только системный буфер обмена. Сохранённые элементы остаются в истории."
+        autoClearCaption: "Очищается только системный буфер обмена. Сохранённые элементы остаются в истории.",
+        previewByDefault: "Открывать с панелью просмотра",
+        previewByDefaultCaption: "Окно буфера обмена открывается с полным содержимым выбранного элемента рядом со списком.",
+        textEntryLabel: "Текст",
+        textSizeFormat: "Символов: %1$@ · Строк: %2$@",
+        sourceAppFormat: "Из %@",
+        linkEntryLabel: "Ссылка",
+        wordCountFormat: "Слов: %@",
+        typeLabel: "Тип",
+        sizeLabel: "Размер",
+        copiedLabel: "Скопировано",
+        sourceLabel: "Источник",
+        locationLabel: "Расположение"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -734,7 +806,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "Vaciar el portapapeles al suspender el Mac",
         autoClearOnDisplaySleep: "Vaciar el portapapeles al apagarse la pantalla",
         autoClearOnScreenLock: "Vaciar el portapapeles al bloquear la pantalla",
-        autoClearCaption: "Solo se vacía el portapapeles del sistema. Los elementos guardados siguen en el historial."
+        autoClearCaption: "Solo se vacía el portapapeles del sistema. Los elementos guardados siguen en el historial.",
+        previewByDefault: "Abrir con el panel de vista previa",
+        previewByDefaultCaption: "La ventana del portapapeles se abre mostrando el elemento seleccionado completo junto a la lista.",
+        textEntryLabel: "Texto",
+        textSizeFormat: "%1$@ caracteres · %2$@ líneas",
+        sourceAppFormat: "Desde %@",
+        linkEntryLabel: "Enlace",
+        wordCountFormat: "%@ palabras",
+        typeLabel: "Tipo",
+        sizeLabel: "Tamaño",
+        copiedLabel: "Copiado",
+        sourceLabel: "Origen",
+        locationLabel: "Ubicación"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -790,7 +874,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "Zwischenablage beim Ruhezustand leeren",
         autoClearOnDisplaySleep: "Zwischenablage beim Ausschalten des Bildschirms leeren",
         autoClearOnScreenLock: "Zwischenablage beim Sperren des Bildschirms leeren",
-        autoClearCaption: "Leert nur die Zwischenablage des Systems. Bereits gesicherte Einträge bleiben im Verlauf."
+        autoClearCaption: "Leert nur die Zwischenablage des Systems. Bereits gesicherte Einträge bleiben im Verlauf.",
+        previewByDefault: "Mit Vorschaubereich öffnen",
+        previewByDefaultCaption: "Das Zwischenablage-Fenster öffnet sich mit dem ausgewählten Eintrag vollständig neben der Liste.",
+        textEntryLabel: "Text",
+        textSizeFormat: "%1$@ Zeichen · %2$@ Zeilen",
+        sourceAppFormat: "Aus %@",
+        linkEntryLabel: "Link",
+        wordCountFormat: "%@ Wörter",
+        typeLabel: "Typ",
+        sizeLabel: "Größe",
+        copiedLabel: "Kopiert",
+        sourceLabel: "Quelle",
+        locationLabel: "Ort"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -846,7 +942,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "Vider le presse-papiers à la mise en veille du Mac",
         autoClearOnDisplaySleep: "Vider le presse-papiers à l'extinction de l'écran",
         autoClearOnScreenLock: "Vider le presse-papiers au verrouillage de l'écran",
-        autoClearCaption: "Seul le presse-papiers du système est vidé. Les éléments enregistrés restent dans l'historique."
+        autoClearCaption: "Seul le presse-papiers du système est vidé. Les éléments enregistrés restent dans l'historique.",
+        previewByDefault: "Ouvrir avec le volet d'aperçu",
+        previewByDefaultCaption: "La fenêtre du presse-papiers s'ouvre avec l'élément sélectionné affiché en entier à côté de la liste.",
+        textEntryLabel: "Texte",
+        textSizeFormat: "%1$@ caractères · %2$@ lignes",
+        sourceAppFormat: "Depuis %@",
+        linkEntryLabel: "Lien",
+        wordCountFormat: "%@ mots",
+        typeLabel: "Type",
+        sizeLabel: "Taille",
+        copiedLabel: "Copié",
+        sourceLabel: "Source",
+        locationLabel: "Emplacement"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -902,7 +1010,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "Svuota gli appunti quando il Mac va in stop",
         autoClearOnDisplaySleep: "Svuota gli appunti quando lo schermo si spegne",
         autoClearOnScreenLock: "Svuota gli appunti al blocco dello schermo",
-        autoClearCaption: "Svuota solo gli appunti di sistema. Gli elementi salvati restano nella cronologia."
+        autoClearCaption: "Svuota solo gli appunti di sistema. Gli elementi salvati restano nella cronologia.",
+        previewByDefault: "Apri con il pannello di anteprima",
+        previewByDefaultCaption: "La finestra degli appunti si apre con l'elemento selezionato mostrato per intero accanto all'elenco.",
+        textEntryLabel: "Testo",
+        textSizeFormat: "%1$@ caratteri · %2$@ righe",
+        sourceAppFormat: "Da %@",
+        linkEntryLabel: "Link",
+        wordCountFormat: "%@ parole",
+        typeLabel: "Tipo",
+        sizeLabel: "Dimensione",
+        copiedLabel: "Copiato",
+        sourceLabel: "Origine",
+        locationLabel: "Posizione"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -958,7 +1078,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "システムスリープ時にクリップボードを消去",
         autoClearOnDisplaySleep: "ディスプレイスリープ時にクリップボードを消去",
         autoClearOnScreenLock: "画面ロック時にクリップボードを消去",
-        autoClearCaption: "システムのクリップボードのみを消去します。保存済みの項目は履歴に残ります。"
+        autoClearCaption: "システムのクリップボードのみを消去します。保存済みの項目は履歴に残ります。",
+        previewByDefault: "プレビューを表示して開く",
+        previewByDefaultCaption: "クリップボードウインドウを開くと、選択中の項目の全文がリストの横に表示されます。",
+        textEntryLabel: "テキスト",
+        textSizeFormat: "%1$@文字 · %2$@行",
+        sourceAppFormat: "%@ からコピー",
+        linkEntryLabel: "リンク",
+        wordCountFormat: "%@ 語",
+        typeLabel: "種類",
+        sizeLabel: "サイズ",
+        copiedLabel: "コピー日時",
+        sourceLabel: "コピー元",
+        locationLabel: "場所"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1014,7 +1146,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "睡眠时清空剪贴板",
         autoClearOnDisplaySleep: "显示器睡眠时清空剪贴板",
         autoClearOnScreenLock: "锁定屏幕时清空剪贴板",
-        autoClearCaption: "仅清空系统剪贴板，已保存的条目仍保留在历史记录中。"
+        autoClearCaption: "仅清空系统剪贴板，已保存的条目仍保留在历史记录中。",
+        previewByDefault: "打开时显示预览面板",
+        previewByDefaultCaption: "打开剪贴板窗口时，在列表旁完整显示选中的条目。",
+        textEntryLabel: "文本",
+        textSizeFormat: "%1$@ 个字符 · %2$@ 行",
+        sourceAppFormat: "来自 %@",
+        linkEntryLabel: "链接",
+        wordCountFormat: "%@ 个词",
+        typeLabel: "类型",
+        sizeLabel: "大小",
+        copiedLabel: "复制时间",
+        sourceLabel: "来源",
+        locationLabel: "位置"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1070,7 +1214,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "睡眠時清除剪貼簿",
         autoClearOnDisplaySleep: "顯示器睡眠時清除剪貼簿",
         autoClearOnScreenLock: "鎖定螢幕時清除剪貼簿",
-        autoClearCaption: "僅清除系統剪貼簿，已儲存的項目仍保留在記錄中。"
+        autoClearCaption: "僅清除系統剪貼簿，已儲存的項目仍保留在記錄中。",
+        previewByDefault: "開啟時顯示預覽窗格",
+        previewByDefaultCaption: "開啟剪貼簿視窗時，在清單旁完整顯示選取的項目。",
+        textEntryLabel: "文字",
+        textSizeFormat: "%1$@ 個字元 · %2$@ 行",
+        sourceAppFormat: "來自 %@",
+        linkEntryLabel: "連結",
+        wordCountFormat: "%@ 個詞",
+        typeLabel: "類型",
+        sizeLabel: "大小",
+        copiedLabel: "複製時間",
+        sourceLabel: "來源",
+        locationLabel: "位置"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1126,7 +1282,19 @@ struct ClipboardFeatureStrings {
         autoClearOnSleep: "睡眠時清除剪貼簿",
         autoClearOnDisplaySleep: "顯示器睡眠時清除剪貼簿",
         autoClearOnScreenLock: "鎖定螢幕時清除剪貼簿",
-        autoClearCaption: "只會清除系統剪貼簿，已儲存的項目仍會保留在記錄中。"
+        autoClearCaption: "只會清除系統剪貼簿，已儲存的項目仍會保留在記錄中。",
+        previewByDefault: "開啟時顯示預覽窗格",
+        previewByDefaultCaption: "開啟剪貼簿視窗時，在清單旁完整顯示選取的項目。",
+        textEntryLabel: "文字",
+        textSizeFormat: "%1$@ 個字元 · %2$@ 行",
+        sourceAppFormat: "來自 %@",
+        linkEntryLabel: "連結",
+        wordCountFormat: "%@ 個詞",
+        typeLabel: "類型",
+        sizeLabel: "大小",
+        copiedLabel: "複製時間",
+        sourceLabel: "來源",
+        locationLabel: "位置"
     )
 }
 
