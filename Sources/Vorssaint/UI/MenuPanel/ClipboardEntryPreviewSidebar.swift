@@ -9,6 +9,7 @@ import UniformTypeIdentifiers
 /// history list.
 struct ClipboardEntryPreviewSidebar: View {
     @ObservedObject private var l10n = L10n.shared
+    @ObservedObject private var history = ClipboardHistoryService.shared
     var text: ClipboardFeatureStrings
     var entry: ClipboardHistoryEntry?
     @Binding var isEditing: Bool
@@ -39,6 +40,13 @@ struct ClipboardEntryPreviewSidebar: View {
             if editingEntryID != nil, editingEntryID != newID {
                 cancelEditing()
             }
+        }
+        // The ⌘K list can ask for editing, which only this view knows how to
+        // start; the request is cleared so a later one is still noticed.
+        .onChange(of: history.quickEditRequest) { _, requested in
+            guard let requested, let entry, entry.id == requested, entry.kind == .text else { return }
+            beginEditing(entry)
+            history.clearQuickEditRequest()
         }
         .onDisappear { cancelEditing() }
     }

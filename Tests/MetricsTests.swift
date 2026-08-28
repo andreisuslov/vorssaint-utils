@@ -328,6 +328,7 @@ struct MetricsTests {
                          "\(language.rawValue) clipboard source app format")
             expect(!clipboardStrings.previewByDefault.isEmpty
                    && !clipboardStrings.previewByDefaultCaption.isEmpty
+                   && !clipboardStrings.openInWindowHint.isEmpty
                    && !clipboardStrings.textEntryLabel.isEmpty,
                    "\(language.rawValue) clipboard preview strings are localized")
             expect(!clipboardStrings.autoClearEnable.isEmpty
@@ -409,11 +410,26 @@ struct MetricsTests {
         expect(ClipboardHistoryEditing.storableText(
             String(repeating: "a", count: ClipboardHistoryEditing.maxCharacters + 1)) == nil,
                "clipboard editing keeps the history text size bound")
+        let actionTextEntry = ClipboardHistoryEntry(text: "copied words")
+        expect(ClipboardQuickActions.kinds(for: actionTextEntry)
+                == [.paste, .copy, .edit, .pin, .preview, .delete],
+               "the clipboard action list offers editing for a text entry")
+        expect(ClipboardQuickActions.kinds(
+            for: ClipboardHistoryEntry(text: "", kind: .image, imageFile: "a.png"))
+                == [.paste, .copy, .pin, .preview, .delete],
+               "the clipboard action list offers neither editing nor Finder for an image")
+        expect(ClipboardQuickActions.kinds(
+            for: ClipboardHistoryEntry(text: "", kind: .files, filePaths: ["/tmp/a.pdf"]))
+                == [.paste, .copy, .showInFinder, .pin, .preview, .delete],
+               "the clipboard action list shows a file entry in Finder")
         let linkEntry = ClipboardHistoryEntry(text: "https://example.com/a?b=c")
         expect(linkEntry.displayKind == .link
                && ClipboardHistoryEntry(text: "see https://example.com now").displayKind == .text
                && ClipboardHistoryEntry(text: "ftp://example.com").displayKind == .text,
                "a clipboard entry is a link only when it is one web address and nothing else")
+        expect(ClipboardQuickActions.kinds(for: linkEntry)
+                == [.paste, .copy, .openLink, .edit, .pin, .preview, .delete],
+               "the clipboard action list opens a link entry")
         expect(ClipboardHistoryEntry(text: "one two  three\nfour").wordCount == 4
                && ClipboardHistoryEntry(text: "héllo").utf8ByteCount == 6,
                "clipboard metadata counts words and UTF-8 bytes")
@@ -12165,7 +12181,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let values = Mirror(reflecting: FeatureStrings.clipboard(language)).children
                 .compactMap { $0.value as? String }
-            expect(values.count == 65 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 67 && values.allSatisfy { !$0.isEmpty },
                    "every clipboard string is set for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible clipboard strings (\(language.rawValue))")

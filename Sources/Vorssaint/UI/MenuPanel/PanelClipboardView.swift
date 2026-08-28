@@ -266,5 +266,16 @@ struct PanelClipboardView: View {
             }
         }
         .panelCard()
+        // The row shows three lines at most, so the whole item lives one
+        // double-click away, in the history window's preview pane. The buttons
+        // above keep their own clicks; this only picks up the rest of the card.
+        .contentShape(Rectangle())
+        .onTapGesture(count: 2) {
+            // The window takes over from here, so the panel gets out of the
+            // way: two clipboards on screen at once is one too many.
+            appDelegate()?.closePopover()
+            history.showHistoryWindow(focusing: entry)
+        }
+        .help(text.openInWindowHint)
     }
 }

@@ -219,6 +219,41 @@ enum ClipboardHistoryDisplayKind {
     case files
 }
 
+/// One thing that can be done to the selected entry from the ⌘K list.
+enum ClipboardQuickActionKind: String {
+    case paste
+    case copy
+    case edit
+    case openLink
+    case showInFinder
+    case pin
+    case preview
+    case delete
+}
+
+enum ClipboardQuickActions {
+    /// What an entry offers, in the order the list shows it. Editing is for
+    /// text, and only a file entry has somewhere in Finder to be shown.
+    static func kinds(for entry: ClipboardHistoryEntry) -> [ClipboardQuickActionKind] {
+        var kinds: [ClipboardQuickActionKind] = [.paste, .copy]
+        switch entry.displayKind {
+        case .text: kinds.append(.edit)
+        case .link: kinds.append(contentsOf: [.openLink, .edit])
+        case .files: kinds.append(.showInFinder)
+        case .image: break
+        }
+        kinds.append(contentsOf: [.pin, .preview, .delete])
+        return kinds
+    }
+
+    /// Wrapping movement, so ↓ from the last action returns to the first.
+    static func movedIndex(_ index: Int, by delta: Int, count: Int) -> Int {
+        guard count > 0 else { return 0 }
+        let next = (index + delta) % count
+        return next < 0 ? next + count : next
+    }
+}
+
 enum ClipboardHistoryEditing {
     /// A copied document should stay available, while a pathological
     /// pasteboard payload still has a firm in-memory and on-disk bound.

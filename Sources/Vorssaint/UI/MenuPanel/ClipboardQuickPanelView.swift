@@ -45,6 +45,18 @@ struct ClipboardQuickPanelView: View {
                     Divider()
                     footer
                 }
+                .overlay {
+                    if history.quickActionsPresented {
+                        ZStack {
+                            Color.black.opacity(0.18)
+                                .ignoresSafeArea()
+                                .onTapGesture { history.setQuickActionsPresented(false) }
+                            actionsCard
+                                .transition(.scale(scale: 0.96).combined(with: .opacity))
+                        }
+                    }
+                }
+                .animation(.easeOut(duration: 0.14), value: history.quickActionsPresented)
                 if history.quickPreviewPresented {
                     Divider()
                     ClipboardEntryPreviewSidebar(text: text,
@@ -491,6 +503,15 @@ struct ClipboardQuickPanelView: View {
                 .disabled(history.recentEntries.isEmpty)
             }
             Spacer()
+            if history.selectedQuickEntryID != nil {
+                HStack(spacing: 4) {
+                    Text("⌘K")
+                        .font(.system(size: 9.5, weight: .semibold, design: .rounded))
+                    Text(text.actionsTitle)
+                        .font(.system(size: 9.5))
+                }
+                .foregroundStyle(.tertiary)
+            }
             HStack(spacing: 5) {
                 Image(systemName: "doc.on.clipboard")
                 Text("\(history.entries.count)")
@@ -501,6 +522,101 @@ struct ClipboardQuickPanelView: View {
         .controlSize(.small)
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+    }
+
+    /// Everything that can be done to the selected entry, as a card over the
+    /// list: the entry it is about at the top, one row per action with the key
+    /// that does the same thing on the right. ⌘K opens it, Esc closes it, and
+    /// the service owns the selection so the key monitor and the mouse agree.
+    private var actionsCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let entry = history.selectedQuickEntry {
+                HStack(spacing: 10) {
+                    ClipboardKindGlyph(kind: entry.displayKind, size: 30)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(entry.kind == .text ? entry.preview : ClipboardKindPresentation.label(entry, text: text))
+                            .font(.system(size: 12.5, weight: .semibold))
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        HStack(spacing: 5) {
+                            Text(ClipboardKindPresentation.label(entry, text: text))
+                            Text("·")
+                            Text(entry.copiedAt, style: .time)
+                        }
+                        .font(.system(size: 10.5))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    }
+                    Spacer(minLength: 8)
+                    Text("⌘K")
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.tertiary)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 5))
+                }
+                .padding(.horizontal, 14)
+                .padding(.top, 14)
+                .padding(.bottom, 10)
+                Divider()
+            }
+            VStack(spacing: 2) {
+                ForEach(Array(history.quickActionRows.enumerated()), id: \.element.id) { index, action in
+                    actionRow(action, isSelected: index == history.quickActionIndex)
+                }
+            }
+            .padding(8)
+        }
+        .frame(width: 330)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.1), lineWidth: 0.8)
+        )
+        .shadow(color: .black.opacity(0.22), radius: 22, y: 10)
+    }
+
+    private func actionRow(_ action: ClipboardHistoryService.QuickAction, isSelected: Bool) -> some View {
+        let tint: Color = action.isDestructive ? .red : .accentColor
+        return Button {
+            history.runQuickAction(action)
+        } label: {
+            HStack(spacing: 11) {
+                Image(systemName: action.symbolName)
+                    .font(.system(size: 12.5, weight: .semibold))
+                    .foregroundStyle(action.isDestructive ? Color.red : Color.primary.opacity(0.8))
+                    .frame(width: 28, height: 28)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(isSelected ? tint.opacity(0.18) : Color.primary.opacity(0.06))
+                    )
+                Text(action.title)
+                    .font(.system(size: 12.5, weight: .medium))
+                    .foregroundStyle(action.isDestructive ? Color.red : Color.primary)
+                    .lineLimit(1)
+                Spacer(minLength: 12)
+                if let hint = action.keyHint {
+                    Text(hint)
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Color.primary.opacity(0.06), in: RoundedRectangle(cornerRadius: 5))
+                }
+                Image(systemName: "return")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(tint)
+                    .opacity(isSelected ? 1 : 0)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .contentShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(isSelected ? tint.opacity(0.13) : .clear)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     private func shortcutIndex(for entry: ClipboardHistoryEntry) -> Int? {

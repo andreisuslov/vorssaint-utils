@@ -42,6 +42,13 @@ final class ClipboardHistoryService: ObservableObject {
     @Published private(set) var quickPreviewPresented = UserDefaults.standard.bool(
         forKey: DefaultsKey.clipboardHistoryQuickPreview
     )
+    /// The ⌘K list for the selected entry, in the same shape the Command bar
+    /// uses, so there is nothing new to learn.
+    @Published private(set) var quickActionsPresented = false
+    @Published private(set) var quickActionIndex = 0
+    /// Bumped when an action asks the preview pane to start editing, which is
+    /// the one action the sidebar owns rather than the service.
+    @Published private(set) var quickEditRequest: UUID?
 
     private var timer: Timer?
     private var lastChangeCount = 0
@@ -996,11 +1003,114 @@ final class ClipboardHistoryService: ObservableObject {
 
     // MARK: - Quick window
 
+    struct QuickAction: Identifiable {
+        let id: String
+        let title: String
+        let symbolName: String
+        let isDestructive: Bool
+        /// The key that does the same thing without the list, when there is one.
+        let keyHint: String?
+        let run: () -> Void
+    }
+
+    var quickActionRows: [QuickAction] {
+        guard let entry = selectedQuickEntry else { return [] }
+        return ClipboardQuickActions.kinds(for: entry).map { action($0, for: entry) }
+    }
+
     /// Icon of the app an entry came from, when that app is still installed.
     static func sourceIcon(for source: ClipboardEntrySource) -> NSImage? {
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: source.bundleID)
         else { return nil }
         return NSWorkspace.shared.icon(forFile: url.path)
+    }
+
+    func toggleQuickActions() {
+        setQuickActionsPresented(!quickActionsPresented)
+    }
+
+    func setQuickActionsPresented(_ presented: Bool) {
+        guard presented != quickActionsPresented else { return }
+        guard !presented || selectedQuickEntry != nil else { return }
+        quickActionsPresented = presented
+        quickActionIndex = 0
+    }
+
+    func moveQuickActionSelection(_ delta: Int) {
+        quickActionIndex = ClipboardQuickActions.movedIndex(quickActionIndex,
+                                                            by: delta,
+                                                            count: quickActionRows.count)
+    }
+
+    func runSelectedQuickAction() {
+        let actions = quickActionRows
+        guard actions.indices.contains(quickActionIndex) else { return }
+        runQuickAction(actions[quickActionIndex])
+    }
+
+    func runQuickAction(_ action: QuickAction) {
+        // The list is about one entry, so it closes as soon as one of its
+        // actions runs, whatever that action then opens.
+        setQuickActionsPresented(false)
+        action.run()
+    }
+
+    func clearQuickEditRequest() {
+        quickEditRequest = nil
+    }
+
+    private func action(_ kind: ClipboardQuickActionKind,
+                        for entry: ClipboardHistoryEntry) -> QuickAction {
+        let text = FeatureStrings.clipboard(L10n.shared.language)
+        switch kind {
+        case .paste:
+            return QuickAction(id: kind.rawValue, title: L10n.shared.s.menuPaste,
+                               symbolName: "doc.on.clipboard", isDestructive: false, keyHint: "↩") { [weak self] in
+                self?.copyQuickEntry(entry)
+            }
+        case .copy:
+            return QuickAction(id: kind.rawValue, title: text.copy,
+                               symbolName: "doc.on.doc", isDestructive: false, keyHint: "⇧↩") { [weak self] in
+                self?.copyOnlyQuickEntry(entry)
+            }
+        case .edit:
+            return QuickAction(id: kind.rawValue, title: text.edit,
+                               symbolName: "pencil", isDestructive: false, keyHint: nil) { [weak self] in
+                self?.setQuickPreviewPresented(true)
+                self?.quickEditRequest = entry.id
+            }
+        case .openLink:
+            return QuickAction(id: kind.rawValue, title: L10n.shared.s.diskOpenInFinder,
+                               symbolName: "safari", isDestructive: false, keyHint: nil) { [weak self] in
+                guard let url = URL(string: entry.text) else { return }
+                self?.hideHistoryWindow()
+                NSWorkspace.shared.open(url)
+            }
+        case .showInFinder:
+            return QuickAction(id: kind.rawValue, title: L10n.shared.s.cleanerRevealInFinder,
+                               symbolName: "folder", isDestructive: false, keyHint: nil) {
+                NSWorkspace.shared.activateFileViewerSelecting(
+                    entry.filePaths.map { URL(fileURLWithPath: $0) })
+            }
+        case .pin:
+            return QuickAction(id: kind.rawValue,
+                               title: entry.isPinned ? text.unpin : text.pin,
+                               symbolName: entry.isPinned ? "pin.slash" : "pin",
+                               isDestructive: false, keyHint: "⌥P") { [weak self] in
+                self?.togglePin(entry)
+            }
+        case .preview:
+            return QuickAction(id: kind.rawValue, title: text.previewLabel,
+                               symbolName: "doc.text.magnifyingglass",
+                               isDestructive: false, keyHint: "␣") { [weak self] in
+                self?.toggleQuickPreview()
+            }
+        case .delete:
+            return QuickAction(id: kind.rawValue, title: text.delete,
+                               symbolName: "trash", isDestructive: true, keyHint: "⌥⌫") { [weak self] in
+                self?.remove(entry)
+            }
+        }
     }
 
     func toggleQuickPreview() {
@@ -1025,15 +1135,23 @@ final class ClipboardHistoryService: ObservableObject {
         }
     }
 
-    func showHistoryWindow() {
+    /// `entry` opens the window on that item with the preview pane up, which is
+    /// what a double-click on a panel row asks for: the whole content, in a
+    /// place where it can be read, selected and edited.
+    func showHistoryWindow(focusing entry: ClipboardHistoryEntry? = nil) {
         let panel = ensurePanel()
         rememberPasteTarget()
         quickWindowPresentationID = UUID()
         quickQuery = ""
         clearQuickBatchSelection()
         resetQuickSelection()
+        setQuickActionsPresented(false)
+        if let entry, let index = filteredQuickEntries.firstIndex(where: { $0.id == entry.id }) {
+            quickSelectionIndex = index
+        }
         // Before position(), which reads the size the preview state asks for.
-        if UserDefaults.standard.bool(forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault) {
+        if entry != nil || UserDefaults.standard
+            .bool(forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault) {
             setQuickPreviewPresented(true)
         }
         position(panel)
@@ -1049,6 +1167,7 @@ final class ClipboardHistoryService: ObservableObject {
         removeDismissMonitors()
         panel?.orderOut(nil)
         clearQuickBatchSelection()
+        setQuickActionsPresented(false)
     }
 
     private func rememberPasteTarget() {
@@ -1160,6 +1279,32 @@ final class ClipboardHistoryService: ObservableObject {
                 return event
             }
             let modifiers = event.modifierFlags.intersection([.command, .option, .shift, .control])
+            // While the ⌘K list is up it owns the keys the list below it would
+            // otherwise take: it is about one entry, so moving the selection
+            // underneath it would leave it describing something else.
+            if self.quickActionsPresented {
+                if event.keyCode == UInt16(kVK_Escape)
+                    || (modifiers == [.command] && event.charactersIgnoringModifiers?.lowercased() == "k") {
+                    self.setQuickActionsPresented(false)
+                    return nil
+                }
+                if event.keyCode == UInt16(kVK_DownArrow) {
+                    self.moveQuickActionSelection(1)
+                    return nil
+                }
+                if event.keyCode == UInt16(kVK_UpArrow) {
+                    self.moveQuickActionSelection(-1)
+                    return nil
+                }
+                if event.keyCode == UInt16(kVK_Return)
+                    || event.keyCode == UInt16(kVK_ANSI_KeypadEnter) {
+                    self.runSelectedQuickAction()
+                    return nil
+                }
+                // Anything else typed here is aimed at the list, not at the
+                // search field under it. System combinations still pass.
+                return modifiers.contains(.command) ? event : nil
+            }
             if event.keyCode == UInt16(kVK_Escape) {
                 switch ClipboardHistoryEscape.action(batchCount: self.quickBatchCount) {
                 case .clearBatchSelection: self.clearQuickBatchSelection()
@@ -1205,6 +1350,10 @@ final class ClipboardHistoryService: ObservableObject {
                    batchCount: self.quickBatchCount,
                    queryIsEmpty: self.quickQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) {
                 self.selectAllQuickEntries()
+                return nil
+            }
+            if modifiers == [.command], key == "k" {
+                self.toggleQuickActions()
                 return nil
             }
             if modifiers == [.option], event.keyCode == UInt16(kVK_ANSI_P) {
