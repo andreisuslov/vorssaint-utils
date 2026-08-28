@@ -409,8 +409,7 @@ enum DefaultsKey {
     static let clipboardHistorySkipSensitive = "clipboardHistorySkipSensitive"
     static let clipboardHistoryIncludeImagesFiles = "clipboardHistoryIncludeImagesFiles" // capture copied images and files too
     static let clipboardHistoryIgnoredApps = "clipboardHistoryIgnoredApps" // apps whose copies are never saved
-    static let clipboardHistoryQuickPreview = "clipboardHistoryQuickPreview"
-    // Whether ⌥Space opens the quick window with that preview pane already up.
+    // Whether the quick window opens with its preview pane already up.
     static let clipboardHistoryQuickPreviewByDefault = "clipboardHistoryQuickPreviewByDefault"
     // Text entries reach the Shelf only when asked: dragging (with shake to open) and the ⌘K action.
     static let clipboardShelfTextDrag = "clipboardShelfTextDrag"
@@ -1113,7 +1112,6 @@ enum Defaults {
         DefaultsKey.clipboardHistorySkipSensitive: true,
         DefaultsKey.clipboardHistoryIncludeImagesFiles: true,
         DefaultsKey.clipboardHistoryIgnoredApps: [String](),
-        DefaultsKey.clipboardHistoryQuickPreview: false,
         DefaultsKey.clipboardHistoryQuickPreviewByDefault: false,
         DefaultsKey.clipboardShelfTextDrag: false,
         DefaultsKey.clipboardShelfTextAction: false,

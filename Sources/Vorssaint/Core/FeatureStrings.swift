@@ -188,7 +188,6 @@ extension ClipboardFeatureStrings {
         openInWindowHint: "두 번 클릭하면 항목 전체를 봅니다",
         textEntryLabel: "텍스트",
         textSizeFormat: "%1$@자 · %2$@줄",
-        sourceAppFormat: "%@에서 복사",
         actionsTitle: "동작",
         linkEntryLabel: "링크",
         addToShelfFormat: "%@에 추가",
@@ -201,7 +200,8 @@ extension ClipboardFeatureStrings {
         locationLabel: "위치",
         shelfTextDragFormat: "텍스트 항목 드래그, 흔들면 %@ 열기",
         shelfTextActionFormat: "⌘K 동작에서 텍스트에도 “%@에 추가” 제공",
-        shelfTextCaptionFormat: "파일과 이미지는 항상 드래그할 수 있고 %@에 추가할 수 있습니다. 이 두 옵션은 이를 텍스트로 확장합니다."
+        shelfTextCaptionFormat: "파일과 이미지는 항상 드래그할 수 있고 %@에 추가할 수 있습니다. 이 두 옵션은 이를 텍스트로 확장합니다.",
+        openLink: "링크 열기"
     )
 }
 
@@ -480,7 +480,6 @@ struct ClipboardFeatureStrings {
     let openInWindowHint: String
     let textEntryLabel: String
     let textSizeFormat: String
-    let sourceAppFormat: String
     let actionsTitle: String
     let linkEntryLabel: String
     let addToShelfFormat: String
@@ -494,6 +493,7 @@ struct ClipboardFeatureStrings {
     let shelfTextDragFormat: String
     let shelfTextActionFormat: String
     let shelfTextCaptionFormat: String
+    let openLink: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -554,7 +554,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Double-click to see the whole item",
         textEntryLabel: "Text",
         textSizeFormat: "%1$@ characters · %2$@ lines",
-        sourceAppFormat: "From %@",
         actionsTitle: "Actions",
         linkEntryLabel: "Link",
         addToShelfFormat: "Add to %@",
@@ -567,7 +566,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Location",
         shelfTextDragFormat: "Drag text entries out, shake to open %@",
         shelfTextActionFormat: "Offer “Add to %@” for text in the ⌘K actions",
-        shelfTextCaptionFormat: "Files and images always drag out and can be added to %@. These two extend that to text."
+        shelfTextCaptionFormat: "Files and images always drag out and can be added to %@. These two extend that to text.",
+        openLink: "Open link"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -629,7 +629,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Clique duas vezes para ver o item inteiro",
         textEntryLabel: "Texto",
         textSizeFormat: "%1$@ caracteres · %2$@ linhas",
-        sourceAppFormat: "De %@",
         actionsTitle: "Ações",
         linkEntryLabel: "Link",
         addToShelfFormat: "Adicionar a %@",
@@ -642,7 +641,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Local",
         shelfTextDragFormat: "Arrastar itens de texto para fora, sacudir para abrir %@",
         shelfTextActionFormat: "Oferecer “Adicionar a %@” para texto nas ações ⌘K",
-        shelfTextCaptionFormat: "Arquivos e imagens sempre podem ser arrastados e adicionados a %@. Estas duas opções estendem isso ao texto."
+        shelfTextCaptionFormat: "Arquivos e imagens sempre podem ser arrastados e adicionados a %@. Estas duas opções estendem isso ao texto.",
+        openLink: "Abrir link"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -704,7 +704,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Öğenin tamamını görmek için çift tıklayın",
         textEntryLabel: "Metin",
         textSizeFormat: "%1$@ karakter · %2$@ satır",
-        sourceAppFormat: "%@ uygulamasından",
         actionsTitle: "Eylemler",
         linkEntryLabel: "Bağlantı",
         addToShelfFormat: "%@ içine ekle",
@@ -717,7 +716,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Konum",
         shelfTextDragFormat: "Metin öğelerini dışarı sürükle, sallayınca %@ açılsın",
         shelfTextActionFormat: "⌘K eylemlerinde metin için “%@ içine ekle” sunulsun",
-        shelfTextCaptionFormat: "Dosyalar ve görseller her zaman dışarı sürüklenebilir ve %@ içine eklenebilir. Bu ikisi bunu metne de genişletir."
+        shelfTextCaptionFormat: "Dosyalar ve görseller her zaman dışarı sürüklenebilir ve %@ içine eklenebilir. Bu ikisi bunu metne de genişletir.",
+        openLink: "Bağlantıyı aç"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -779,7 +779,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Дважды щёлкните, чтобы увидеть элемент целиком",
         textEntryLabel: "Текст",
         textSizeFormat: "Символов: %1$@ · Строк: %2$@",
-        sourceAppFormat: "Из %@",
         actionsTitle: "Действия",
         linkEntryLabel: "Ссылка",
         addToShelfFormat: "Добавить: %@",
@@ -792,7 +791,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Расположение",
         shelfTextDragFormat: "Перетаскивать текст наружу, встряхивание открывает: %@",
         shelfTextActionFormat: "Предлагать «Добавить: %@» для текста в действиях ⌘K",
-        shelfTextCaptionFormat: "Файлы и изображения всегда можно перетащить и добавить: %@. Эти два параметра распространяют это на текст."
+        shelfTextCaptionFormat: "Файлы и изображения всегда можно перетащить и добавить: %@. Эти два параметра распространяют это на текст.",
+        openLink: "Открыть ссылку"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -854,7 +854,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Haz doble clic para ver el elemento completo",
         textEntryLabel: "Texto",
         textSizeFormat: "%1$@ caracteres · %2$@ líneas",
-        sourceAppFormat: "Desde %@",
         actionsTitle: "Acciones",
         linkEntryLabel: "Enlace",
         addToShelfFormat: "Añadir a %@",
@@ -867,7 +866,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Ubicación",
         shelfTextDragFormat: "Arrastrar entradas de texto, agitar para abrir %@",
         shelfTextActionFormat: "Ofrecer “Añadir a %@” para texto en las acciones ⌘K",
-        shelfTextCaptionFormat: "Los archivos e imágenes siempre se pueden arrastrar y añadir a %@. Estas dos opciones lo extienden al texto."
+        shelfTextCaptionFormat: "Los archivos e imágenes siempre se pueden arrastrar y añadir a %@. Estas dos opciones lo extienden al texto.",
+        openLink: "Abrir enlace"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -929,7 +929,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Doppelklicken, um den ganzen Eintrag zu sehen",
         textEntryLabel: "Text",
         textSizeFormat: "%1$@ Zeichen · %2$@ Zeilen",
-        sourceAppFormat: "Aus %@",
         actionsTitle: "Aktionen",
         linkEntryLabel: "Link",
         addToShelfFormat: "Zu %@ hinzufügen",
@@ -942,7 +941,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Ort",
         shelfTextDragFormat: "Texteinträge herausziehen, Schütteln öffnet %@",
         shelfTextActionFormat: "„Zu %@ hinzufügen“ für Text in den ⌘K-Aktionen anbieten",
-        shelfTextCaptionFormat: "Dateien und Bilder lassen sich immer herausziehen und zu %@ hinzufügen. Diese beiden erweitern das auf Text."
+        shelfTextCaptionFormat: "Dateien und Bilder lassen sich immer herausziehen und zu %@ hinzufügen. Diese beiden erweitern das auf Text.",
+        openLink: "Link öffnen"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -1004,7 +1004,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Double-cliquez pour voir l'élément en entier",
         textEntryLabel: "Texte",
         textSizeFormat: "%1$@ caractères · %2$@ lignes",
-        sourceAppFormat: "Depuis %@",
         actionsTitle: "Actions",
         linkEntryLabel: "Lien",
         addToShelfFormat: "Ajouter à %@",
@@ -1017,7 +1016,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Emplacement",
         shelfTextDragFormat: "Glisser les entrées texte, secouer pour ouvrir %@",
         shelfTextActionFormat: "Proposer « Ajouter à %@ » pour le texte dans les actions ⌘K",
-        shelfTextCaptionFormat: "Les fichiers et images se glissent toujours et peuvent être ajoutés à %@. Ces deux options l'étendent au texte."
+        shelfTextCaptionFormat: "Les fichiers et images se glissent toujours et peuvent être ajoutés à %@. Ces deux options l'étendent au texte.",
+        openLink: "Ouvrir le lien"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1079,7 +1079,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "Fai doppio clic per vedere l'elemento per intero",
         textEntryLabel: "Testo",
         textSizeFormat: "%1$@ caratteri · %2$@ righe",
-        sourceAppFormat: "Da %@",
         actionsTitle: "Azioni",
         linkEntryLabel: "Link",
         addToShelfFormat: "Aggiungi a %@",
@@ -1092,7 +1091,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Posizione",
         shelfTextDragFormat: "Trascina le voci di testo, scuoti per aprire %@",
         shelfTextActionFormat: "Offri “Aggiungi a %@” per il testo nelle azioni ⌘K",
-        shelfTextCaptionFormat: "File e immagini si trascinano sempre e possono essere aggiunti a %@. Queste due opzioni lo estendono al testo."
+        shelfTextCaptionFormat: "File e immagini si trascinano sempre e possono essere aggiunti a %@. Queste due opzioni lo estendono al testo.",
+        openLink: "Apri link"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1154,7 +1154,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "ダブルクリックで項目全体を表示",
         textEntryLabel: "テキスト",
         textSizeFormat: "%1$@文字 · %2$@行",
-        sourceAppFormat: "%@ からコピー",
         actionsTitle: "アクション",
         linkEntryLabel: "リンク",
         addToShelfFormat: "%@に追加",
@@ -1167,7 +1166,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "場所",
         shelfTextDragFormat: "テキスト項目をドラッグ、振ると%@を開く",
         shelfTextActionFormat: "⌘Kアクションでテキストにも「%@に追加」を表示",
-        shelfTextCaptionFormat: "ファイルと画像は常にドラッグでき、%@に追加できます。この2つはそれをテキストにも広げます。"
+        shelfTextCaptionFormat: "ファイルと画像は常にドラッグでき、%@に追加できます。この2つはそれをテキストにも広げます。",
+        openLink: "リンクを開く"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1229,7 +1229,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "双击查看完整条目",
         textEntryLabel: "文本",
         textSizeFormat: "%1$@ 个字符 · %2$@ 行",
-        sourceAppFormat: "来自 %@",
         actionsTitle: "操作",
         linkEntryLabel: "链接",
         addToShelfFormat: "添加到%@",
@@ -1242,7 +1241,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         shelfTextDragFormat: "拖出文本条目，晃动打开%@",
         shelfTextActionFormat: "在 ⌘K 操作中为文本提供“添加到%@”",
-        shelfTextCaptionFormat: "文件和图片始终可以拖出并添加到%@。这两项将其扩展到文本。"
+        shelfTextCaptionFormat: "文件和图片始终可以拖出并添加到%@。这两项将其扩展到文本。",
+        openLink: "打开链接"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1304,7 +1304,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "按兩下查看完整項目",
         textEntryLabel: "文字",
         textSizeFormat: "%1$@ 個字元 · %2$@ 行",
-        sourceAppFormat: "來自 %@",
         actionsTitle: "操作",
         linkEntryLabel: "連結",
         addToShelfFormat: "加入%@",
@@ -1317,7 +1316,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         shelfTextDragFormat: "拖出文字項目，晃動開啟%@",
         shelfTextActionFormat: "在 ⌘K 操作中為文字提供「加入%@」",
-        shelfTextCaptionFormat: "檔案和圖片始終可以拖出並加入%@。這兩項將其擴展到文字。"
+        shelfTextCaptionFormat: "檔案和圖片始終可以拖出並加入%@。這兩項將其擴展到文字。",
+        openLink: "開啟連結"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1379,7 +1379,6 @@ struct ClipboardFeatureStrings {
         openInWindowHint: "按兩下查看完整項目",
         textEntryLabel: "文字",
         textSizeFormat: "%1$@ 個字元 · %2$@ 行",
-        sourceAppFormat: "來自 %@",
         actionsTitle: "操作",
         linkEntryLabel: "連結",
         addToShelfFormat: "加入%@",
@@ -1392,7 +1391,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         shelfTextDragFormat: "拖出文字項目，晃動開啟%@",
         shelfTextActionFormat: "在 ⌘K 操作中為文字提供「加入%@」",
-        shelfTextCaptionFormat: "檔案和圖片始終可以拖出並加入%@。這兩項將其擴展到文字。"
+        shelfTextCaptionFormat: "檔案和圖片始終可以拖出並加入%@。這兩項將其擴展到文字。",
+        openLink: "開啟連結"
     )
 }
 
