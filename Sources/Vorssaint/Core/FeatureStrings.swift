@@ -197,7 +197,8 @@ extension ClipboardFeatureStrings {
         sourceLabel: "출처",
         locationLabel: "위치",
         openLink: "링크 열기",
-        copyPath: "경로 복사"
+        copyPath: "경로 복사",
+        fileEntryLabel: "파일"
     )
 }
 
@@ -486,6 +487,7 @@ struct ClipboardFeatureStrings {
     let locationLabel: String
     let openLink: String
     let copyPath: String
+    let fileEntryLabel: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -555,7 +557,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "Source",
         locationLabel: "Location",
         openLink: "Open link",
-        copyPath: "Copy path"
+        copyPath: "Copy path",
+        fileEntryLabel: "File"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -626,7 +629,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "Origem",
         locationLabel: "Local",
         openLink: "Abrir link",
-        copyPath: "Copiar caminho"
+        copyPath: "Copiar caminho",
+        fileEntryLabel: "Arquivo"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -697,7 +701,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "Kaynak",
         locationLabel: "Konum",
         openLink: "Bağlantıyı aç",
-        copyPath: "Yolu kopyala"
+        copyPath: "Yolu kopyala",
+        fileEntryLabel: "Dosya"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -768,7 +773,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "Источник",
         locationLabel: "Расположение",
         openLink: "Открыть ссылку",
-        copyPath: "Скопировать путь"
+        copyPath: "Скопировать путь",
+        fileEntryLabel: "Файл"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -839,7 +845,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "Origen",
         locationLabel: "Ubicación",
         openLink: "Abrir enlace",
-        copyPath: "Copiar ruta"
+        copyPath: "Copiar ruta",
+        fileEntryLabel: "Archivo"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -910,7 +917,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "Quelle",
         locationLabel: "Ort",
         openLink: "Link öffnen",
-        copyPath: "Pfad kopieren"
+        copyPath: "Pfad kopieren",
+        fileEntryLabel: "Datei"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -981,7 +989,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "Source",
         locationLabel: "Emplacement",
         openLink: "Ouvrir le lien",
-        copyPath: "Copier le chemin"
+        copyPath: "Copier le chemin",
+        fileEntryLabel: "Fichier"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1052,7 +1061,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "Origine",
         locationLabel: "Posizione",
         openLink: "Apri link",
-        copyPath: "Copia percorso"
+        copyPath: "Copia percorso",
+        fileEntryLabel: "File"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1123,7 +1133,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "コピー元",
         locationLabel: "場所",
         openLink: "リンクを開く",
-        copyPath: "パスをコピー"
+        copyPath: "パスをコピー",
+        fileEntryLabel: "ファイル"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1194,7 +1205,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "来源",
         locationLabel: "位置",
         openLink: "打开链接",
-        copyPath: "拷贝路径"
+        copyPath: "拷贝路径",
+        fileEntryLabel: "文件"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1265,7 +1277,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "來源",
         locationLabel: "位置",
         openLink: "開啟連結",
-        copyPath: "拷貝路徑"
+        copyPath: "拷貝路徑",
+        fileEntryLabel: "檔案"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1336,7 +1349,8 @@ struct ClipboardFeatureStrings {
         sourceLabel: "來源",
         locationLabel: "位置",
         openLink: "開啟連結",
-        copyPath: "拷貝路徑"
+        copyPath: "拷貝路徑",
+        fileEntryLabel: "檔案"
     )
 }
 
