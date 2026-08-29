@@ -42,7 +42,9 @@ struct ClipboardEntryPreviewSidebar: View {
         }
         // The ⌘K list can ask for editing, which only this view knows how to
         // start; the request is cleared so a later one is still noticed.
-        .onChange(of: history.quickEditRequest) { _, requested in
+        // `initial` because the request and this view often arrive in the
+        // same turn, when the action also opens the pane.
+        .onChange(of: history.quickEditRequest, initial: true) { _, requested in
             guard let requested, let entry, entry.id == requested, entry.kind == .text else { return }
             beginEditing(entry)
             history.clearQuickEditRequest()

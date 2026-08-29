@@ -1088,7 +1088,9 @@ final class ClipboardHistoryService: ObservableObject {
             }
         case .showInFinder:
             return QuickAction(id: kind.rawValue, title: L10n.shared.s.cleanerRevealInFinder,
-                               symbolName: "folder", isDestructive: false, keyHint: nil) {
+                               symbolName: "folder", isDestructive: false, keyHint: nil) { [weak self] in
+                // Like paste and open link: the window steps aside for Finder.
+                self?.hideHistoryWindow()
                 NSWorkspace.shared.activateFileViewerSelecting(
                     entry.filePaths.map { URL(fileURLWithPath: $0) })
             }
