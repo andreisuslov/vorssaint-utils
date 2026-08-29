@@ -258,6 +258,28 @@ final class Permissions: ObservableObject {
         }
     }
 
+    /// Drops this app's entry from the list and asks again. The entry macOS
+    /// keeps is bound to the app's code signature, so a copy signed
+    /// differently (a local build, an update signed another way) finds the
+    /// switch on and the permission gone; nothing short of removing the entry
+    /// makes the system ask afresh. `tccutil` does that for the calling
+    /// user's own entries with no privilege, and is the command Apple
+    /// documents for the purpose.
+    func startOver(_ kind: PermissionKind) {
+        guard kind == .accessibility || kind == .screenRecording,
+              let bundleID = Bundle.main.bundleIdentifier else { return }
+        let service = kind == .accessibility ? "Accessibility" : "ScreenCapture"
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
+        process.arguments = ["reset", service, bundleID]
+        process.standardOutput = nil
+        process.standardError = nil
+        try? process.run()
+        process.waitUntilExit()
+        refreshActivePermissions()
+        if kind == .accessibility { requestAccessibility() } else { requestScreenRecording() }
+    }
+
     func openAccessibilitySettings() {
         open(pane: "Privacy_Accessibility")
     }
