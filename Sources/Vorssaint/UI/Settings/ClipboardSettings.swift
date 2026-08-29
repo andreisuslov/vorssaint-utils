@@ -17,6 +17,7 @@ struct ClipboardSettings: View {
     @AppStorage(DefaultsKey.clipboardHistoryShortcutEnabled) private var shortcutEnabled = true
     @AppStorage(DefaultsKey.panelUtilityClipboard) private var showInPanel = true
     @AppStorage(DefaultsKey.clipboardHistoryQuickPreviewByDefault) private var previewByDefault = false
+    @AppStorage(DefaultsKey.clipboardArrowOpensActions) private var arrowOpensActions = true
     @AppStorage(DefaultsKey.clipboardShelfTextDrag) private var shelfTextDrag = false
     @AppStorage(DefaultsKey.clipboardShelfTextAction) private var shelfTextAction = false
     @AppStorage(DefaultsKey.shelfEnabled) private var shelfEnabled = false
@@ -193,6 +194,8 @@ struct ClipboardSettings: View {
             Text(text.previewByDefaultCaption)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            Toggle(text.arrowOpensActions, isOn: $arrowOpensActions)
+                .disabled(!enabled)
             Button {
                 ClipboardHistoryService.shared.showHistoryWindow()
             } label: {

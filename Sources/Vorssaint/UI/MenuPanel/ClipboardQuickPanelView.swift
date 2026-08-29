@@ -567,7 +567,7 @@ struct ClipboardQuickPanelView: View {
                         .lineLimit(1)
                     }
                     Spacer(minLength: 8)
-                    Text("⌘K")
+                    Text(UserDefaults.standard.bool(forKey: DefaultsKey.clipboardArrowOpensActions) ? "← ⌘K" : "⌘K")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(.tertiary)
                         .padding(.horizontal, 6)

@@ -412,6 +412,8 @@ enum DefaultsKey {
     static let clipboardHistoryQuickPreview = "clipboardHistoryQuickPreview" // replaced by clipboardHistoryQuickPreviewByDefault, kept so the migration can read it
     // Whether the quick window opens with its preview pane already up.
     static let clipboardHistoryQuickPreviewByDefault = "clipboardHistoryQuickPreviewByDefault"
+    // → opens the action card for the selected entry, ← closes it.
+    static let clipboardArrowOpensActions = "clipboardArrowOpensActions"
     // Text entries reach the Shelf only when asked: dragging (with shake to open) and the ⌘K action.
     static let clipboardShelfTextDrag = "clipboardShelfTextDrag"
     static let clipboardShelfTextAction = "clipboardShelfTextAction"
@@ -1114,6 +1116,7 @@ enum Defaults {
         DefaultsKey.clipboardHistoryIncludeImagesFiles: true,
         DefaultsKey.clipboardHistoryIgnoredApps: [String](),
         DefaultsKey.clipboardHistoryQuickPreviewByDefault: false,
+        DefaultsKey.clipboardArrowOpensActions: true,
         DefaultsKey.clipboardShelfTextDrag: false,
         DefaultsKey.clipboardShelfTextAction: false,
         DefaultsKey.clipboardAutoClearOnDelay: false,

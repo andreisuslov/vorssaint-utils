@@ -222,6 +222,9 @@ enum ClipboardQuickActionKind: String {
     case copy
     case edit
     case openLink
+    case lookUp
+    case moveUp
+    case moveDown
     case showInFinder
     case copyPath
     case addToShelf
@@ -237,11 +240,14 @@ enum ClipboardQuickActions {
     /// shelf too; files and images always can while the shelf is on.
     static func kinds(for entry: ClipboardHistoryEntry,
                       shelfAvailable: Bool = false,
-                      textToShelf: Bool = false) -> [ClipboardQuickActionKind] {
+                      textToShelf: Bool = false,
+                      canMoveUp: Bool = false,
+                      canMoveDown: Bool = false) -> [ClipboardQuickActionKind] {
         var kinds: [ClipboardQuickActionKind] = [.paste, .copy]
         switch entry.displayKind {
         case .text:
             kinds.append(.edit)
+            if isLookUpCandidate(entry.text) { kinds.append(.lookUp) }
             if shelfAvailable, textToShelf { kinds.append(.addToShelf) }
         case .link:
             kinds.append(contentsOf: [.openLink, .edit])
@@ -252,8 +258,18 @@ enum ClipboardQuickActions {
         case .image:
             if shelfAvailable { kinds.append(.addToShelf) }
         }
-        kinds.append(contentsOf: [.pin, .preview, .delete])
+        kinds.append(.pin)
+        if canMoveUp { kinds.append(.moveUp) }
+        if canMoveDown { kinds.append(.moveDown) }
+        kinds.append(contentsOf: [.preview, .delete])
         return kinds
+    }
+
+    /// A word or short phrase, which is what Dictionary can answer for; a
+    /// paragraph is not a look-up.
+    static func isLookUpCandidate(_ text: String) -> Bool {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmed.isEmpty && trimmed.count <= 60 && !trimmed.contains(where: \.isNewline)
     }
 
     /// Wrapping movement, so ↓ from the last action returns to the first.

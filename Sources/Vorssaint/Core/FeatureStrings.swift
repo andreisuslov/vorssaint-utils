@@ -203,7 +203,9 @@ extension ClipboardFeatureStrings {
         shelfTextCaptionFormat: "파일과 이미지는 항상 드래그할 수 있고 %@에 추가할 수 있습니다. 이 두 옵션은 이를 텍스트로 확장합니다.",
         openLink: "링크 열기",
         copyPath: "경로 복사",
-        fileEntryLabel: "파일"
+        fileEntryLabel: "파일",
+        lookUpInDictionary: "사전에서 찾기",
+        arrowOpensActions: "→ 키로 동작 열기(← 키로 닫기)"
     )
 }
 
@@ -498,6 +500,8 @@ struct ClipboardFeatureStrings {
     let openLink: String
     let copyPath: String
     let fileEntryLabel: String
+    let lookUpInDictionary: String
+    let arrowOpensActions: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -573,7 +577,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "Files and images always drag out and can be added to %@. These two extend that to text.",
         openLink: "Open link",
         copyPath: "Copy path",
-        fileEntryLabel: "File"
+        fileEntryLabel: "File",
+        lookUpInDictionary: "Look Up in Dictionary",
+        arrowOpensActions: "Open the actions with → (← closes them)"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -650,7 +656,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "Arquivos e imagens sempre podem ser arrastados e adicionados a %@. Estas duas opções estendem isso ao texto.",
         openLink: "Abrir link",
         copyPath: "Copiar caminho",
-        fileEntryLabel: "Arquivo"
+        fileEntryLabel: "Arquivo",
+        lookUpInDictionary: "Consultar no Dicionário",
+        arrowOpensActions: "Abrir as ações com → (← as fecha)"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -727,7 +735,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "Dosyalar ve görseller her zaman dışarı sürüklenebilir ve %@ içine eklenebilir. Bu ikisi bunu metne de genişletir.",
         openLink: "Bağlantıyı aç",
         copyPath: "Yolu kopyala",
-        fileEntryLabel: "Dosya"
+        fileEntryLabel: "Dosya",
+        lookUpInDictionary: "Sözlükte ara",
+        arrowOpensActions: "Eylemleri → ile aç (← kapatır)"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -804,7 +814,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "Файлы и изображения всегда можно перетащить и добавить: %@. Эти два параметра распространяют это на текст.",
         openLink: "Открыть ссылку",
         copyPath: "Скопировать путь",
-        fileEntryLabel: "Файл"
+        fileEntryLabel: "Файл",
+        lookUpInDictionary: "Искать в Словаре",
+        arrowOpensActions: "Открывать действия клавишей → (← закрывает)"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -881,7 +893,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "Los archivos e imágenes siempre se pueden arrastrar y añadir a %@. Estas dos opciones lo extienden al texto.",
         openLink: "Abrir enlace",
         copyPath: "Copiar ruta",
-        fileEntryLabel: "Archivo"
+        fileEntryLabel: "Archivo",
+        lookUpInDictionary: "Buscar en Diccionario",
+        arrowOpensActions: "Abrir las acciones con → (← las cierra)"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -958,7 +972,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "Dateien und Bilder lassen sich immer herausziehen und zu %@ hinzufügen. Diese beiden erweitern das auf Text.",
         openLink: "Link öffnen",
         copyPath: "Pfad kopieren",
-        fileEntryLabel: "Datei"
+        fileEntryLabel: "Datei",
+        lookUpInDictionary: "Im Lexikon nachschlagen",
+        arrowOpensActions: "Aktionen mit → öffnen (← schließt sie)"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -1035,7 +1051,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "Les fichiers et images se glissent toujours et peuvent être ajoutés à %@. Ces deux options l'étendent au texte.",
         openLink: "Ouvrir le lien",
         copyPath: "Copier le chemin",
-        fileEntryLabel: "Fichier"
+        fileEntryLabel: "Fichier",
+        lookUpInDictionary: "Rechercher dans le Dictionnaire",
+        arrowOpensActions: "Ouvrir les actions avec → (← les ferme)"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1112,7 +1130,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "File e immagini si trascinano sempre e possono essere aggiunti a %@. Queste due opzioni lo estendono al testo.",
         openLink: "Apri link",
         copyPath: "Copia percorso",
-        fileEntryLabel: "File"
+        fileEntryLabel: "File",
+        lookUpInDictionary: "Cerca nel Dizionario",
+        arrowOpensActions: "Apri le azioni con → (← le chiude)"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1189,7 +1209,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "ファイルと画像は常にドラッグでき、%@に追加できます。この2つはそれをテキストにも広げます。",
         openLink: "リンクを開く",
         copyPath: "パスをコピー",
-        fileEntryLabel: "ファイル"
+        fileEntryLabel: "ファイル",
+        lookUpInDictionary: "辞書で調べる",
+        arrowOpensActions: "→ でアクションを開く（← で閉じる）"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1266,7 +1288,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "文件和图片始终可以拖出并添加到%@。这两项将其扩展到文本。",
         openLink: "打开链接",
         copyPath: "拷贝路径",
-        fileEntryLabel: "文件"
+        fileEntryLabel: "文件",
+        lookUpInDictionary: "在词典中查询",
+        arrowOpensActions: "用 → 打开操作（← 关闭）"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1343,7 +1367,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "檔案和圖片始終可以拖出並加入%@。這兩項將其擴展到文字。",
         openLink: "開啟連結",
         copyPath: "拷貝路徑",
-        fileEntryLabel: "檔案"
+        fileEntryLabel: "檔案",
+        lookUpInDictionary: "在字典中查詢",
+        arrowOpensActions: "用 → 開啟操作（← 關閉）"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1420,7 +1446,9 @@ struct ClipboardFeatureStrings {
         shelfTextCaptionFormat: "檔案和圖片始終可以拖出並加入%@。這兩項將其擴展到文字。",
         openLink: "開啟連結",
         copyPath: "拷貝路徑",
-        fileEntryLabel: "檔案"
+        fileEntryLabel: "檔案",
+        lookUpInDictionary: "在字典中查詢",
+        arrowOpensActions: "用 → 開啟操作（← 關閉）"
     )
 }
 

@@ -1015,10 +1015,13 @@ final class ClipboardHistoryService: ObservableObject {
 
     var quickActionRows: [QuickAction] {
         guard let entry = selectedQuickEntry else { return [] }
+        let canReorder = quickQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         return ClipboardQuickActions.kinds(
             for: entry,
             shelfAvailable: Self.shelfAvailable,
-            textToShelf: UserDefaults.standard.bool(forKey: DefaultsKey.clipboardShelfTextAction)
+            textToShelf: UserDefaults.standard.bool(forKey: DefaultsKey.clipboardShelfTextAction),
+            canMoveUp: canReorder && canMove(entry, .up),
+            canMoveDown: canReorder && canMove(entry, .down)
         ).map { action($0, for: entry) }
     }
 
@@ -1165,6 +1168,25 @@ final class ClipboardHistoryService: ObservableObject {
                 // One path per line; the history records it as text of its own.
                 self?.copyPlainText(entry.filePaths.joined(separator: "\n"))
                 self?.hideHistoryWindow()
+            }
+        case .lookUp:
+            return QuickAction(id: kind.rawValue, title: text.lookUpInDictionary,
+                               symbolName: "character.book.closed", isDestructive: false, keyHint: nil) { [weak self] in
+                let term = entry.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard let encoded = term.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
+                      let url = URL(string: "dict://\(encoded)") else { return }
+                self?.hideHistoryWindow()
+                NSWorkspace.shared.open(url)
+            }
+        case .moveUp:
+            return QuickAction(id: kind.rawValue, title: text.moveUp,
+                               symbolName: "arrow.up", isDestructive: false, keyHint: nil) { [weak self] in
+                self?.move(entry, .up)
+            }
+        case .moveDown:
+            return QuickAction(id: kind.rawValue, title: text.moveDown,
+                               symbolName: "arrow.down", isDestructive: false, keyHint: nil) { [weak self] in
+                self?.move(entry, .down)
             }
         case .showInFinder:
             return QuickAction(id: kind.rawValue, title: L10n.shared.s.cleanerRevealInFinder,
@@ -1366,6 +1388,7 @@ final class ClipboardHistoryService: ObservableObject {
             // underneath it would leave it describing something else.
             if self.quickActionsPresented {
                 if event.keyCode == UInt16(kVK_Escape)
+                    || event.keyCode == UInt16(kVK_LeftArrow)
                     || (modifiers == [.command] && event.charactersIgnoringModifiers?.lowercased() == "k") {
                     self.setQuickActionsPresented(false)
                     return nil
@@ -1436,6 +1459,15 @@ final class ClipboardHistoryService: ObservableObject {
             }
             if modifiers == [.command], key == "k" {
                 self.toggleQuickActions()
+                return nil
+            }
+            // → is the one-hand way in, like the launchers people know; a
+            // Settings switch keeps it out of the way of the search field's
+            // caret for anyone who wants that.
+            if modifiers.isEmpty, event.keyCode == UInt16(kVK_RightArrow),
+               UserDefaults.standard.bool(forKey: DefaultsKey.clipboardArrowOpensActions),
+               self.quickSelectionIsVisible {
+                self.setQuickActionsPresented(true)
                 return nil
             }
             if modifiers == [.option], event.keyCode == UInt16(kVK_ANSI_P) {
