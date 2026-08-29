@@ -193,7 +193,8 @@ extension ClipboardFeatureStrings {
         sizeLabel: "크기",
         copiedLabel: "복사됨",
         sourceLabel: "출처",
-        locationLabel: "위치"
+        locationLabel: "위치",
+        fileEntryLabel: "파일"
     )
 }
 
@@ -478,6 +479,7 @@ struct ClipboardFeatureStrings {
     let copiedLabel: String
     let sourceLabel: String
     let locationLabel: String
+    let fileEntryLabel: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -543,7 +545,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Size",
         copiedLabel: "Copied",
         sourceLabel: "Source",
-        locationLabel: "Location"
+        locationLabel: "Location",
+        fileEntryLabel: "File"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -610,7 +613,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Tamanho",
         copiedLabel: "Copiado",
         sourceLabel: "Origem",
-        locationLabel: "Local"
+        locationLabel: "Local",
+        fileEntryLabel: "Arquivo"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -677,7 +681,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Boyut",
         copiedLabel: "Kopyalandı",
         sourceLabel: "Kaynak",
-        locationLabel: "Konum"
+        locationLabel: "Konum",
+        fileEntryLabel: "Dosya"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -744,7 +749,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Размер",
         copiedLabel: "Скопировано",
         sourceLabel: "Источник",
-        locationLabel: "Расположение"
+        locationLabel: "Расположение",
+        fileEntryLabel: "Файл"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -811,7 +817,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Tamaño",
         copiedLabel: "Copiado",
         sourceLabel: "Origen",
-        locationLabel: "Ubicación"
+        locationLabel: "Ubicación",
+        fileEntryLabel: "Archivo"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -878,7 +885,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Größe",
         copiedLabel: "Kopiert",
         sourceLabel: "Quelle",
-        locationLabel: "Ort"
+        locationLabel: "Ort",
+        fileEntryLabel: "Datei"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -945,7 +953,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Taille",
         copiedLabel: "Copié",
         sourceLabel: "Source",
-        locationLabel: "Emplacement"
+        locationLabel: "Emplacement",
+        fileEntryLabel: "Fichier"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1012,7 +1021,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "Dimensione",
         copiedLabel: "Copiato",
         sourceLabel: "Origine",
-        locationLabel: "Posizione"
+        locationLabel: "Posizione",
+        fileEntryLabel: "File"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1079,7 +1089,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "サイズ",
         copiedLabel: "コピー日時",
         sourceLabel: "コピー元",
-        locationLabel: "場所"
+        locationLabel: "場所",
+        fileEntryLabel: "ファイル"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1146,7 +1157,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "大小",
         copiedLabel: "复制时间",
         sourceLabel: "来源",
-        locationLabel: "位置"
+        locationLabel: "位置",
+        fileEntryLabel: "文件"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1213,7 +1225,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "大小",
         copiedLabel: "複製時間",
         sourceLabel: "來源",
-        locationLabel: "位置"
+        locationLabel: "位置",
+        fileEntryLabel: "檔案"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1280,7 +1293,8 @@ struct ClipboardFeatureStrings {
         sizeLabel: "大小",
         copiedLabel: "複製時間",
         sourceLabel: "來源",
-        locationLabel: "位置"
+        locationLabel: "位置",
+        fileEntryLabel: "檔案"
     )
 }
 

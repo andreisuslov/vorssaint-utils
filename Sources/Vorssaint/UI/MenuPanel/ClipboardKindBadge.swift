@@ -30,8 +30,9 @@ enum ClipboardKindPresentation {
         case .link: return text.linkEntryLabel
         case .image: return text.imageEntryLabel
         case .files:
+            // The row already prints the file's name; this slot says what it is.
             return entry.filePaths.count == 1
-                ? (entry.fileNames.first ?? text.fileCountFormat)
+                ? text.fileEntryLabel
                 : String(format: text.fileCountFormat, entry.filePaths.count)
         }
     }
