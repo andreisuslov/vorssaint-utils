@@ -1794,6 +1794,15 @@ struct MetricsTests {
             Defaults.migrateScrollInverterAxes(in: migrationDefaults)
             expect(!migrationDefaults.bool(forKey: DefaultsKey.scrollInverterHorizontalEnabled),
                    "the direction migration preserves a newer horizontal choice")
+            migrationDefaults.removeObject(forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault)
+            migrationDefaults.set(true, forKey: DefaultsKey.clipboardHistoryQuickPreview)
+            Defaults.migrateClipboardQuickPreview(in: migrationDefaults)
+            expect(migrationDefaults.bool(forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault),
+                   "a clipboard preview pane left open keeps opening after updating")
+            migrationDefaults.set(false, forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault)
+            Defaults.migrateClipboardQuickPreview(in: migrationDefaults)
+            expect(!migrationDefaults.bool(forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault),
+                   "the clipboard preview migration preserves a newer choice")
             migrationDefaults.set("option:50", forKey: DefaultsKey.switcherWindowShortcut)
             Defaults.migrateLegacySwitcherWindowShortcut(in: migrationDefaults)
             expect(migrationDefaults.string(forKey: DefaultsKey.switcherWindowShortcut) == "option:50",
