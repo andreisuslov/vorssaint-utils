@@ -222,6 +222,9 @@ enum ClipboardQuickActionKind: String {
     case copy
     case edit
     case openLink
+    case lookUp
+    case moveUp
+    case moveDown
     case showInFinder
     case copyPath
     case pin
@@ -232,16 +235,32 @@ enum ClipboardQuickActionKind: String {
 enum ClipboardQuickActions {
     /// What an entry offers, in the order the list shows it. Editing is for
     /// text, and only a file entry has somewhere in Finder to be shown.
-    static func kinds(for entry: ClipboardHistoryEntry) -> [ClipboardQuickActionKind] {
+    /// `canMoveUp`/`canMoveDown` are the list's own answer, so the card
+    /// offers only the moves that would do something.
+    static func kinds(for entry: ClipboardHistoryEntry,
+                      canMoveUp: Bool = false,
+                      canMoveDown: Bool = false) -> [ClipboardQuickActionKind] {
         var kinds: [ClipboardQuickActionKind] = [.paste, .copy]
         switch entry.displayKind {
-        case .text: kinds.append(.edit)
+        case .text:
+            kinds.append(.edit)
+            if isLookUpCandidate(entry.text) { kinds.append(.lookUp) }
         case .link: kinds.append(contentsOf: [.openLink, .edit])
         case .files: kinds.append(contentsOf: [.showInFinder, .copyPath])
         case .image: break
         }
-        kinds.append(contentsOf: [.pin, .preview, .delete])
+        kinds.append(.pin)
+        if canMoveUp { kinds.append(.moveUp) }
+        if canMoveDown { kinds.append(.moveDown) }
+        kinds.append(contentsOf: [.preview, .delete])
         return kinds
+    }
+
+    /// A word or short phrase, which is what Dictionary can answer for; a
+    /// paragraph is not a look-up.
+    static func isLookUpCandidate(_ text: String) -> Bool {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmed.isEmpty && trimmed.count <= 60 && !trimmed.contains(where: \.isNewline)
     }
 
     /// Wrapping movement, so ↓ from the last action returns to the first.

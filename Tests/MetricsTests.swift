@@ -220,6 +220,8 @@ struct MetricsTests {
                "auto clear starts at twenty seconds")
         expect(Defaults.registeredDefaults[DefaultsKey.clipboardHistoryQuickPreviewByDefault] as? Bool == false,
                "clipboard history quick preview is closed by default")
+        expect(Defaults.registeredDefaults[DefaultsKey.clipboardArrowOpensActions] as? Bool == true,
+               "the right arrow opens the clipboard actions until switched off")
 
         // MARK: Clipboard auto clear timing
 
@@ -410,8 +412,15 @@ struct MetricsTests {
                "clipboard editing keeps the history text size bound")
         let actionTextEntry = ClipboardHistoryEntry(text: "copied words")
         expect(ClipboardQuickActions.kinds(for: actionTextEntry)
-                == [.paste, .copy, .edit, .pin, .preview, .delete],
-               "the clipboard action list offers editing for a text entry")
+                == [.paste, .copy, .edit, .lookUp, .pin, .preview, .delete],
+               "the clipboard action list offers editing and a dictionary look-up for a short text entry")
+        expect(ClipboardQuickActions.kinds(for: ClipboardHistoryEntry(text: "line one\nline two"))
+                == [.paste, .copy, .edit, .pin, .preview, .delete]
+               && !ClipboardQuickActions.isLookUpCandidate(String(repeating: "a", count: 61)),
+               "a paragraph or a long string is not offered to Dictionary")
+        expect(ClipboardQuickActions.kinds(for: actionTextEntry, canMoveUp: true, canMoveDown: true)
+                == [.paste, .copy, .edit, .lookUp, .pin, .moveUp, .moveDown, .preview, .delete],
+               "the clipboard action list offers the moves the list allows")
         expect(ClipboardQuickActions.kinds(
             for: ClipboardHistoryEntry(text: "", kind: .image, imageFile: "a.png"))
                 == [.paste, .copy, .pin, .preview, .delete],
@@ -12188,7 +12197,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let values = Mirror(reflecting: FeatureStrings.clipboard(language)).children
                 .compactMap { $0.value as? String }
-            expect(values.count == 69 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 71 && values.allSatisfy { !$0.isEmpty },
                    "every clipboard string is set for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible clipboard strings (\(language.rawValue))")

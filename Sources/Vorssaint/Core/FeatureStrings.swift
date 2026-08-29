@@ -198,7 +198,9 @@ extension ClipboardFeatureStrings {
         locationLabel: "위치",
         openLink: "링크 열기",
         copyPath: "경로 복사",
-        fileEntryLabel: "파일"
+        fileEntryLabel: "파일",
+        lookUpInDictionary: "사전에서 찾기",
+        arrowOpensActions: "→ 키로 동작 열기(← 키로 닫기)"
     )
 }
 
@@ -488,6 +490,8 @@ struct ClipboardFeatureStrings {
     let openLink: String
     let copyPath: String
     let fileEntryLabel: String
+    let lookUpInDictionary: String
+    let arrowOpensActions: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -558,7 +562,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "Location",
         openLink: "Open link",
         copyPath: "Copy path",
-        fileEntryLabel: "File"
+        fileEntryLabel: "File",
+        lookUpInDictionary: "Look Up in Dictionary",
+        arrowOpensActions: "Open the actions with → (← closes them)"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -630,7 +636,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "Local",
         openLink: "Abrir link",
         copyPath: "Copiar caminho",
-        fileEntryLabel: "Arquivo"
+        fileEntryLabel: "Arquivo",
+        lookUpInDictionary: "Consultar no Dicionário",
+        arrowOpensActions: "Abrir as ações com → (← as fecha)"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -702,7 +710,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "Konum",
         openLink: "Bağlantıyı aç",
         copyPath: "Yolu kopyala",
-        fileEntryLabel: "Dosya"
+        fileEntryLabel: "Dosya",
+        lookUpInDictionary: "Sözlükte ara",
+        arrowOpensActions: "Eylemleri → ile aç (← kapatır)"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -774,7 +784,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "Расположение",
         openLink: "Открыть ссылку",
         copyPath: "Скопировать путь",
-        fileEntryLabel: "Файл"
+        fileEntryLabel: "Файл",
+        lookUpInDictionary: "Искать в Словаре",
+        arrowOpensActions: "Открывать действия клавишей → (← закрывает)"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -846,7 +858,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "Ubicación",
         openLink: "Abrir enlace",
         copyPath: "Copiar ruta",
-        fileEntryLabel: "Archivo"
+        fileEntryLabel: "Archivo",
+        lookUpInDictionary: "Buscar en Diccionario",
+        arrowOpensActions: "Abrir las acciones con → (← las cierra)"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -918,7 +932,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "Ort",
         openLink: "Link öffnen",
         copyPath: "Pfad kopieren",
-        fileEntryLabel: "Datei"
+        fileEntryLabel: "Datei",
+        lookUpInDictionary: "Im Lexikon nachschlagen",
+        arrowOpensActions: "Aktionen mit → öffnen (← schließt sie)"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -990,7 +1006,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "Emplacement",
         openLink: "Ouvrir le lien",
         copyPath: "Copier le chemin",
-        fileEntryLabel: "Fichier"
+        fileEntryLabel: "Fichier",
+        lookUpInDictionary: "Rechercher dans le Dictionnaire",
+        arrowOpensActions: "Ouvrir les actions avec → (← les ferme)"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1062,7 +1080,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "Posizione",
         openLink: "Apri link",
         copyPath: "Copia percorso",
-        fileEntryLabel: "File"
+        fileEntryLabel: "File",
+        lookUpInDictionary: "Cerca nel Dizionario",
+        arrowOpensActions: "Apri le azioni con → (← le chiude)"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1134,7 +1154,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "場所",
         openLink: "リンクを開く",
         copyPath: "パスをコピー",
-        fileEntryLabel: "ファイル"
+        fileEntryLabel: "ファイル",
+        lookUpInDictionary: "辞書で調べる",
+        arrowOpensActions: "→ でアクションを開く（← で閉じる）"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1206,7 +1228,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         openLink: "打开链接",
         copyPath: "拷贝路径",
-        fileEntryLabel: "文件"
+        fileEntryLabel: "文件",
+        lookUpInDictionary: "在词典中查询",
+        arrowOpensActions: "用 → 打开操作（← 关闭）"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1278,7 +1302,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         openLink: "開啟連結",
         copyPath: "拷貝路徑",
-        fileEntryLabel: "檔案"
+        fileEntryLabel: "檔案",
+        lookUpInDictionary: "在字典中查詢",
+        arrowOpensActions: "用 → 開啟操作（← 關閉）"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1350,7 +1376,9 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         openLink: "開啟連結",
         copyPath: "拷貝路徑",
-        fileEntryLabel: "檔案"
+        fileEntryLabel: "檔案",
+        lookUpInDictionary: "在字典中查詢",
+        arrowOpensActions: "用 → 開啟操作（← 關閉）"
     )
 }
 

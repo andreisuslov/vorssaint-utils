@@ -412,6 +412,8 @@ enum DefaultsKey {
     static let clipboardHistoryQuickPreview = "clipboardHistoryQuickPreview" // replaced by clipboardHistoryQuickPreviewByDefault, kept so the migration can read it
     // Whether the quick window opens with its preview pane already up.
     static let clipboardHistoryQuickPreviewByDefault = "clipboardHistoryQuickPreviewByDefault"
+    // → opens the action card for the selected entry, ← closes it.
+    static let clipboardArrowOpensActions = "clipboardArrowOpensActions"
 
     // Auto clear: wipes the system pasteboard on a delay or on sleep and lock.
     // Deliberately outside the clipboardHistory family, since it clears the
@@ -1111,6 +1113,7 @@ enum Defaults {
         DefaultsKey.clipboardHistoryIncludeImagesFiles: true,
         DefaultsKey.clipboardHistoryIgnoredApps: [String](),
         DefaultsKey.clipboardHistoryQuickPreviewByDefault: false,
+        DefaultsKey.clipboardArrowOpensActions: true,
         DefaultsKey.clipboardAutoClearOnDelay: false,
         DefaultsKey.clipboardAutoClearDelay: Defaults.defaultClipboardAutoClearDelay,
         DefaultsKey.clipboardAutoClearOnSleep: false,
