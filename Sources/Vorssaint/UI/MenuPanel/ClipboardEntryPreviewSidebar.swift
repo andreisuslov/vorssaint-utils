@@ -26,6 +26,8 @@ struct ClipboardEntryPreviewSidebar: View {
                 Divider()
                 if editingEntryID == entry.id {
                     textEditor(entry)
+                } else if entry.kind == .text {
+                    ClipboardTextPreview(text: entry.text)
                 } else {
                     contentScrollView(entry)
                 }
