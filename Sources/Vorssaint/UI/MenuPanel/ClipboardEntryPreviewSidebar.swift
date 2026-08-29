@@ -130,6 +130,10 @@ struct ClipboardEntryPreviewSidebar: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .task(id: entry.id) {
+            // Cleared first: the rows fall back to what the entry itself
+            // says, rather than showing the previous entry's facts until the
+            // disk answers for this one.
+            facts = nil
             let strings = text
             let gathered = await Task.detached(priority: .userInitiated) {
                 ClipboardEntryFacts.gather(entry, text: strings)
