@@ -10,6 +10,22 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# The icon catalog and the bundle are staged in temp dirs; sweep both however
+# the script ends.
+ICON_TMP=""
+STAGE_TMP=""
+
+cleanup() {
+    [[ -n "$ICON_TMP" ]] && rm -rf "$ICON_TMP"
+    [[ -n "$STAGE_TMP" ]] && rm -rf "$STAGE_TMP"
+    return 0
+}
+trap cleanup EXIT
+# zsh runs the EXIT trap when the script is hung up, but not when it is
+# interrupted or terminated; route those through exit so a Ctrl-C partway
+# into the build sweeps like any other ending.
+trap 'exit 1' INT TERM HUP
+
 # Flags: --dev builds the local-only "Vorssaint (Developer)" variant (its own
 # bundle id, so it coexists with the official app); --install puts it in /Applications.
 DEV=0
@@ -170,10 +186,8 @@ fi
 discard_test_preferences() {
     local preferences="$HOME/Library/Preferences" name
     for name in "vorss.tests." "com.vorssaint.tests."; do
-        find "$preferences" -maxdepth 1 -name "$name*.plist" -delete 2>/dev/null || true
+        rm -f "$preferences"/$name*.plist
     done
-    # The harness has no bundle identifier, so `UserDefaults.standard` writes
-    # a file named after the executable.
     rm -f "$preferences/metrics-tests.plist"
     local survivors
     survivors=$(find "$preferences" -maxdepth 1 \
@@ -290,6 +304,7 @@ if (( TEST )); then
         Sources/Vorssaint/Core/MouseExceptionStrings.swift \
         Sources/Vorssaint/Core/ClipboardIgnoredAppsStrings.swift \
         Sources/Vorssaint/Core/WindowPreviewExclusionStrings.swift \
+        Sources/Vorssaint/Core/DiskExclusionStrings.swift \
         Sources/Vorssaint/Core/SwitcherAppRulesStrings.swift \
         Sources/Vorssaint/Services/QuickTools/QuickToolsSupport.swift \
         Sources/Vorssaint/Services/CommandBar/CommandBarSupport.swift \
@@ -420,10 +435,9 @@ if [[ -n "$ADAPTIVE_SKIP" ]]; then
     cp "$ICON_TMP/actool.log" build/actool-failure.log 2>/dev/null || true
     echo "  adaptive icon skipped: $ADAPTIVE_SKIP (Dock falls back to AppIcon.icns)"
 fi
-rm -rf "$ICON_TMP"
-
 echo "▸ Assembling and signing bundle…"
-STAGE="$(mktemp -d)/$APP_NAME.app"
+STAGE_TMP="$(mktemp -d)"
+STAGE="$STAGE_TMP/$APP_NAME.app"
 mkdir -p "$STAGE/Contents/MacOS" "$STAGE/Contents/Resources" \
     "$STAGE/Contents/Library/LaunchDaemons" "$STAGE/Contents/Library/LaunchServices"
 cp "build/$EXECUTABLE" "$STAGE/Contents/MacOS/$EXECUTABLE"
