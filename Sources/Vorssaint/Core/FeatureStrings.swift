@@ -195,7 +195,9 @@ extension ClipboardFeatureStrings {
         copiedLabel: "복사됨",
         sourceLabel: "출처",
         locationLabel: "위치",
-        fileEntryLabel: "파일"
+        fileEntryLabel: "파일",
+        uniformRows: "모든 행을 같은 높이로 유지",
+        uniformRowsCaption: "행마다 텍스트 한 줄과 작은 축소판만 표시하고, 전체 항목은 미리보기 패널에 표시합니다."
     )
 }
 
@@ -482,6 +484,8 @@ struct ClipboardFeatureStrings {
     let sourceLabel: String
     let locationLabel: String
     let fileEntryLabel: String
+    let uniformRows: String
+    let uniformRowsCaption: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -549,7 +553,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copied",
         sourceLabel: "Source",
         locationLabel: "Location",
-        fileEntryLabel: "File"
+        fileEntryLabel: "File",
+        uniformRows: "Keep every row the same height",
+        uniformRowsCaption: "One line of text and a small thumbnail per row; the preview pane shows the whole item."
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -618,7 +624,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copiado",
         sourceLabel: "Origem",
         locationLabel: "Local",
-        fileEntryLabel: "Arquivo"
+        fileEntryLabel: "Arquivo",
+        uniformRows: "Manter todas as linhas com a mesma altura",
+        uniformRowsCaption: "Uma linha de texto e uma miniatura pequena por item; o painel de prévia mostra o item inteiro."
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -687,7 +695,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Kopyalandı",
         sourceLabel: "Kaynak",
         locationLabel: "Konum",
-        fileEntryLabel: "Dosya"
+        fileEntryLabel: "Dosya",
+        uniformRows: "Her satırı aynı yükseklikte tut",
+        uniformRowsCaption: "Satır başına tek satır metin ve küçük bir küçük resim; önizleme bölmesi öğenin tamamını gösterir."
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -756,7 +766,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Скопировано",
         sourceLabel: "Источник",
         locationLabel: "Расположение",
-        fileEntryLabel: "Файл"
+        fileEntryLabel: "Файл",
+        uniformRows: "Одинаковая высота всех строк",
+        uniformRowsCaption: "Одна строка текста и маленькая миниатюра в каждой строке; панель просмотра показывает элемент целиком."
     )
 
     static let es = ClipboardFeatureStrings(
@@ -825,7 +837,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copiado",
         sourceLabel: "Origen",
         locationLabel: "Ubicación",
-        fileEntryLabel: "Archivo"
+        fileEntryLabel: "Archivo",
+        uniformRows: "Mantener todas las filas a la misma altura",
+        uniformRowsCaption: "Una línea de texto y una miniatura pequeña por fila; el panel de vista previa muestra el elemento completo."
     )
 
     static let de = ClipboardFeatureStrings(
@@ -894,7 +908,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Kopiert",
         sourceLabel: "Quelle",
         locationLabel: "Ort",
-        fileEntryLabel: "Datei"
+        fileEntryLabel: "Datei",
+        uniformRows: "Alle Zeilen gleich hoch halten",
+        uniformRowsCaption: "Eine Textzeile und ein kleines Vorschaubild pro Zeile; der Vorschaubereich zeigt den ganzen Eintrag."
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -963,7 +979,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copié",
         sourceLabel: "Source",
         locationLabel: "Emplacement",
-        fileEntryLabel: "Fichier"
+        fileEntryLabel: "Fichier",
+        uniformRows: "Garder toutes les lignes à la même hauteur",
+        uniformRowsCaption: "Une ligne de texte et une petite vignette par ligne ; le volet d'aperçu affiche l'élément entier."
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1032,7 +1050,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copiato",
         sourceLabel: "Origine",
         locationLabel: "Posizione",
-        fileEntryLabel: "File"
+        fileEntryLabel: "File",
+        uniformRows: "Mantieni tutte le righe della stessa altezza",
+        uniformRowsCaption: "Una riga di testo e una miniatura piccola per riga; il pannello di anteprima mostra l'elemento intero."
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1101,7 +1121,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "コピー日時",
         sourceLabel: "コピー元",
         locationLabel: "場所",
-        fileEntryLabel: "ファイル"
+        fileEntryLabel: "ファイル",
+        uniformRows: "すべての行を同じ高さにする",
+        uniformRowsCaption: "各行はテキスト1行と小さなサムネイル。項目全体はプレビューに表示されます。"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1170,7 +1192,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "复制时间",
         sourceLabel: "来源",
         locationLabel: "位置",
-        fileEntryLabel: "文件"
+        fileEntryLabel: "文件",
+        uniformRows: "所有行保持相同高度",
+        uniformRowsCaption: "每行只显示一行文本和一个小缩略图；完整内容在预览面板中显示。"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1239,7 +1263,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "複製時間",
         sourceLabel: "來源",
         locationLabel: "位置",
-        fileEntryLabel: "檔案"
+        fileEntryLabel: "檔案",
+        uniformRows: "所有列保持相同高度",
+        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1308,7 +1334,9 @@ struct ClipboardFeatureStrings {
         copiedLabel: "複製時間",
         sourceLabel: "來源",
         locationLabel: "位置",
-        fileEntryLabel: "檔案"
+        fileEntryLabel: "檔案",
+        uniformRows: "所有列保持相同高度",
+        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。"
     )
 }
 

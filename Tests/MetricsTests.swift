@@ -220,6 +220,8 @@ struct MetricsTests {
                "auto clear starts at twenty seconds")
         expect(Defaults.registeredDefaults[DefaultsKey.clipboardHistoryQuickPreviewByDefault] as? Bool == false,
                "clipboard history quick preview is closed by default")
+        expect(Defaults.registeredDefaults[DefaultsKey.clipboardUniformRows] as? Bool == true,
+               "clipboard rows share one height until asked otherwise")
 
         // MARK: Clipboard auto clear timing
 
@@ -12174,7 +12176,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let values = Mirror(reflecting: FeatureStrings.clipboard(language)).children
                 .compactMap { $0.value as? String }
-            expect(values.count == 66 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 68 && values.allSatisfy { !$0.isEmpty },
                    "every clipboard string is set for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible clipboard strings (\(language.rawValue))")

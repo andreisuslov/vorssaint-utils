@@ -134,6 +134,10 @@ struct PanelClipboardView: View {
                              fallback: .clipboardDefault)
     }
 
+    private static var uniformRows: Bool {
+        UserDefaults.standard.bool(forKey: DefaultsKey.clipboardUniformRows)
+    }
+
     @ViewBuilder
     private func entryPreview(_ entry: ClipboardHistoryEntry) -> some View {
         switch entry.kind {
@@ -155,7 +159,7 @@ struct PanelClipboardView: View {
                     Image(nsImage: thumbnail)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: 110, maxHeight: 40)
+                        .frame(maxWidth: Self.uniformRows ? 22 : 110, maxHeight: Self.uniformRows ? 22 : 40)
                         .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                 }
                 Text("\(text.imageEntryLabel) · \(entry.imageDimensionsLabel)")
@@ -171,7 +175,7 @@ struct PanelClipboardView: View {
                     Image(nsImage: thumbnail)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: 110, maxHeight: 40)
+                        .frame(maxWidth: Self.uniformRows ? 22 : 110, maxHeight: Self.uniformRows ? 22 : 40)
                         .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                     Text(entry.fileNames.first ?? entry.preview)
                         .font(.system(size: 10.5))
