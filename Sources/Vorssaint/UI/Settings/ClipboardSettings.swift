@@ -20,7 +20,6 @@ struct ClipboardSettings: View {
     @AppStorage(DefaultsKey.clipboardArrowOpensActions) private var arrowOpensActions = true
     @AppStorage(DefaultsKey.clipboardShelfTextDrag) private var shelfTextDrag = false
     @AppStorage(DefaultsKey.clipboardShelfTextAction) private var shelfTextAction = false
-    @AppStorage(DefaultsKey.shelfEnabled) private var shelfEnabled = false
     @AppStorage(DefaultsKey.finderPasteImageAsFile) private var pasteImageAsFile = false
     @AppStorage(DefaultsKey.clipboardAutoClearOnDelay) private var autoClearOnDelay = false
     @AppStorage(DefaultsKey.clipboardAutoClearDelay)
@@ -88,7 +87,8 @@ struct ClipboardSettings: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    .disabled(!enabled || !shelfEnabled)
+                    // Settable with the Shelf off: both take effect once it is on.
+                    .disabled(!enabled)
                 }
 
                 // Its own section because it is the one setting here that keeps
