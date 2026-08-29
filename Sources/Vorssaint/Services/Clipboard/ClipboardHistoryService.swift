@@ -1069,10 +1069,23 @@ final class ClipboardHistoryService: ObservableObject {
     }
 
     /// Icon of the app an entry came from, when that app is still installed.
+    /// Cached per app: the lookup asks Launch Services every time otherwise,
+    /// and the preview asks on every step through the list.
     static func sourceIcon(for source: ClipboardEntrySource) -> NSImage? {
+        if let cached = sourceIcons.object(forKey: source.bundleID as NSString) { return cached }
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: source.bundleID)
         else { return nil }
-        return NSWorkspace.shared.icon(forFile: url.path)
+        let icon = NSWorkspace.shared.icon(forFile: url.path)
+        sourceIcons.setObject(icon, forKey: source.bundleID as NSString)
+        return icon
+    }
+
+    private static let sourceIcons = NSCache<NSString, NSImage>()
+
+    /// A string the user asked for as text (a file's path, say), through the
+    /// shared lane like any copy. The history records it as its own entry.
+    func copyPlainText(_ string: String) {
+        writeToPasteboard([ClipboardHistoryEntry(text: string)]) { _ in }
     }
 
     func toggleQuickActions() {
@@ -1146,9 +1159,18 @@ final class ClipboardHistoryService: ObservableObject {
                     ShelfService.shared.add(fileURLs: Self.draggableFileURLs(for: entry))
                 }
             }
+        case .copyPath:
+            return QuickAction(id: kind.rawValue, title: text.copyPath,
+                               symbolName: "text.quote", isDestructive: false, keyHint: nil) { [weak self] in
+                // One path per line; the history records it as text of its own.
+                self?.copyPlainText(entry.filePaths.joined(separator: "\n"))
+                self?.hideHistoryWindow()
+            }
         case .showInFinder:
             return QuickAction(id: kind.rawValue, title: L10n.shared.s.cleanerRevealInFinder,
-                               symbolName: "folder", isDestructive: false, keyHint: nil) {
+                               symbolName: "folder", isDestructive: false, keyHint: nil) { [weak self] in
+                // Like paste and open link: the window steps aside for Finder.
+                self?.hideHistoryWindow()
                 NSWorkspace.shared.activateFileViewerSelecting(
                     entry.filePaths.map { URL(fileURLWithPath: $0) })
             }

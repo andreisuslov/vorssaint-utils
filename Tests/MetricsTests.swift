@@ -422,11 +422,11 @@ struct MetricsTests {
                "the clipboard action list shelves an image when the shelf is on")
         expect(ClipboardQuickActions.kinds(
             for: ClipboardHistoryEntry(text: "", kind: .files, filePaths: ["/tmp/a.pdf"]))
-                == [.paste, .copy, .showInFinder, .pin, .preview, .delete],
-               "the clipboard action list shows a file entry in Finder")
+                == [.paste, .copy, .showInFinder, .copyPath, .pin, .preview, .delete],
+               "the clipboard action list shows a file entry in Finder and copies its path")
         expect(ClipboardQuickActions.kinds(
             for: ClipboardHistoryEntry(text: "", kind: .files, filePaths: ["/tmp/a.pdf"]), shelfAvailable: true)
-                == [.paste, .copy, .showInFinder, .addToShelf, .pin, .preview, .delete],
+                == [.paste, .copy, .showInFinder, .copyPath, .addToShelf, .pin, .preview, .delete],
                "the clipboard action list shelves a file entry when the shelf is on")
         let linkEntry = ClipboardHistoryEntry(text: "https://example.com/a?b=c")
         expect(linkEntry.displayKind == .link
@@ -12213,7 +12213,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let values = Mirror(reflecting: FeatureStrings.clipboard(language)).children
                 .compactMap { $0.value as? String }
-            expect(values.count == 72 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 73 && values.allSatisfy { !$0.isEmpty },
                    "every clipboard string is set for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible clipboard strings (\(language.rawValue))")

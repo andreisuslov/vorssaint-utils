@@ -46,7 +46,8 @@ final class ClipboardFileDragView: NSView, NSDraggingSource {
         guard hypot(location.x - pressLocation.x, location.y - pressLocation.y) > Self.dragThreshold
         else { return }
         self.pressLocation = nil
-        beginDraggingSession(with: draggingItems(), event: event, source: self)
+        beginDraggingSession(with: draggingItems(around: convert(location, from: nil)),
+                             event: event, source: self)
     }
 
     override func mouseUp(with event: NSEvent) {
@@ -60,16 +61,18 @@ final class ClipboardFileDragView: NSView, NSDraggingSource {
     }
 
     /// Finder-style: each file drags under its own icon, fanned so a copy of
-    /// many files reads as many files from the first moment.
-    private func draggingItems() -> [NSDraggingItem] {
+    /// many files reads as many files from the first moment. Centred on the
+    /// pointer, not the row, or the icon slides in from wherever the row's
+    /// middle happens to be.
+    private func draggingItems(around point: NSPoint) -> [NSDraggingItem] {
         let iconSize = NSSize(width: 48, height: 48)
         return items.enumerated().map { index, entry in
             let item = NSDraggingItem(pasteboardWriter: entry.writer)
             let icon = entry.icon.copy() as? NSImage ?? entry.icon
             icon.size = iconSize
             let offset = CGFloat(min(index, 3)) * 6
-            item.setDraggingFrame(NSRect(x: bounds.midX - iconSize.width / 2 + offset,
-                                         y: bounds.midY - iconSize.height / 2 - offset,
+            item.setDraggingFrame(NSRect(x: point.x - iconSize.width / 2 + offset,
+                                         y: point.y - iconSize.height / 2 - offset,
                                          width: iconSize.width,
                                          height: iconSize.height),
                                   contents: icon)

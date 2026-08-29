@@ -474,6 +474,10 @@ final class ShelfService: ObservableObject {
     private var internalShake = ShelfShakeDetector()
 
     func noteInternalContentDrag(at timestamp: TimeInterval) {
+        // The global monitor never saw this gesture start, so the source it
+        // remembers is whichever app the mouse was last pressed in; the
+        // exclusion list must not judge this drag by that.
+        dragSourceBundleIdentifier = nil
         if UserDefaults.standard.bool(forKey: DefaultsKey.shelfShakeToOpen),
            internalShake.record(x: NSEvent.mouseLocation.x, at: timestamp) {
             DispatchQueue.main.async { [weak self] in self?.summon() }
@@ -1461,7 +1465,11 @@ final class ShelfService: ObservableObject {
     private func fileItem(for url: URL, id: UUID = UUID(), title: String? = nil,
                           bookmark: Data? = nil, deferImageThumbnail: Bool = false) -> Item {
         // A fresh item only: a restored one already points at its own copy.
-        let url = bookmark == nil ? adoptedIfOnLoan(url) : url
+        // An adopted copy is named by its UUID, so it takes the name a pasted
+        // image gets instead of showing that.
+        let adopted = bookmark == nil ? adoptedIfOnLoan(url) : url
+        let title = title ?? (adopted != url ? L10n.shared.s.shelfItemImage : nil)
+        let url = adopted
         let isImage = Self.contentThumbnailKind(for: url) == .image
         let fallbackIcon = NSWorkspace.shared.icon(forFile: url.path)
         let inlineThumbnail = isImage && !deferImageThumbnail && Self.decodesCheaplyInline(url)

@@ -223,6 +223,7 @@ enum ClipboardQuickActionKind: String {
     case edit
     case openLink
     case showInFinder
+    case copyPath
     case addToShelf
     case pin
     case preview
@@ -246,7 +247,7 @@ enum ClipboardQuickActions {
             kinds.append(contentsOf: [.openLink, .edit])
             if shelfAvailable, textToShelf { kinds.append(.addToShelf) }
         case .files:
-            kinds.append(.showInFinder)
+            kinds.append(contentsOf: [.showInFinder, .copyPath])
             if shelfAvailable { kinds.append(.addToShelf) }
         case .image:
             if shelfAvailable { kinds.append(.addToShelf) }

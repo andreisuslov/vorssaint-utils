@@ -409,6 +409,7 @@ enum DefaultsKey {
     static let clipboardHistorySkipSensitive = "clipboardHistorySkipSensitive"
     static let clipboardHistoryIncludeImagesFiles = "clipboardHistoryIncludeImagesFiles" // capture copied images and files too
     static let clipboardHistoryIgnoredApps = "clipboardHistoryIgnoredApps" // apps whose copies are never saved
+    static let clipboardHistoryQuickPreview = "clipboardHistoryQuickPreview" // replaced by clipboardHistoryQuickPreviewByDefault, kept so the migration can read it
     // Whether the quick window opens with its preview pane already up.
     static let clipboardHistoryQuickPreviewByDefault = "clipboardHistoryQuickPreviewByDefault"
     // Text entries reach the Shelf only when asked: dragging (with shake to open) and the ⌘K action.
@@ -1259,6 +1260,7 @@ enum Defaults {
         migrateFanControlVisibility(in: defaults)
         migrateScrollInverterAxes(in: defaults)
         migrateWhatsAppDownloadsEnabled(in: defaults)
+        migrateClipboardQuickPreview(in: defaults)
         defaults.register(defaults: registeredDefaults)
         defaults.register(defaults: AppFeature.availabilityDefaults)
         activateBetaChannelIfRunningBeta(in: defaults)
@@ -1315,6 +1317,16 @@ enum Defaults {
         }
         defaults.set(defaults.bool(forKey: DefaultsKey.scrollInverterEnabled),
                      forKey: DefaultsKey.scrollInverterHorizontalEnabled)
+    }
+
+    /// The pane used to remember its last state; now it is a setting. Whoever
+    /// had it open keeps it open.
+    static func migrateClipboardQuickPreview(in defaults: UserDefaults) {
+        guard defaults.object(forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault) == nil else {
+            return
+        }
+        defaults.set(defaults.bool(forKey: DefaultsKey.clipboardHistoryQuickPreview),
+                     forKey: DefaultsKey.clipboardHistoryQuickPreviewByDefault)
     }
 
     static func migrateFanControlVisibility(in defaults: UserDefaults) {
