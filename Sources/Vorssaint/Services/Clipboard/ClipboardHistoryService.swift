@@ -1119,8 +1119,7 @@ final class ClipboardHistoryService: ObservableObject {
         case .copyPath:
             return QuickAction(id: kind.rawValue, title: text.copyPath,
                                symbolName: "text.quote", isDestructive: false, keyHint: nil) { [weak self] in
-                // One path per line. Like any copy from here, the poll skips it
-                // as the app's own write, so it leaves no history entry.
+                // One path per line; copyPlainText records it as a text entry.
                 self?.copyPlainText(entry.filePaths.joined(separator: "\n"))
                 self?.hideHistoryWindow()
             }
