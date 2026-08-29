@@ -201,7 +201,9 @@ extension ClipboardFeatureStrings {
         copyPath: "경로 복사",
         fileEntryLabel: "파일",
         lookUpInDictionary: "사전에서 찾기",
-        arrowOpensActions: "→ 키로 동작 열기(← 키로 닫기)"
+        arrowOpensActions: "→ 키로 동작 열기(← 키로 닫기)",
+        uniformRows: "모든 행을 같은 높이로 유지",
+        uniformRowsCaption: "행마다 텍스트 한 줄과 작은 축소판만 표시하고, 전체 항목은 미리보기 패널에 표시합니다."
     )
 }
 
@@ -494,6 +496,8 @@ struct ClipboardFeatureStrings {
     let fileEntryLabel: String
     let lookUpInDictionary: String
     let arrowOpensActions: String
+    let uniformRows: String
+    let uniformRowsCaption: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -567,7 +571,9 @@ struct ClipboardFeatureStrings {
         copyPath: "Copy path",
         fileEntryLabel: "File",
         lookUpInDictionary: "Look Up in Dictionary",
-        arrowOpensActions: "Open the actions with → (← closes them)"
+        arrowOpensActions: "Open the actions with → (← closes them)",
+        uniformRows: "Keep every row the same height",
+        uniformRowsCaption: "One line of text and a small thumbnail per row; the preview pane shows the whole item."
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -642,7 +648,9 @@ struct ClipboardFeatureStrings {
         copyPath: "Copiar caminho",
         fileEntryLabel: "Arquivo",
         lookUpInDictionary: "Consultar no Dicionário",
-        arrowOpensActions: "Abrir as ações com → (← as fecha)"
+        arrowOpensActions: "Abrir as ações com → (← as fecha)",
+        uniformRows: "Manter todas as linhas com a mesma altura",
+        uniformRowsCaption: "Uma linha de texto e uma miniatura pequena por item; o painel de prévia mostra o item inteiro."
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -717,7 +725,9 @@ struct ClipboardFeatureStrings {
         copyPath: "Yolu kopyala",
         fileEntryLabel: "Dosya",
         lookUpInDictionary: "Sözlükte ara",
-        arrowOpensActions: "Eylemleri → ile aç (← kapatır)"
+        arrowOpensActions: "Eylemleri → ile aç (← kapatır)",
+        uniformRows: "Her satırı aynı yükseklikte tut",
+        uniformRowsCaption: "Satır başına tek satır metin ve küçük bir küçük resim; önizleme bölmesi öğenin tamamını gösterir."
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -792,7 +802,9 @@ struct ClipboardFeatureStrings {
         copyPath: "Скопировать путь",
         fileEntryLabel: "Файл",
         lookUpInDictionary: "Искать в Словаре",
-        arrowOpensActions: "Открывать действия клавишей → (← закрывает)"
+        arrowOpensActions: "Открывать действия клавишей → (← закрывает)",
+        uniformRows: "Одинаковая высота всех строк",
+        uniformRowsCaption: "Одна строка текста и маленькая миниатюра в каждой строке; панель просмотра показывает элемент целиком."
     )
 
     static let es = ClipboardFeatureStrings(
@@ -867,7 +879,9 @@ struct ClipboardFeatureStrings {
         copyPath: "Copiar ruta",
         fileEntryLabel: "Archivo",
         lookUpInDictionary: "Buscar en Diccionario",
-        arrowOpensActions: "Abrir las acciones con → (← las cierra)"
+        arrowOpensActions: "Abrir las acciones con → (← las cierra)",
+        uniformRows: "Mantener todas las filas a la misma altura",
+        uniformRowsCaption: "Una línea de texto y una miniatura pequeña por fila; el panel de vista previa muestra el elemento completo."
     )
 
     static let de = ClipboardFeatureStrings(
@@ -942,7 +956,9 @@ struct ClipboardFeatureStrings {
         copyPath: "Pfad kopieren",
         fileEntryLabel: "Datei",
         lookUpInDictionary: "Im Lexikon nachschlagen",
-        arrowOpensActions: "Aktionen mit → öffnen (← schließt sie)"
+        arrowOpensActions: "Aktionen mit → öffnen (← schließt sie)",
+        uniformRows: "Alle Zeilen gleich hoch halten",
+        uniformRowsCaption: "Eine Textzeile und ein kleines Vorschaubild pro Zeile; der Vorschaubereich zeigt den ganzen Eintrag."
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -1017,7 +1033,9 @@ struct ClipboardFeatureStrings {
         copyPath: "Copier le chemin",
         fileEntryLabel: "Fichier",
         lookUpInDictionary: "Rechercher dans le Dictionnaire",
-        arrowOpensActions: "Ouvrir les actions avec → (← les ferme)"
+        arrowOpensActions: "Ouvrir les actions avec → (← les ferme)",
+        uniformRows: "Garder toutes les lignes à la même hauteur",
+        uniformRowsCaption: "Une ligne de texte et une petite vignette par ligne ; le volet d'aperçu affiche l'élément entier."
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1092,7 +1110,9 @@ struct ClipboardFeatureStrings {
         copyPath: "Copia percorso",
         fileEntryLabel: "File",
         lookUpInDictionary: "Cerca nel Dizionario",
-        arrowOpensActions: "Apri le azioni con → (← le chiude)"
+        arrowOpensActions: "Apri le azioni con → (← le chiude)",
+        uniformRows: "Mantieni tutte le righe della stessa altezza",
+        uniformRowsCaption: "Una riga di testo e una miniatura piccola per riga; il pannello di anteprima mostra l'elemento intero."
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1167,7 +1187,9 @@ struct ClipboardFeatureStrings {
         copyPath: "パスをコピー",
         fileEntryLabel: "ファイル",
         lookUpInDictionary: "辞書で調べる",
-        arrowOpensActions: "→ でアクションを開く（← で閉じる）"
+        arrowOpensActions: "→ でアクションを開く（← で閉じる）",
+        uniformRows: "すべての行を同じ高さにする",
+        uniformRowsCaption: "各行はテキスト1行と小さなサムネイル。項目全体はプレビューに表示されます。"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1242,7 +1264,9 @@ struct ClipboardFeatureStrings {
         copyPath: "拷贝路径",
         fileEntryLabel: "文件",
         lookUpInDictionary: "在词典中查询",
-        arrowOpensActions: "用 → 打开操作（← 关闭）"
+        arrowOpensActions: "用 → 打开操作（← 关闭）",
+        uniformRows: "所有行保持相同高度",
+        uniformRowsCaption: "每行只显示一行文本和一个小缩略图；完整内容在预览面板中显示。"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1317,7 +1341,9 @@ struct ClipboardFeatureStrings {
         copyPath: "拷貝路徑",
         fileEntryLabel: "檔案",
         lookUpInDictionary: "在字典中查詢",
-        arrowOpensActions: "用 → 開啟操作（← 關閉）"
+        arrowOpensActions: "用 → 開啟操作（← 關閉）",
+        uniformRows: "所有列保持相同高度",
+        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1392,7 +1418,9 @@ struct ClipboardFeatureStrings {
         copyPath: "拷貝路徑",
         fileEntryLabel: "檔案",
         lookUpInDictionary: "在字典中查詢",
-        arrowOpensActions: "用 → 開啟操作（← 關閉）"
+        arrowOpensActions: "用 → 開啟操作（← 關閉）",
+        uniformRows: "所有列保持相同高度",
+        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。"
     )
 }
 

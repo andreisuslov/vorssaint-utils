@@ -412,6 +412,8 @@ enum DefaultsKey {
     static let clipboardHistoryQuickPreview = "clipboardHistoryQuickPreview" // replaced by clipboardHistoryQuickPreviewByDefault, kept so the migration can read it
     // Whether the quick window opens with its preview pane already up.
     static let clipboardHistoryQuickPreviewByDefault = "clipboardHistoryQuickPreviewByDefault"
+    // Every list row the same height: one line of text, a small thumbnail; the preview shows the rest.
+    static let clipboardUniformRows = "clipboardUniformRows"
     // → opens the action card for the selected entry, ← closes it.
     static let clipboardArrowOpensActions = "clipboardArrowOpensActions"
 
@@ -1113,6 +1115,7 @@ enum Defaults {
         DefaultsKey.clipboardHistoryIncludeImagesFiles: true,
         DefaultsKey.clipboardHistoryIgnoredApps: [String](),
         DefaultsKey.clipboardHistoryQuickPreviewByDefault: false,
+        DefaultsKey.clipboardUniformRows: true,
         DefaultsKey.clipboardArrowOpensActions: true,
         DefaultsKey.clipboardAutoClearOnDelay: false,
         DefaultsKey.clipboardAutoClearDelay: Defaults.defaultClipboardAutoClearDelay,
