@@ -14,6 +14,7 @@ struct ClipboardEntryPreviewSidebar: View {
     @Binding var isEditing: Bool
     var onClose: () -> Void
     @State private var draft = ""
+    @State private var facts: ClipboardEntryFacts?
     @State private var editingEntryID: UUID?
     @FocusState private var editorFocused: Bool
 
@@ -72,19 +73,20 @@ struct ClipboardEntryPreviewSidebar: View {
         .padding(.vertical, 10)
     }
 
-    /// What the item is, how big it is, when it was copied, where from and
-    /// where it lives. Every line is derived from the entry, so nothing here
-    /// goes stale; a line with nothing to say is left out.
+    /// What the item is, how big it is, when it was copied and where from.
+    /// The lines that need the disk or the workspace are gathered once per
+    /// entry, off the main thread, so stepping through the list with the
+    /// arrow keys costs the same for a big file as for a word.
     private func metadata(_ entry: ClipboardHistoryEntry) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             metaRow(text.typeLabel) {
                 HStack(spacing: 5) {
                     ClipboardKindGlyph(kind: entry.displayKind, size: 16)
-                    Text(typeDescription(entry))
+                    Text(facts?.type ?? ClipboardKindPresentation.label(entry, text: text))
                         .lineLimit(2)
                 }
             }
-            if let size = sizeDescription(entry) {
+            if let size = facts?.size {
                 metaRow(text.sizeLabel) { Text(size) }
             }
             metaRow(text.copiedLabel) {
@@ -97,7 +99,7 @@ struct ClipboardEntryPreviewSidebar: View {
             if let source = entry.source {
                 metaRow(text.sourceLabel) {
                     HStack(spacing: 5) {
-                        if let icon = ClipboardHistoryService.sourceIcon(for: source) {
+                        if let icon = facts?.sourceIcon {
                             Image(nsImage: icon)
                                 .resizable()
                                 .frame(width: 16, height: 16)
@@ -109,13 +111,13 @@ struct ClipboardEntryPreviewSidebar: View {
                     .help(source.bundleID)
                 }
             }
-            if let location = locationDescription(entry) {
+            // A file's path is already in the content below, with its own
+            // copy button; only a link has a location to add here.
+            if entry.displayKind == .link, let host = URL(string: entry.text)?.host {
                 metaRow(text.locationLabel) {
-                    Text(location)
-                        .lineLimit(2)
+                    Text(host)
+                        .lineLimit(1)
                         .truncationMode(.middle)
-                        .textSelection(.enabled)
-                        .help(location)
                 }
             }
         }
@@ -123,6 +125,14 @@ struct ClipboardEntryPreviewSidebar: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
+        .task(id: entry.id) {
+            let strings = text
+            let gathered = await Task.detached(priority: .userInitiated) {
+                ClipboardEntryFacts.gather(entry, text: strings)
+            }.value
+            guard !Task.isCancelled else { return }
+            facts = gathered
+        }
     }
 
     private func metaRow<Value: View>(_ label: String,
@@ -138,59 +148,33 @@ struct ClipboardEntryPreviewSidebar: View {
         }
     }
 
-    private func typeDescription(_ entry: ClipboardHistoryEntry) -> String {
-        let label = ClipboardKindPresentation.label(entry, text: text)
-        switch entry.displayKind {
-        case .text, .link:
-            let counts = String(format: text.textSizeFormat,
-                                Self.count(entry.characterCount), Self.count(entry.lineCount))
-            let words = String(format: text.wordCountFormat, Self.count(entry.wordCount))
-            return "\(label) · \(counts) · \(words)"
-        case .image:
-            return "\(label) · PNG · \(entry.imageDimensionsLabel)"
-        case .files:
-            if entry.filePaths.count == 1, let path = entry.filePaths.first {
-                // The filesystem's own answer, so a folder says "Folder" and a
-                // file with no extension still gets its Get Info kind.
-                let kind = (try? URL(fileURLWithPath: path)
-                    .resourceValues(forKeys: [.localizedTypeDescriptionKey]))?.localizedTypeDescription
-                let dimensions = ClipboardImageStore.imageDimensionsLabel(atPath: path)
-                let details = [kind, dimensions].compactMap { $0 }
-                return details.isEmpty ? label : details.joined(separator: " · ")
+    /// The path, with a button that copies it, since the path is the thing
+    /// most often wanted from a file entry short of the file itself.
+    private func pathBox(_ path: String) -> some View {
+        HStack(alignment: .top, spacing: 6) {
+            Text(path)
+                .font(.system(size: 10.5, design: .monospaced))
+                .textSelection(.enabled)
+                .lineSpacing(2)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Button {
+                ClipboardHistoryService.shared.copyPlainText(path)
+            } label: {
+                Image(systemName: "doc.on.doc")
+                    .font(.system(size: 10, weight: .semibold))
+                    .frame(width: 20, height: 20)
             }
-            return label
+            .buttonStyle(.plain)
+            .help(text.copy)
+            .accessibilityLabel(text.copy)
         }
-    }
-
-    private func sizeDescription(_ entry: ClipboardHistoryEntry) -> String? {
-        switch entry.kind {
-        case .text:
-            return ByteCountFormatter.string(fromByteCount: Int64(entry.utf8ByteCount), countStyle: .file)
-        case .image:
-            guard let name = entry.imageFile, let url = ClipboardImageStore.imageURL(named: name)
-            else { return nil }
-            return ClipboardImageStore.fileSizeString(atPath: url.path)
-        case .files:
-            return ClipboardImageStore.totalFileSizeString(paths: entry.filePaths)
-        }
-    }
-
-    private func locationDescription(_ entry: ClipboardHistoryEntry) -> String? {
-        switch entry.displayKind {
-        case .link:
-            return URL(string: entry.text)?.host
-        case .files:
-            guard let first = entry.filePaths.first else { return nil }
-            if entry.filePaths.count == 1 { return (first as NSString).abbreviatingWithTildeInPath }
-            let folder = (first as NSString).deletingLastPathComponent
-            return (folder as NSString).abbreviatingWithTildeInPath
-        case .text, .image:
-            return nil
-        }
-    }
-
-    private static func count(_ value: Int) -> String {
-        NumberFormatter.localizedString(from: NSNumber(value: value), number: .decimal)
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(Color.primary.opacity(0.04))
+        )
     }
 
     private func contentScrollView(_ entry: ClipboardHistoryEntry) -> some View {
@@ -305,19 +289,7 @@ struct ClipboardEntryPreviewSidebar: View {
                 }
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(path)
-                    .font(.system(size: 10.5, design: .monospaced))
-                    .textSelection(.enabled)
-                    .lineSpacing(2)
-                    .foregroundStyle(.secondary)
-                    .padding(8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(Color.primary.opacity(0.04))
-                    )
-            }
+            pathBox(path)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
@@ -434,5 +406,62 @@ struct ClipboardEntryPreviewSidebar: View {
     private func saveEditing(_ entry: ClipboardHistoryEntry) {
         guard ClipboardHistoryService.shared.updateText(entry, to: draft) else { return }
         cancelEditing()
+    }
+}
+
+/// The metadata lines that cost a disk or workspace round trip, gathered off
+/// the main thread once per entry. Everything else is read straight off the
+/// entry when drawing.
+struct ClipboardEntryFacts: Sendable {
+    let type: String
+    let size: String?
+    let sourceIcon: NSImage?
+
+    static func gather(_ entry: ClipboardHistoryEntry, text: ClipboardFeatureStrings) -> ClipboardEntryFacts {
+        ClipboardEntryFacts(type: typeDescription(entry, text: text),
+                            size: sizeDescription(entry),
+                            sourceIcon: entry.source.flatMap(ClipboardHistoryService.sourceIcon))
+    }
+
+    private static func typeDescription(_ entry: ClipboardHistoryEntry,
+                                        text: ClipboardFeatureStrings) -> String {
+        let label = ClipboardKindPresentation.label(entry, text: text)
+        switch entry.displayKind {
+        case .text, .link:
+            let counts = String(format: text.textSizeFormat,
+                                count(entry.characterCount), count(entry.lineCount))
+            let words = String(format: text.wordCountFormat, count(entry.wordCount))
+            return "\(label) · \(counts) · \(words)"
+        case .image:
+            return "\(label) · PNG · \(entry.imageDimensionsLabel)"
+        case .files:
+            if entry.filePaths.count == 1, let path = entry.filePaths.first {
+                // The filesystem's own answer, so a folder says "Folder" and a
+                // file with no extension still gets its Get Info kind.
+                let kind = (try? URL(fileURLWithPath: path)
+                    .resourceValues(forKeys: [.localizedTypeDescriptionKey]))?.localizedTypeDescription
+                let dimensions = ClipboardImageStore.imageDimensionsLabel(atPath: path)
+                let details = [kind, dimensions].compactMap { $0 }
+                return details.isEmpty ? label : details.joined(separator: " · ")
+            }
+            return label
+        }
+    }
+
+    private static func sizeDescription(_ entry: ClipboardHistoryEntry) -> String? {
+        switch entry.kind {
+        case .text:
+            return ByteCountFormatter.string(fromByteCount: Int64(entry.utf8ByteCount), countStyle: .file)
+        case .image:
+            guard let name = entry.imageFile, let url = ClipboardImageStore.imageURL(named: name)
+            else { return nil }
+            return ClipboardImageStore.fileSizeString(atPath: url.path)
+        case .files:
+            return ClipboardImageStore.totalFileSizeString(paths: entry.filePaths)
+        }
+    }
+
+    private static func count(_ value: Int) -> String {
+        NumberFormatter.localizedString(from: NSNumber(value: value), number: .decimal)
     }
 }

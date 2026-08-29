@@ -1019,10 +1019,23 @@ final class ClipboardHistoryService: ObservableObject {
     }
 
     /// Icon of the app an entry came from, when that app is still installed.
+    /// Cached per app: the lookup asks Launch Services every time otherwise,
+    /// and the preview asks on every step through the list.
     static func sourceIcon(for source: ClipboardEntrySource) -> NSImage? {
+        if let cached = sourceIcons.object(forKey: source.bundleID as NSString) { return cached }
         guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: source.bundleID)
         else { return nil }
-        return NSWorkspace.shared.icon(forFile: url.path)
+        let icon = NSWorkspace.shared.icon(forFile: url.path)
+        sourceIcons.setObject(icon, forKey: source.bundleID as NSString)
+        return icon
+    }
+
+    private static let sourceIcons = NSCache<NSString, NSImage>()
+
+    /// A string the user asked for as text (a file's path, say), through the
+    /// shared lane like any copy. The history records it as its own entry.
+    func copyPlainText(_ string: String) {
+        writeToPasteboard([ClipboardHistoryEntry(text: string)]) { _ in }
     }
 
     func toggleQuickActions() {
