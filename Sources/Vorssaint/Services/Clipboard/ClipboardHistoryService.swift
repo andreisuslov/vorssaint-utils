@@ -1095,10 +1095,13 @@ final class ClipboardHistoryService: ObservableObject {
     private static let sourceIcons = NSCache<NSString, NSImage>()
 
     /// A string the user asked for as text (a file's path, say), through the
-    /// shared lane like any copy, which also means the poll skips it as the
-    /// app's own write rather than recording it.
+    /// shared lane like any copy. The poll skips the app's own writes, so the
+    /// entry is recorded here on purpose: a path copied from the pane is a
+    /// copy like any other and belongs in the list.
     func copyPlainText(_ string: String) {
-        writeToPasteboard([ClipboardHistoryEntry(text: string)]) { _ in }
+        writeToPasteboard([ClipboardHistoryEntry(text: string)]) { [weak self] copied in
+            if copied { self?.promote(string, from: nil) }
+        }
     }
 
     func toggleQuickActions() {
@@ -1175,8 +1178,7 @@ final class ClipboardHistoryService: ObservableObject {
         case .copyPath:
             return QuickAction(id: kind.rawValue, title: text.copyPath,
                                symbolName: "text.quote", isDestructive: false, keyHint: nil) { [weak self] in
-                // One path per line. Like any copy from here, the poll skips it
-                // as the app's own write, so it leaves no history entry.
+                // One path per line; copyPlainText records it as a text entry.
                 self?.copyPlainText(entry.filePaths.joined(separator: "\n"))
                 self?.hideHistoryWindow()
             }
