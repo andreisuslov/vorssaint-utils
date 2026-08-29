@@ -418,8 +418,8 @@ struct MetricsTests {
                "the clipboard action list offers neither editing nor Finder for an image")
         expect(ClipboardQuickActions.kinds(
             for: ClipboardHistoryEntry(text: "", kind: .files, filePaths: ["/tmp/a.pdf"]))
-                == [.paste, .copy, .showInFinder, .pin, .preview, .delete],
-               "the clipboard action list shows a file entry in Finder")
+                == [.paste, .copy, .showInFinder, .copyPath, .pin, .preview, .delete],
+               "the clipboard action list shows a file entry in Finder and copies its path")
         let linkEntry = ClipboardHistoryEntry(text: "https://example.com/a?b=c")
         expect(linkEntry.displayKind == .link
                && ClipboardHistoryEntry(text: "see https://example.com now").displayKind == .text
@@ -12188,7 +12188,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let values = Mirror(reflecting: FeatureStrings.clipboard(language)).children
                 .compactMap { $0.value as? String }
-            expect(values.count == 67 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 68 && values.allSatisfy { !$0.isEmpty },
                    "every clipboard string is set for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible clipboard strings (\(language.rawValue))")

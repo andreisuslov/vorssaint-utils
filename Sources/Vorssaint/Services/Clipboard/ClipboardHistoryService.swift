@@ -1086,6 +1086,15 @@ final class ClipboardHistoryService: ObservableObject {
                 self?.hideHistoryWindow()
                 NSWorkspace.shared.open(url)
             }
+        case .copyPath:
+            return QuickAction(id: kind.rawValue, title: text.copyPath,
+                               symbolName: "text.quote", isDestructive: false, keyHint: nil) { [weak self] in
+                // Through the lane like any copy, one path per line; the
+                // history then records it as a text entry of its own.
+                let paths = ClipboardHistoryEntry(text: entry.filePaths.joined(separator: "\n"))
+                self?.writeToPasteboard([paths]) { _ in }
+                self?.hideHistoryWindow()
+            }
         case .showInFinder:
             return QuickAction(id: kind.rawValue, title: L10n.shared.s.cleanerRevealInFinder,
                                symbolName: "folder", isDestructive: false, keyHint: nil) { [weak self] in

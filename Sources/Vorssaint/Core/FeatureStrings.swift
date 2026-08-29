@@ -196,7 +196,8 @@ extension ClipboardFeatureStrings {
         copiedLabel: "복사됨",
         sourceLabel: "출처",
         locationLabel: "위치",
-        openLink: "링크 열기"
+        openLink: "링크 열기",
+        copyPath: "경로 복사"
     )
 }
 
@@ -484,6 +485,7 @@ struct ClipboardFeatureStrings {
     let sourceLabel: String
     let locationLabel: String
     let openLink: String
+    let copyPath: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -552,7 +554,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copied",
         sourceLabel: "Source",
         locationLabel: "Location",
-        openLink: "Open link"
+        openLink: "Open link",
+        copyPath: "Copy path"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -622,7 +625,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copiado",
         sourceLabel: "Origem",
         locationLabel: "Local",
-        openLink: "Abrir link"
+        openLink: "Abrir link",
+        copyPath: "Copiar caminho"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -692,7 +696,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Kopyalandı",
         sourceLabel: "Kaynak",
         locationLabel: "Konum",
-        openLink: "Bağlantıyı aç"
+        openLink: "Bağlantıyı aç",
+        copyPath: "Yolu kopyala"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -762,7 +767,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Скопировано",
         sourceLabel: "Источник",
         locationLabel: "Расположение",
-        openLink: "Открыть ссылку"
+        openLink: "Открыть ссылку",
+        copyPath: "Скопировать путь"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -832,7 +838,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copiado",
         sourceLabel: "Origen",
         locationLabel: "Ubicación",
-        openLink: "Abrir enlace"
+        openLink: "Abrir enlace",
+        copyPath: "Copiar ruta"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -902,7 +909,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Kopiert",
         sourceLabel: "Quelle",
         locationLabel: "Ort",
-        openLink: "Link öffnen"
+        openLink: "Link öffnen",
+        copyPath: "Pfad kopieren"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -972,7 +980,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copié",
         sourceLabel: "Source",
         locationLabel: "Emplacement",
-        openLink: "Ouvrir le lien"
+        openLink: "Ouvrir le lien",
+        copyPath: "Copier le chemin"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1042,7 +1051,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "Copiato",
         sourceLabel: "Origine",
         locationLabel: "Posizione",
-        openLink: "Apri link"
+        openLink: "Apri link",
+        copyPath: "Copia percorso"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1112,7 +1122,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "コピー日時",
         sourceLabel: "コピー元",
         locationLabel: "場所",
-        openLink: "リンクを開く"
+        openLink: "リンクを開く",
+        copyPath: "パスをコピー"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1182,7 +1193,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "复制时间",
         sourceLabel: "来源",
         locationLabel: "位置",
-        openLink: "打开链接"
+        openLink: "打开链接",
+        copyPath: "拷贝路径"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1252,7 +1264,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "複製時間",
         sourceLabel: "來源",
         locationLabel: "位置",
-        openLink: "開啟連結"
+        openLink: "開啟連結",
+        copyPath: "拷貝路徑"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1322,7 +1335,8 @@ struct ClipboardFeatureStrings {
         copiedLabel: "複製時間",
         sourceLabel: "來源",
         locationLabel: "位置",
-        openLink: "開啟連結"
+        openLink: "開啟連結",
+        copyPath: "拷貝路徑"
     )
 }
 

@@ -223,6 +223,7 @@ enum ClipboardQuickActionKind: String {
     case edit
     case openLink
     case showInFinder
+    case copyPath
     case pin
     case preview
     case delete
@@ -236,7 +237,7 @@ enum ClipboardQuickActions {
         switch entry.displayKind {
         case .text: kinds.append(.edit)
         case .link: kinds.append(contentsOf: [.openLink, .edit])
-        case .files: kinds.append(.showInFinder)
+        case .files: kinds.append(contentsOf: [.showInFinder, .copyPath])
         case .image: break
         }
         kinds.append(contentsOf: [.pin, .preview, .delete])
