@@ -1102,10 +1102,8 @@ final class ClipboardHistoryService: ObservableObject {
         case .copyPath:
             return QuickAction(id: kind.rawValue, title: text.copyPath,
                                symbolName: "text.quote", isDestructive: false, keyHint: nil) { [weak self] in
-                // Through the lane like any copy, one path per line; the
-                // history then records it as a text entry of its own.
-                let paths = ClipboardHistoryEntry(text: entry.filePaths.joined(separator: "\n"))
-                self?.writeToPasteboard([paths]) { _ in }
+                // One path per line; the history records it as text of its own.
+                self?.copyPlainText(entry.filePaths.joined(separator: "\n"))
                 self?.hideHistoryWindow()
             }
         case .showInFinder:
