@@ -324,8 +324,10 @@ struct MetricsTests {
                          "\(language.rawValue) paste-selected button format")
             expectFormat(clipboardStrings.copySelectedFormat, ["d"],
                          "\(language.rawValue) copy-selected button format")
-            expectFormat(clipboardStrings.textSizeFormat, ["@", "@"],
-                         "\(language.rawValue) clipboard text size format")
+            expectFormat(clipboardStrings.characterCountFormat, ["@"],
+                         "\(language.rawValue) clipboard character count format")
+            expectFormat(clipboardStrings.lineCountFormat, ["@"],
+                         "\(language.rawValue) clipboard line count format")
             expect(!clipboardStrings.previewByDefault.isEmpty
                    && !clipboardStrings.previewByDefaultCaption.isEmpty
                    && !clipboardStrings.openInWindowHint.isEmpty
@@ -12222,7 +12224,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let values = Mirror(reflecting: FeatureStrings.clipboard(language)).children
                 .compactMap { $0.value as? String }
-            expect(values.count == 76 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 77 && values.allSatisfy { !$0.isEmpty },
                    "every clipboard string is set for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible clipboard strings (\(language.rawValue))")

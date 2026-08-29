@@ -1055,7 +1055,8 @@ final class ClipboardHistoryService: ObservableObject {
 
     /// Files and images always drag as files; text drags as text only when
     /// Settings says so, since a text row that grabs the pointer is a row
-    /// that no longer selects on click-and-drag.
+    /// that no longer selects on click-and-drag. Neither depends on the
+    /// Shelf: a drag goes to whatever takes a drop.
     static func dragItems(for entry: ClipboardHistoryEntry) -> [DragItem] {
         switch entry.kind {
         case .files, .image:
@@ -1063,8 +1064,7 @@ final class ClipboardHistoryService: ObservableObject {
                 DragItem(writer: $0 as NSURL, icon: NSWorkspace.shared.icon(forFile: $0.path))
             }
         case .text:
-            guard shelfAvailable,
-                  UserDefaults.standard.bool(forKey: DefaultsKey.clipboardShelfTextDrag),
+            guard UserDefaults.standard.bool(forKey: DefaultsKey.clipboardShelfTextDrag),
                   let icon = NSImage(systemSymbolName: entry.isLink ? "link" : "text.alignleft",
                                      accessibilityDescription: nil)
             else { return [] }

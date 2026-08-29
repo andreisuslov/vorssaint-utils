@@ -77,19 +77,19 @@ struct ClipboardSettings: View {
                     .disabled(!enabled)
                 }
 
-                if AppFeature.shelf.isAvailable {
-                    Section {
-                        Toggle(String(format: text.shelfTextDragFormat, l10n.s.shelfName),
-                               isOn: $shelfTextDrag)
+                // The drag goes to anything that takes a drop, so it does not
+                // wait for the Shelf; only the ⌘K action is the Shelf's own.
+                Section {
+                    Toggle(text.textDragToggle, isOn: $shelfTextDrag)
+                    if AppFeature.shelf.isAvailable {
                         Toggle(String(format: text.shelfTextActionFormat, l10n.s.shelfName),
                                isOn: $shelfTextAction)
-                        Text(String(format: text.shelfTextCaptionFormat, l10n.s.shelfName))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
                     }
-                    // Settable with the Shelf off: both take effect once it is on.
-                    .disabled(!enabled)
+                    Text(String(format: text.shelfTextCaptionFormat, l10n.s.shelfName))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
+                .disabled(!enabled)
 
                 // Its own section because it is the one setting here that keeps
                 // working with capture off: the panel entry stays, saying so,

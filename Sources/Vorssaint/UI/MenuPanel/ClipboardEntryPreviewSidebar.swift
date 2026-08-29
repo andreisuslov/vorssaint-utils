@@ -80,7 +80,9 @@ struct ClipboardEntryPreviewSidebar: View {
     private func metadata(_ entry: ClipboardHistoryEntry) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             metaRow(text.typeLabel) {
-                HStack(spacing: 5) {
+                // Top-aligned: the description can wrap, and the glyph belongs
+                // to its first line, not to the middle of two.
+                HStack(alignment: .top, spacing: 5) {
                     ClipboardKindGlyph(kind: entry.displayKind, size: 16)
                     Text(facts?.type ?? ClipboardKindPresentation.label(entry, text: text))
                         .lineLimit(2)
@@ -431,10 +433,12 @@ struct ClipboardEntryFacts: Sendable {
         let label = ClipboardKindPresentation.label(entry, text: text)
         switch entry.displayKind {
         case .text, .link:
-            let counts = String(format: text.textSizeFormat,
-                                count(entry.characterCount), count(entry.lineCount))
-            let words = String(format: text.wordCountFormat, count(entry.wordCount))
-            return "\(label) · \(counts) · \(words)"
+            // Lines and words only when there is more than one of them: a
+            // single line is not a line count, and "1 lines" reads wrong.
+            var parts = [label, String(format: text.characterCountFormat, count(entry.characterCount))]
+            if entry.lineCount > 1 { parts.append(String(format: text.lineCountFormat, count(entry.lineCount))) }
+            if entry.wordCount > 1 { parts.append(String(format: text.wordCountFormat, count(entry.wordCount))) }
+            return parts.joined(separator: " · ")
         case .image:
             return "\(label) · PNG · \(entry.imageDimensionsLabel)"
         case .files:
