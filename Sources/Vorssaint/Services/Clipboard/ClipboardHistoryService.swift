@@ -1213,10 +1213,11 @@ final class ClipboardHistoryService: ObservableObject {
                 self?.togglePin(entry)
             }
         case .preview:
-            return QuickAction(id: kind.rawValue, title: text.previewLabel,
-                               symbolName: "doc.text.magnifyingglass",
-                               isDestructive: false, keyHint: "␣") { [weak self] in
-                self?.toggleQuickPreview()
+            // A window of its own, the system's Quick Look, rather than the
+            // pane beside the list, which Space already toggles.
+            return QuickAction(id: kind.rawValue, title: text.quickLook,
+                               symbolName: "eye", isDestructive: false, keyHint: nil) {
+                ClipboardQuickLook.shared.show(entry)
             }
         case .delete:
             return QuickAction(id: kind.rawValue, title: text.delete,
@@ -1260,9 +1261,10 @@ final class ClipboardHistoryService: ObservableObject {
         setQuickActionsPresented(false)
         if let entry, let index = filteredQuickEntries.firstIndex(where: { $0.id == entry.id }) {
             quickSelectionIndex = index
-            // Shown as selected and scrolled to, like an arrow-key selection.
-            quickSelectionIsVisible = true
         }
+        // The first row starts selected, so Return pastes it and ↓ goes to
+        // the second; before, the first ↓ only made the selection appear.
+        quickSelectionIsVisible = !filteredQuickEntries.isEmpty
         // Assigned, not set through the setter: position() below reads the
         // flag for the size, and the panel is resized there in one go.
         quickPreviewPresented = entry != nil || UserDefaults.standard
@@ -1276,6 +1278,7 @@ final class ClipboardHistoryService: ObservableObject {
     }
 
     func hideHistoryWindow() {
+        ClipboardQuickLook.shared.hide()
         removeKeyMonitor()
         removeDismissMonitors()
         panel?.orderOut(nil)

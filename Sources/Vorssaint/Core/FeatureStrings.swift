@@ -208,7 +208,8 @@ extension ClipboardFeatureStrings {
         lookUpInDictionary: "사전에서 찾기",
         arrowOpensActions: "→ 키로 동작 열기(← 키로 닫기)",
         uniformRows: "모든 행을 같은 높이로 유지",
-        uniformRowsCaption: "행마다 텍스트 한 줄과 작은 축소판만 표시하고, 전체 항목은 미리보기 패널에 표시합니다."
+        uniformRowsCaption: "행마다 텍스트 한 줄과 작은 축소판만 표시하고, 전체 항목은 미리보기 패널에 표시합니다.",
+        quickLook: "훑어보기"
     )
 }
 
@@ -508,6 +509,7 @@ struct ClipboardFeatureStrings {
     let arrowOpensActions: String
     let uniformRows: String
     let uniformRowsCaption: String
+    let quickLook: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -588,7 +590,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "Look Up in Dictionary",
         arrowOpensActions: "Open the actions with → (← closes them)",
         uniformRows: "Keep every row the same height",
-        uniformRowsCaption: "One line of text and a small thumbnail per row; the preview pane shows the whole item."
+        uniformRowsCaption: "One line of text and a small thumbnail per row; the preview pane shows the whole item.",
+        quickLook: "Quick Look"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -670,7 +673,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "Consultar no Dicionário",
         arrowOpensActions: "Abrir as ações com → (← as fecha)",
         uniformRows: "Manter todas as linhas com a mesma altura",
-        uniformRowsCaption: "Uma linha de texto e uma miniatura pequena por item; o painel de prévia mostra o item inteiro."
+        uniformRowsCaption: "Uma linha de texto e uma miniatura pequena por item; o painel de prévia mostra o item inteiro.",
+        quickLook: "Visualização Rápida"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -752,7 +756,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "Sözlükte ara",
         arrowOpensActions: "Eylemleri → ile aç (← kapatır)",
         uniformRows: "Her satırı aynı yükseklikte tut",
-        uniformRowsCaption: "Satır başına tek satır metin ve küçük bir küçük resim; önizleme bölmesi öğenin tamamını gösterir."
+        uniformRowsCaption: "Satır başına tek satır metin ve küçük bir küçük resim; önizleme bölmesi öğenin tamamını gösterir.",
+        quickLook: "Hızlı Bakış"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -834,7 +839,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "Искать в Словаре",
         arrowOpensActions: "Открывать действия клавишей → (← закрывает)",
         uniformRows: "Одинаковая высота всех строк",
-        uniformRowsCaption: "Одна строка текста и маленькая миниатюра в каждой строке; панель просмотра показывает элемент целиком."
+        uniformRowsCaption: "Одна строка текста и маленькая миниатюра в каждой строке; панель просмотра показывает элемент целиком.",
+        quickLook: "Быстрый просмотр"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -916,7 +922,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "Buscar en Diccionario",
         arrowOpensActions: "Abrir las acciones con → (← las cierra)",
         uniformRows: "Mantener todas las filas a la misma altura",
-        uniformRowsCaption: "Una línea de texto y una miniatura pequeña por fila; el panel de vista previa muestra el elemento completo."
+        uniformRowsCaption: "Una línea de texto y una miniatura pequeña por fila; el panel de vista previa muestra el elemento completo.",
+        quickLook: "Vista Rápida"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -998,7 +1005,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "Im Lexikon nachschlagen",
         arrowOpensActions: "Aktionen mit → öffnen (← schließt sie)",
         uniformRows: "Alle Zeilen gleich hoch halten",
-        uniformRowsCaption: "Eine Textzeile und ein kleines Vorschaubild pro Zeile; der Vorschaubereich zeigt den ganzen Eintrag."
+        uniformRowsCaption: "Eine Textzeile und ein kleines Vorschaubild pro Zeile; der Vorschaubereich zeigt den ganzen Eintrag.",
+        quickLook: "Übersicht"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -1080,7 +1088,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "Rechercher dans le Dictionnaire",
         arrowOpensActions: "Ouvrir les actions avec → (← les ferme)",
         uniformRows: "Garder toutes les lignes à la même hauteur",
-        uniformRowsCaption: "Une ligne de texte et une petite vignette par ligne ; le volet d'aperçu affiche l'élément entier."
+        uniformRowsCaption: "Une ligne de texte et une petite vignette par ligne ; le volet d'aperçu affiche l'élément entier.",
+        quickLook: "Coup d'œil"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1162,7 +1171,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "Cerca nel Dizionario",
         arrowOpensActions: "Apri le azioni con → (← le chiude)",
         uniformRows: "Mantieni tutte le righe della stessa altezza",
-        uniformRowsCaption: "Una riga di testo e una miniatura piccola per riga; il pannello di anteprima mostra l'elemento intero."
+        uniformRowsCaption: "Una riga di testo e una miniatura piccola per riga; il pannello di anteprima mostra l'elemento intero.",
+        quickLook: "Visualizzazione rapida"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1244,7 +1254,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "辞書で調べる",
         arrowOpensActions: "→ でアクションを開く（← で閉じる）",
         uniformRows: "すべての行を同じ高さにする",
-        uniformRowsCaption: "各行はテキスト1行と小さなサムネイル。項目全体はプレビューに表示されます。"
+        uniformRowsCaption: "各行はテキスト1行と小さなサムネイル。項目全体はプレビューに表示されます。",
+        quickLook: "クイックルック"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1326,7 +1337,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "在词典中查询",
         arrowOpensActions: "用 → 打开操作（← 关闭）",
         uniformRows: "所有行保持相同高度",
-        uniformRowsCaption: "每行只显示一行文本和一个小缩略图；完整内容在预览面板中显示。"
+        uniformRowsCaption: "每行只显示一行文本和一个小缩略图；完整内容在预览面板中显示。",
+        quickLook: "快速查看"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1408,7 +1420,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "在字典中查詢",
         arrowOpensActions: "用 → 開啟操作（← 關閉）",
         uniformRows: "所有列保持相同高度",
-        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。"
+        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。",
+        quickLook: "快速查看"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1490,7 +1503,8 @@ struct ClipboardFeatureStrings {
         lookUpInDictionary: "在字典中查詢",
         arrowOpensActions: "用 → 開啟操作（← 關閉）",
         uniformRows: "所有列保持相同高度",
-        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。"
+        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。",
+        quickLook: "快速查看"
     )
 }
 
