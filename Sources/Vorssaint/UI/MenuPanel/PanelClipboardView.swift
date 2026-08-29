@@ -86,6 +86,9 @@ struct PanelClipboardView: View {
                 .help(text.clearRecent)
                 .disabled(history.recentEntries.isEmpty)
                 Button {
+                    // The window takes over from the panel, as a double-click
+                    // on a row does; two clipboards on screen is one too many.
+                    appDelegate()?.closePopover()
                     history.showHistoryWindow()
                 } label: {
                     Image(systemName: "arrow.up.forward.app")

@@ -513,15 +513,23 @@ struct ClipboardQuickPanelView: View {
                             .font(.system(size: 9.5))
                             .lineLimit(1)
                             .truncationMode(.tail)
-                    } else {
-                        Text("⌘K")
-                            .font(.system(size: 9.5, weight: .semibold, design: .rounded))
-                        Text(text.actionsTitle)
-                            .font(.system(size: 9.5))
                     }
                 }
                 .foregroundStyle(.tertiary)
                 .frame(maxWidth: 260, alignment: .trailing)
+                Button {
+                    history.toggleQuickActions()
+                } label: {
+                    HStack(spacing: 5) {
+                        Image(systemName: "command")
+                            .font(.system(size: 9, weight: .semibold))
+                        Text("K")
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        Text(text.actionsTitle)
+                    }
+                }
+                .buttonStyle(.bordered)
+                .help(text.actionsTitle)
             }
             HStack(spacing: 5) {
                 Image(systemName: "doc.on.clipboard")

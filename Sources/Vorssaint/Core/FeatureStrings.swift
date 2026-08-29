@@ -202,7 +202,8 @@ extension ClipboardFeatureStrings {
         shelfTextActionFormat: "⌘K 동작에서 텍스트에도 “%@에 추가” 제공",
         shelfTextCaptionFormat: "파일과 이미지는 항상 드래그할 수 있고 %@에 추가할 수 있습니다. 이 두 옵션은 이를 텍스트로 확장합니다.",
         openLink: "링크 열기",
-        copyPath: "경로 복사"
+        copyPath: "경로 복사",
+        fileEntryLabel: "파일"
     )
 }
 
@@ -496,6 +497,7 @@ struct ClipboardFeatureStrings {
     let shelfTextCaptionFormat: String
     let openLink: String
     let copyPath: String
+    let fileEntryLabel: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -570,7 +572,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "Offer “Add to %@” for text in the ⌘K actions",
         shelfTextCaptionFormat: "Files and images always drag out and can be added to %@. These two extend that to text.",
         openLink: "Open link",
-        copyPath: "Copy path"
+        copyPath: "Copy path",
+        fileEntryLabel: "File"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -646,7 +649,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "Oferecer “Adicionar a %@” para texto nas ações ⌘K",
         shelfTextCaptionFormat: "Arquivos e imagens sempre podem ser arrastados e adicionados a %@. Estas duas opções estendem isso ao texto.",
         openLink: "Abrir link",
-        copyPath: "Copiar caminho"
+        copyPath: "Copiar caminho",
+        fileEntryLabel: "Arquivo"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -722,7 +726,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "⌘K eylemlerinde metin için “%@ içine ekle” sunulsun",
         shelfTextCaptionFormat: "Dosyalar ve görseller her zaman dışarı sürüklenebilir ve %@ içine eklenebilir. Bu ikisi bunu metne de genişletir.",
         openLink: "Bağlantıyı aç",
-        copyPath: "Yolu kopyala"
+        copyPath: "Yolu kopyala",
+        fileEntryLabel: "Dosya"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -798,7 +803,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "Предлагать «Добавить: %@» для текста в действиях ⌘K",
         shelfTextCaptionFormat: "Файлы и изображения всегда можно перетащить и добавить: %@. Эти два параметра распространяют это на текст.",
         openLink: "Открыть ссылку",
-        copyPath: "Скопировать путь"
+        copyPath: "Скопировать путь",
+        fileEntryLabel: "Файл"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -874,7 +880,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "Ofrecer “Añadir a %@” para texto en las acciones ⌘K",
         shelfTextCaptionFormat: "Los archivos e imágenes siempre se pueden arrastrar y añadir a %@. Estas dos opciones lo extienden al texto.",
         openLink: "Abrir enlace",
-        copyPath: "Copiar ruta"
+        copyPath: "Copiar ruta",
+        fileEntryLabel: "Archivo"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -950,7 +957,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "„Zu %@ hinzufügen“ für Text in den ⌘K-Aktionen anbieten",
         shelfTextCaptionFormat: "Dateien und Bilder lassen sich immer herausziehen und zu %@ hinzufügen. Diese beiden erweitern das auf Text.",
         openLink: "Link öffnen",
-        copyPath: "Pfad kopieren"
+        copyPath: "Pfad kopieren",
+        fileEntryLabel: "Datei"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -1026,7 +1034,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "Proposer « Ajouter à %@ » pour le texte dans les actions ⌘K",
         shelfTextCaptionFormat: "Les fichiers et images se glissent toujours et peuvent être ajoutés à %@. Ces deux options l'étendent au texte.",
         openLink: "Ouvrir le lien",
-        copyPath: "Copier le chemin"
+        copyPath: "Copier le chemin",
+        fileEntryLabel: "Fichier"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1102,7 +1111,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "Offri “Aggiungi a %@” per il testo nelle azioni ⌘K",
         shelfTextCaptionFormat: "File e immagini si trascinano sempre e possono essere aggiunti a %@. Queste due opzioni lo estendono al testo.",
         openLink: "Apri link",
-        copyPath: "Copia percorso"
+        copyPath: "Copia percorso",
+        fileEntryLabel: "File"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1178,7 +1188,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "⌘Kアクションでテキストにも「%@に追加」を表示",
         shelfTextCaptionFormat: "ファイルと画像は常にドラッグでき、%@に追加できます。この2つはそれをテキストにも広げます。",
         openLink: "リンクを開く",
-        copyPath: "パスをコピー"
+        copyPath: "パスをコピー",
+        fileEntryLabel: "ファイル"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1254,7 +1265,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "在 ⌘K 操作中为文本提供“添加到%@”",
         shelfTextCaptionFormat: "文件和图片始终可以拖出并添加到%@。这两项将其扩展到文本。",
         openLink: "打开链接",
-        copyPath: "拷贝路径"
+        copyPath: "拷贝路径",
+        fileEntryLabel: "文件"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1330,7 +1342,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "在 ⌘K 操作中為文字提供「加入%@」",
         shelfTextCaptionFormat: "檔案和圖片始終可以拖出並加入%@。這兩項將其擴展到文字。",
         openLink: "開啟連結",
-        copyPath: "拷貝路徑"
+        copyPath: "拷貝路徑",
+        fileEntryLabel: "檔案"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1406,7 +1419,8 @@ struct ClipboardFeatureStrings {
         shelfTextActionFormat: "在 ⌘K 操作中為文字提供「加入%@」",
         shelfTextCaptionFormat: "檔案和圖片始終可以拖出並加入%@。這兩項將其擴展到文字。",
         openLink: "開啟連結",
-        copyPath: "拷貝路徑"
+        copyPath: "拷貝路徑",
+        fileEntryLabel: "檔案"
     )
 }
 
