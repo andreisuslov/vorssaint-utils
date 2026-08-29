@@ -633,13 +633,14 @@ struct UtilitiesSection: View {
         }
         .onDisappear {
             PanelInteractionState.shared.viewKeepsPopoverOpen = false
-            PanelInteractionState.shared.hostedSettingsPage = nil
         }
     }
 
     /// The Settings page that belongs to whichever tool the section is
-    /// showing, derived from the same flags as `isHostingUtility` so every
-    /// hosted tool is covered by the one list.
+    /// showing, derived from the same state as `isHostingUtility` so every
+    /// hosted tool is covered by the one list. Never cleared elsewhere: the
+    /// hosting view lives as long as the app and a closed panel keeps its
+    /// tool on screen, so the `onChange` mirror is the only writer.
     private var hostedSettingsPage: SettingsPage? {
         if showUninstaller { return .uninstaller }
         if showCleanerPanel { return .cleaner }
