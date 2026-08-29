@@ -95,6 +95,10 @@ final class PermissionGuideOverlay {
                 model.granted = true
                 model.stale = false
                 self?.staleWork?.cancel()
+                // Granted is the end of the wait either way, so the fast
+                // polling this card asked for stops here, whether the card
+                // leaves or stays.
+                if let self { Permissions.shared.setActivePermissionSurface(self.pollingDemandID, visible: false) }
                 // Screen Recording applies to a fresh process only, so the
                 // card stays with a Relaunch button instead of leaving.
                 if kind == .accessibility { self?.scheduleDismiss() }

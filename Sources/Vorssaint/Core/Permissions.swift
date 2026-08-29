@@ -269,15 +269,18 @@ final class Permissions: ObservableObject {
         guard kind == .accessibility || kind == .screenRecording,
               let bundleID = Bundle.main.bundleIdentifier else { return }
         let service = kind == .accessibility ? "Accessibility" : "ScreenCapture"
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
-        process.arguments = ["reset", service, bundleID]
-        process.standardOutput = nil
-        process.standardError = nil
-        try? process.run()
-        process.waitUntilExit()
-        refreshActivePermissions()
-        if kind == .accessibility { requestAccessibility() } else { requestScreenRecording() }
+        // Off the main thread through the bounded runner, like
+        // `SelfUninstall.resetTCC`: a stuck tccutil must not hang the UI. The
+        // hop back also lets the button's click finish before the card that
+        // holds the button is rebuilt by the new request.
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            _ = Shell.run("/usr/bin/tccutil", ["reset", service, bundleID])
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.refreshActivePermissions()
+                if kind == .accessibility { self.requestAccessibility() } else { self.requestScreenRecording() }
+            }
+        }
     }
 
     func openAccessibilitySettings() {
