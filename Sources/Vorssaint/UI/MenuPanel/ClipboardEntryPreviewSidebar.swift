@@ -112,7 +112,7 @@ struct ClipboardEntryPreviewSidebar: View {
         .font(.system(size: 10.5))
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
-        .padding(.bottom, 10)
+        .padding(.vertical, 10)
     }
 
     private func metaRow<Value: View>(_ label: String,
