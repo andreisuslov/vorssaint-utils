@@ -45,18 +45,6 @@ struct ClipboardQuickPanelView: View {
                     Divider()
                     footer
                 }
-                .overlay {
-                    if history.quickActionsPresented {
-                        ZStack {
-                            Color.black.opacity(0.18)
-                                .ignoresSafeArea()
-                                .onTapGesture { history.setQuickActionsPresented(false) }
-                            actionsCard
-                                .transition(.scale(scale: 0.96).combined(with: .opacity))
-                        }
-                    }
-                }
-                .animation(.easeOut(duration: 0.14), value: history.quickActionsPresented)
                 if history.quickPreviewPresented {
                     Divider()
                     ClipboardEntryPreviewSidebar(text: text,
@@ -67,6 +55,20 @@ struct ClipboardQuickPanelView: View {
                         .transition(.opacity)
                 }
             }
+            // Over the list and the pane both: the card takes every key, so
+            // nothing beside it should look, or be, clickable meanwhile.
+            .overlay {
+                if history.quickActionsPresented {
+                    ZStack {
+                        Color.black.opacity(0.18)
+                            .ignoresSafeArea()
+                            .onTapGesture { history.setQuickActionsPresented(false) }
+                        actionsCard
+                            .transition(.scale(scale: 0.96).combined(with: .opacity))
+                    }
+                }
+            }
+            .animation(.easeOut(duration: 0.14), value: history.quickActionsPresented)
         }
         .frame(width: panelSize.width, height: panelSize.height, alignment: .topLeading)
         .background(.regularMaterial)
