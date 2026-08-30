@@ -312,8 +312,11 @@ enum ClipboardHistorySelection {
     }
 }
 
-enum ClipboardHistoryPreview {
-    static func handlesSpace(selectionIsVisible: Bool, hasModifiers: Bool) -> Bool {
+enum ClipboardHistorySpaceKey {
+    /// Space belongs to the list only once the keyboard is driving it, so a
+    /// space typed into the search field stays a space, and a modified Space
+    /// keeps whatever it means elsewhere.
+    static func handledByList(selectionIsVisible: Bool, hasModifiers: Bool) -> Bool {
         selectionIsVisible && !hasModifiers
     }
 }

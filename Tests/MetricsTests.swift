@@ -411,12 +411,12 @@ struct MetricsTests {
                                                          resultIDs: ["b", "a"]) == 0,
                "Settings search selection follows the same result after reranking")
 
-        expect(!ClipboardHistoryPreview.handlesSpace(selectionIsVisible: false, hasModifiers: false),
-               "clipboard preview leaves spaces typed into search alone")
-        expect(ClipboardHistoryPreview.handlesSpace(selectionIsVisible: true, hasModifiers: false),
-               "clipboard preview uses Space after keyboard navigation")
-        expect(!ClipboardHistoryPreview.handlesSpace(selectionIsVisible: true, hasModifiers: true),
-               "clipboard preview never steals modified Space shortcuts")
+        expect(!ClipboardHistorySpaceKey.handledByList(selectionIsVisible: false, hasModifiers: false),
+               "the clipboard list leaves spaces typed into search alone")
+        expect(ClipboardHistorySpaceKey.handledByList(selectionIsVisible: true, hasModifiers: false),
+               "the clipboard list takes Space after keyboard navigation")
+        expect(!ClipboardHistorySpaceKey.handledByList(selectionIsVisible: true, hasModifiers: true),
+               "the clipboard list never steals modified Space shortcuts")
         expect(ClipboardHistoryEscape.action(batchCount: 0) == .hideWindow,
                "Esc closes the panel when nothing is selected")
         expect(ClipboardHistoryEscape.action(batchCount: 2) == .clearBatchSelection,
