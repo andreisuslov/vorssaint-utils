@@ -1160,7 +1160,7 @@ final class ClipboardHistoryService: ObservableObject {
         case .preview:
             return QuickAction(id: kind.rawValue, title: text.previewLabel,
                                symbolName: "doc.text.magnifyingglass",
-                               isDestructive: false, keyHint: "␣") { [weak self] in
+                               isDestructive: false, keyHint: nil) { [weak self] in
                 self?.toggleQuickPreview()
             }
         case .delete:
