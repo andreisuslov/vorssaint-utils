@@ -10,6 +10,22 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# The icon catalog and the bundle are staged in temp dirs; sweep both however
+# the script ends.
+ICON_TMP=""
+STAGE_TMP=""
+
+cleanup() {
+    [[ -n "$ICON_TMP" ]] && rm -rf "$ICON_TMP"
+    [[ -n "$STAGE_TMP" ]] && rm -rf "$STAGE_TMP"
+    return 0
+}
+trap cleanup EXIT
+# zsh runs the EXIT trap when the script is hung up, but not when it is
+# interrupted or terminated; route those through exit so a Ctrl-C partway
+# into the build sweeps like any other ending.
+trap 'exit 1' INT TERM HUP
+
 # Flags: --dev builds the local-only "Vorssaint (Developer)" variant (its own
 # bundle id, so it coexists with the official app); --install puts it in /Applications.
 DEV=0
@@ -283,6 +299,7 @@ if (( TEST )); then
         Sources/Vorssaint/Services/MiddleClick/MiddleClickSupport.swift \
         Sources/Vorssaint/Services/MouseNavigation/MouseNavigationSupport.swift \
         Sources/Vorssaint/Services/MouseButtons/MouseButtonShortcutSupport.swift \
+        Sources/Vorssaint/Services/MouseButtons/MouseSpacesGestureSupport.swift \
         Sources/Vorssaint/Services/MouseExceptions/MouseAppExceptionSupport.swift \
         Sources/Vorssaint/Core/MouseButtonStrings.swift \
         Sources/Vorssaint/Core/MouseExceptionStrings.swift \
@@ -313,6 +330,8 @@ if (( TEST )); then
         Sources/Vorssaint/Services/SuperKey/SuperKeySupport.swift \
         Sources/Vorssaint/Services/SuperKey/SuperKeyMappingGuard.swift \
         Sources/Vorssaint/Core/SuperKeyStrings.swift \
+        Sources/Vorssaint/Services/SessionActivity.swift \
+        Sources/Vorssaint/Services/SessionActivitySupport.swift \
         Sources/Vorssaint/Services/ScrollWheelSupport.swift \
         Sources/Vorssaint/Services/SmoothScrollSupport.swift \
         Sources/Vorssaint/Services/FocusFollowsMouse/FocusFollowsMouseSupport.swift \
@@ -419,10 +438,9 @@ if [[ -n "$ADAPTIVE_SKIP" ]]; then
     cp "$ICON_TMP/actool.log" build/actool-failure.log 2>/dev/null || true
     echo "  adaptive icon skipped: $ADAPTIVE_SKIP (Dock falls back to AppIcon.icns)"
 fi
-rm -rf "$ICON_TMP"
-
 echo "▸ Assembling and signing bundle…"
-STAGE="$(mktemp -d)/$APP_NAME.app"
+STAGE_TMP="$(mktemp -d)"
+STAGE="$STAGE_TMP/$APP_NAME.app"
 mkdir -p "$STAGE/Contents/MacOS" "$STAGE/Contents/Resources" \
     "$STAGE/Contents/Library/LaunchDaemons" "$STAGE/Contents/Library/LaunchServices"
 cp "build/$EXECUTABLE" "$STAGE/Contents/MacOS/$EXECUTABLE"
