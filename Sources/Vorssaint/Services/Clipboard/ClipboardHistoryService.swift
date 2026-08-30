@@ -1200,12 +1200,14 @@ final class ClipboardHistoryService: ObservableObject {
                 }
                 return nil
             }
-            // Finder-style Quick Look without stealing ordinary spaces typed
-            // into search: the list claims Space only after arrow navigation.
+            // Space marks the row the arrow keys are on, the way ⌘Return and
+            // ⌘-click do, so a keyboard-only selection can be built and pasted
+            // together. It claims Space only after arrow navigation, so a
+            // space typed into the search field stays a space.
             if event.keyCode == UInt16(kVK_Space),
-               ClipboardHistoryPreview.handlesSpace(selectionIsVisible: self.quickSelectionIsVisible,
-                                                     hasModifiers: !modifiers.isEmpty) {
-                self.toggleQuickPreview()
+               ClipboardHistorySpaceKey.handledByList(selectionIsVisible: self.quickSelectionIsVisible,
+                                                      hasModifiers: !modifiers.isEmpty) {
+                self.toggleSelectedQuickEntryBatchSelection()
                 return nil
             }
             if event.keyCode == UInt16(kVK_Return) || event.keyCode == UInt16(kVK_ANSI_KeypadEnter) {
