@@ -129,7 +129,9 @@ struct ClipboardEntryPreviewSidebar: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .task(id: entry.id) {
+        // Keyed on the entry, not its id: an edit keeps the id and changes
+        // the text, and the counts here have to follow the text.
+        .task(id: entry) {
             // Cleared first: the rows fall back to what the entry itself
             // says, rather than showing the previous entry's facts until the
             // disk answers for this one.
@@ -158,7 +160,7 @@ struct ClipboardEntryPreviewSidebar: View {
 
     /// The path, with a button that copies it, since the path is the thing
     /// most often wanted from a file entry short of the file itself.
-    private func pathBox(_ path: String) -> some View {
+    private func pathBox(_ path: String, of entry: ClipboardHistoryEntry) -> some View {
         HStack(alignment: .top, spacing: 6) {
             Text(path)
                 .font(.system(size: 10.5, design: .monospaced))
@@ -167,7 +169,9 @@ struct ClipboardEntryPreviewSidebar: View {
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Button {
-                ClipboardHistoryService.shared.copyPlainText(path)
+                // The copy adds a row at the top; the selection stays on the
+                // file whose path this is, so the pane does not jump.
+                ClipboardHistoryService.shared.copyPlainText(path, keepingSelectionOn: entry)
             } label: {
                 Image(systemName: "doc.on.doc")
                     .font(.system(size: 10, weight: .semibold))
@@ -254,14 +258,14 @@ struct ClipboardEntryPreviewSidebar: View {
     @ViewBuilder
     private func filesPreview(_ entry: ClipboardHistoryEntry) -> some View {
         if entry.filePaths.count == 1, let path = entry.filePaths.first {
-            singleFilePreview(path)
+            singleFilePreview(path, of: entry)
         } else {
             multipleFilesPreview(entry)
         }
     }
 
     @ViewBuilder
-    private func singleFilePreview(_ path: String) -> some View {
+    private func singleFilePreview(_ path: String, of entry: ClipboardHistoryEntry) -> some View {
         let isImage = ClipboardImageStore.isImageFile(atPath: path)
         let thumbnail = ClipboardImageStore.fileThumbnail(atPath: path)
         let fileName = (path as NSString).lastPathComponent
@@ -300,7 +304,7 @@ struct ClipboardEntryPreviewSidebar: View {
                 }
             }
 
-            pathBox(path)
+            pathBox(path, of: entry)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
