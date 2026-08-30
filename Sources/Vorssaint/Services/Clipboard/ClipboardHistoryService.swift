@@ -1022,9 +1022,15 @@ final class ClipboardHistoryService: ObservableObject {
     /// shared lane like any copy. The poll skips the app's own writes, so the
     /// entry is recorded here on purpose: a path copied from the pane is a
     /// copy like any other and belongs in the list.
-    func copyPlainText(_ string: String) {
+    /// `keepingSelectionOn` names the entry the selection should stay on:
+    /// the new row goes in at the top, and the selection is an index.
+    func copyPlainText(_ string: String, keepingSelectionOn keep: ClipboardHistoryEntry? = nil) {
         writeToPasteboard([ClipboardHistoryEntry(text: string)]) { [weak self] copied in
-            if copied { self?.promote(string, from: nil) }
+            guard copied, let self else { return }
+            self.promote(string, from: nil)
+            if let keep, let index = self.filteredQuickEntries.firstIndex(where: { $0.id == keep.id }) {
+                self.quickSelectionIndex = index
+            }
         }
     }
 
