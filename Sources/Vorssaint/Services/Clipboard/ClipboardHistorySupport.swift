@@ -485,12 +485,11 @@ enum ClipboardHistoryEscape {
     }
 
     /// Esc backs out one layer at a time - selection, then the window.
-    /// Preview is a persistent view setting, not a layer: only clicking its
-    /// own toggle turns it off (or Space, but only once arrow-key navigation
-    /// has made a row's selection visible - see `ClipboardHistoryPreview
-    /// .handlesSpace`; while the search field has focus, Space just types),
-    /// so a keystroke meant to close the panel can never silently re-hide
-    /// it first.
+    /// Preview is a persistent view setting, not a layer: only the toolbar
+    /// toggle and the pane's own close button turn it off, both of them
+    /// mouse-only now that Space marks a row for batch instead of toggling
+    /// the pane (see `ClipboardHistorySpaceKey`), so a keystroke meant to
+    /// close the panel can never silently re-hide it first.
     static func action(batchCount: Int) -> Action {
         batchCount > 0 ? .clearBatchSelection : .hideWindow
     }
