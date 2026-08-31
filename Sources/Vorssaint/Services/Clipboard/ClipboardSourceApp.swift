@@ -25,6 +25,13 @@ final class ClipboardSourceApp {
     private var activationObserver: NSObjectProtocol?
     private var historyIsRunning = false
 
+    /// The last ordinary app other than this one to come to the front, for
+    /// whoever needs a paste target rather than a copy source. It rides the
+    /// same activation notification as the source window instead of a second
+    /// observer, but keeps its own filter: a paste has to go to an app with a
+    /// UI, while a copy can come from an accessory or a background agent.
+    private(set) var lastRegularFrontApp: NSRunningApplication?
+
     private init() {}
 
     /// Follows the history: nothing is watched while the history is off.
@@ -48,6 +55,7 @@ final class ClipboardSourceApp {
         if historyIsRunning {
             guard activationObserver == nil else { return }
             window = Self.currentFront(at: Date()).map { [$0] } ?? []
+            lastRegularFrontApp = NSWorkspace.shared.frontmostApplication.flatMap(Self.pasteTarget)
             activationObserver = NSWorkspace.shared.notificationCenter.addObserver(
                 forName: NSWorkspace.didActivateApplicationNotification,
                 object: nil,
@@ -57,11 +65,13 @@ final class ClipboardSourceApp {
                     .userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
                 else { return }
                 self?.append(app, at: Date())
+                if let target = Self.pasteTarget(app) { self?.lastRegularFrontApp = target }
             }
         } else if let activationObserver {
             NSWorkspace.shared.notificationCenter.removeObserver(activationObserver)
             self.activationObserver = nil
             window = []
+            lastRegularFrontApp = nil
         }
     }
 
@@ -71,6 +81,15 @@ final class ClipboardSourceApp {
         // every app switch; only the front runners can win it anyway.
         if window.count > 32 { window.removeFirst(window.count - 32) }
         window.append(candidate)
+    }
+
+    /// An app worth pasting into: not this one, and one that owns a normal UI
+    /// to receive the keystroke.
+    private static func pasteTarget(_ app: NSRunningApplication) -> NSRunningApplication? {
+        guard app.bundleIdentifier != Bundle.main.bundleIdentifier,
+              app.activationPolicy == .regular
+        else { return nil }
+        return app
     }
 
     private static func currentFront(at date: Date) -> ClipboardSourceCandidate? {

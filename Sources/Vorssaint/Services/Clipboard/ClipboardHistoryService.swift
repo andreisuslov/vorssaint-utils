@@ -87,7 +87,6 @@ final class ClipboardHistoryService: ObservableObject {
     private var migrateLegacyBlob = false
 
     private init() {
-        observeFrontApp()
         load()
     }
 
@@ -1299,25 +1298,11 @@ final class ClipboardHistoryService: ObservableObject {
         setQuickActionsPresented(false)
     }
 
-    /// The last app other than this one to come to the front. When the
-    /// window is opened from the menu panel, this app is already frontmost,
-    /// so "whoever is in front" would be nobody to paste into; the app the
-    /// user was in before the panel is the one they mean.
-    private var lastOtherFrontApp: NSRunningApplication?
-    private var frontAppObserver: NSObjectProtocol?
-
-    private func observeFrontApp() {
-        guard frontAppObserver == nil else { return }
-        frontAppObserver = NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
-        ) { [weak self] notification in
-            guard let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
-                  app.bundleIdentifier != Bundle.main.bundleIdentifier,
-                  app.activationPolicy == .regular else { return }
-            self?.lastOtherFrontApp = app
-        }
-    }
-
+    /// When the window is opened from the menu panel this app is already
+    /// frontmost, so "whoever is in front" would be nobody to paste into; the
+    /// app the user was in before the panel is the one they mean.
+    /// `ClipboardSourceApp` already follows activations for the source label
+    /// and keeps that answer too, so there is one observer, not two.
     private func rememberPasteTarget() {
         let ownBundleID = Bundle.main.bundleIdentifier
         if let app = NSWorkspace.shared.frontmostApplication,
@@ -1327,7 +1312,7 @@ final class ClipboardHistoryService: ObservableObject {
             pasteTargetApp = app
             return
         }
-        if let app = lastOtherFrontApp, !app.isTerminated {
+        if let app = ClipboardSourceApp.shared.lastRegularFrontApp, !app.isTerminated {
             pasteTargetApp = app
             return
         }
