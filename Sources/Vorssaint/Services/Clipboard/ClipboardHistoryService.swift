@@ -39,8 +39,11 @@ final class ClipboardHistoryService: ObservableObject {
     @Published private(set) var quickSelectionIndex = 0
     @Published private(set) var quickSelectionIsVisible = false
     @Published private(set) var quickWindowPresentationID = UUID()
-    /// Decided each time the window opens, from the Settings choice; Space
-    /// and the toolbar button change it for that one showing.
+    /// Decided each time the window opens, from the Settings choice; the
+    /// toolbar button and the pane's own close button change it for that one
+    /// showing. Space no longer reaches this: it marks the selected row for
+    /// batch instead, so the pane has no keyboard toggle (see
+    /// `ClipboardHistorySpaceKey`).
     @Published private(set) var quickPreviewPresented = false
 
     private var timer: Timer?
