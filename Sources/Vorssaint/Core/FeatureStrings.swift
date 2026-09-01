@@ -197,7 +197,8 @@ extension ClipboardFeatureStrings {
         locationLabel: "위치",
         fileEntryLabel: "파일",
         uniformRows: "모든 행을 같은 높이로 유지",
-        uniformRowsCaption: "행마다 텍스트 한 줄과 작은 축소판만 표시하고, 전체 항목은 미리보기 패널에 표시합니다."
+        uniformRowsCaption: "행마다 텍스트 한 줄과 작은 축소판만 표시하고, 전체 항목은 미리보기 패널에 표시합니다.",
+        deleteSelectedFormat: "%d개 삭제"
     )
 }
 
@@ -496,6 +497,7 @@ struct ClipboardFeatureStrings {
     let fileEntryLabel: String
     let uniformRows: String
     let uniformRowsCaption: String
+    let deleteSelectedFormat: String
 
     static let enUS = ClipboardFeatureStrings(
         title: "Clipboard",
@@ -565,7 +567,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Location",
         fileEntryLabel: "File",
         uniformRows: "Keep every row the same height",
-        uniformRowsCaption: "One line of text and a small thumbnail per row; the preview pane shows the whole item."
+        uniformRowsCaption: "One line of text and a small thumbnail per row; the preview pane shows the whole item.",
+        deleteSelectedFormat: "Delete %d"
     )
 
     static let ptBR = ClipboardFeatureStrings(
@@ -636,7 +639,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Local",
         fileEntryLabel: "Arquivo",
         uniformRows: "Manter todas as linhas com a mesma altura",
-        uniformRowsCaption: "Uma linha de texto e uma miniatura pequena por item; o painel de prévia mostra o item inteiro."
+        uniformRowsCaption: "Uma linha de texto e uma miniatura pequena por item; o painel de prévia mostra o item inteiro.",
+        deleteSelectedFormat: "Apagar %d"
     )
 
     static let tr = ClipboardFeatureStrings(
@@ -707,7 +711,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Konum",
         fileEntryLabel: "Dosya",
         uniformRows: "Her satırı aynı yükseklikte tut",
-        uniformRowsCaption: "Satır başına tek satır metin ve küçük bir küçük resim; önizleme bölmesi öğenin tamamını gösterir."
+        uniformRowsCaption: "Satır başına tek satır metin ve küçük bir küçük resim; önizleme bölmesi öğenin tamamını gösterir.",
+        deleteSelectedFormat: "%d öğeyi sil"
     )
 
     static let ru = ClipboardFeatureStrings(
@@ -778,7 +783,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Расположение",
         fileEntryLabel: "Файл",
         uniformRows: "Одинаковая высота всех строк",
-        uniformRowsCaption: "Одна строка текста и маленькая миниатюра в каждой строке; панель просмотра показывает элемент целиком."
+        uniformRowsCaption: "Одна строка текста и маленькая миниатюра в каждой строке; панель просмотра показывает элемент целиком.",
+        deleteSelectedFormat: "Удалить: %d"
     )
 
     static let es = ClipboardFeatureStrings(
@@ -849,7 +855,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Ubicación",
         fileEntryLabel: "Archivo",
         uniformRows: "Mantener todas las filas a la misma altura",
-        uniformRowsCaption: "Una línea de texto y una miniatura pequeña por fila; el panel de vista previa muestra el elemento completo."
+        uniformRowsCaption: "Una línea de texto y una miniatura pequeña por fila; el panel de vista previa muestra el elemento completo.",
+        deleteSelectedFormat: "Eliminar %d"
     )
 
     static let de = ClipboardFeatureStrings(
@@ -920,7 +927,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Ort",
         fileEntryLabel: "Datei",
         uniformRows: "Alle Zeilen gleich hoch halten",
-        uniformRowsCaption: "Eine Textzeile und ein kleines Vorschaubild pro Zeile; der Vorschaubereich zeigt den ganzen Eintrag."
+        uniformRowsCaption: "Eine Textzeile und ein kleines Vorschaubild pro Zeile; der Vorschaubereich zeigt den ganzen Eintrag.",
+        deleteSelectedFormat: "%d löschen"
     )
 
     static let fr = ClipboardFeatureStrings(
@@ -991,7 +999,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Emplacement",
         fileEntryLabel: "Fichier",
         uniformRows: "Garder toutes les lignes à la même hauteur",
-        uniformRowsCaption: "Une ligne de texte et une petite vignette par ligne ; le volet d'aperçu affiche l'élément entier."
+        uniformRowsCaption: "Une ligne de texte et une petite vignette par ligne ; le volet d'aperçu affiche l'élément entier.",
+        deleteSelectedFormat: "Supprimer %d"
     )
 
     static let it = ClipboardFeatureStrings(
@@ -1062,7 +1071,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "Posizione",
         fileEntryLabel: "File",
         uniformRows: "Mantieni tutte le righe della stessa altezza",
-        uniformRowsCaption: "Una riga di testo e una miniatura piccola per riga; il pannello di anteprima mostra l'elemento intero."
+        uniformRowsCaption: "Una riga di testo e una miniatura piccola per riga; il pannello di anteprima mostra l'elemento intero.",
+        deleteSelectedFormat: "Elimina %d"
     )
 
     static let ja = ClipboardFeatureStrings(
@@ -1133,7 +1143,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "場所",
         fileEntryLabel: "ファイル",
         uniformRows: "すべての行を同じ高さにする",
-        uniformRowsCaption: "各行はテキスト1行と小さなサムネイル。項目全体はプレビューに表示されます。"
+        uniformRowsCaption: "各行はテキスト1行と小さなサムネイル。項目全体はプレビューに表示されます。",
+        deleteSelectedFormat: "%d件を削除"
     )
 
     static let zhHans = ClipboardFeatureStrings(
@@ -1204,7 +1215,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         fileEntryLabel: "文件",
         uniformRows: "所有行保持相同高度",
-        uniformRowsCaption: "每行只显示一行文本和一个小缩略图；完整内容在预览面板中显示。"
+        uniformRowsCaption: "每行只显示一行文本和一个小缩略图；完整内容在预览面板中显示。",
+        deleteSelectedFormat: "删除 %d 项"
     )
 
     static let zhTW = ClipboardFeatureStrings(
@@ -1275,7 +1287,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         fileEntryLabel: "檔案",
         uniformRows: "所有列保持相同高度",
-        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。"
+        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。",
+        deleteSelectedFormat: "刪除 %d 個"
     )
 
     static let zhHK = ClipboardFeatureStrings(
@@ -1346,7 +1359,8 @@ struct ClipboardFeatureStrings {
         locationLabel: "位置",
         fileEntryLabel: "檔案",
         uniformRows: "所有列保持相同高度",
-        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。"
+        uniformRowsCaption: "每列只顯示一行文字和一個小縮圖；完整內容在預覽窗格中顯示。",
+        deleteSelectedFormat: "刪除 %d 個"
     )
 }
 
