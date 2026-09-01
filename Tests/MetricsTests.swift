@@ -222,6 +222,17 @@ struct MetricsTests {
                "clipboard history quick preview is closed by default")
         expect(Defaults.registeredDefaults[DefaultsKey.clipboardUniformRows] as? Bool == true,
                "clipboard rows share one height until asked otherwise")
+        let panelClipboardSource = (try? String(
+            contentsOfFile: "Sources/Vorssaint/UI/MenuPanel/PanelClipboardView.swift",
+            encoding: .utf8)) ?? ""
+        expect(!panelClipboardSource.contains("DefaultsKey.clipboardUniformRows")
+               && panelClipboardSource.components(
+                   separatedBy: ".frame(maxWidth: 110, maxHeight: 40)").count == 3,
+               "the uniform-row setting leaves the menu panel thumbnails at 110 by 40")
+        expect(panelClipboardSource.contains(
+            "The history window shows the full, selectable text.")
+               && !panelClipboardSource.contains("Double-clicking the row"),
+               "the menu panel comment names its real path to selectable text")
 
         // MARK: Clipboard auto clear timing
 
