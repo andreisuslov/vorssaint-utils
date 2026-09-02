@@ -5731,6 +5731,43 @@ struct MetricsTests {
                                                              frames: horizontalDisplays,
                                                              movingForward: true) == nil,
                "window layout leaves one display and invalid selections unchanged")
+        expect(WindowLayoutGeometry.horizontalNeighbourIndex(currentIndex: 0,
+                                                             frames: horizontalDisplays,
+                                                             movingRight: true) == 2
+                && WindowLayoutGeometry.horizontalNeighbourIndex(currentIndex: 0,
+                                                                 frames: horizontalDisplays,
+                                                                 movingRight: false) == 1
+                && WindowLayoutGeometry.horizontalNeighbourIndex(currentIndex: 2,
+                                                                 frames: horizontalDisplays,
+                                                                 movingRight: false) == 0,
+               "window layout finds the display starting on the asked side")
+        expect(WindowLayoutGeometry.horizontalNeighbourIndex(currentIndex: 2,
+                                                             frames: horizontalDisplays,
+                                                             movingRight: true) == nil
+                && WindowLayoutGeometry.horizontalNeighbourIndex(currentIndex: 1,
+                                                                 frames: horizontalDisplays,
+                                                                 movingRight: false) == nil,
+               "window layout stops at the outermost display instead of wrapping sideways")
+        let stackedDisplays = [
+            CGRect(x: 0, y: 0, width: 1440, height: 900),
+            CGRect(x: 0, y: 900, width: 1440, height: 900),
+        ]
+        expect(WindowLayoutGeometry.horizontalNeighbourIndex(currentIndex: 0,
+                                                             frames: stackedDisplays,
+                                                             movingRight: true) == nil
+                && WindowLayoutGeometry.horizontalNeighbourIndex(currentIndex: 1,
+                                                                 frames: stackedDisplays,
+                                                                 movingRight: false) == nil,
+               "window layout never answers a sideways push with a stacked display")
+        let towerDisplays = [
+            CGRect(x: 0, y: 0, width: 1440, height: 900),
+            CGRect(x: 1440, y: 800, width: 1000, height: 1000),
+            CGRect(x: 1440, y: -100, width: 1000, height: 1000),
+        ]
+        expect(WindowLayoutGeometry.horizontalNeighbourIndex(currentIndex: 0,
+                                                             frames: towerDisplays,
+                                                             movingRight: true) == 2,
+               "window layout picks the closest display when several share the same edge")
         let portraitFrame = CGRect(x: -1200, y: -200, width: 1200, height: 1800)
         let scaledFrame = CGRect(x: 1440, y: 100, width: 2000, height: 1000)
         let portraitWindow = CGRect(x: -900, y: 1000, width: 600, height: 400)
@@ -5846,6 +5883,23 @@ struct MetricsTests {
                                                     visibleFrame: visibleFrame,
                                                     previousAction: .bottomHalf) == .rightHalf,
                "window layout right does not become a corner after bottom")
+        expect(WindowLayoutGeometry.displayCrossing(for: .rightHalf,
+                                                    previousAction: .rightHalf)?.action == .leftHalf
+                && WindowLayoutGeometry.displayCrossing(for: .rightHalf,
+                                                        previousAction: .rightHalf)?.movingRight == true,
+               "window layout right twice enters the display on the right from its left half")
+        expect(WindowLayoutGeometry.displayCrossing(for: .leftHalf,
+                                                    previousAction: .leftHalf)?.action == .rightHalf
+                && WindowLayoutGeometry.displayCrossing(for: .leftHalf,
+                                                        previousAction: .leftHalf)?.movingRight == false,
+               "window layout left twice enters the display on the left from its right half")
+        expect(WindowLayoutGeometry.displayCrossing(for: .leftHalf, previousAction: nil) == nil
+                && WindowLayoutGeometry.displayCrossing(for: .leftHalf, previousAction: .rightHalf) == nil,
+               "window layout only crosses displays when the same side is used twice in a row")
+        expect(WindowLayoutGeometry.displayCrossing(for: .topHalf, previousAction: .topHalf) == nil
+                && WindowLayoutGeometry.displayCrossing(for: .bottomHalf, previousAction: .bottomHalf) == nil
+                && WindowLayoutGeometry.displayCrossing(for: .leftThird, previousAction: .leftThird) == nil,
+               "window layout keeps top, bottom and thirds on their own display")
         let leftTarget = WindowLayoutGeometry.rect(for: .leftHalf,
                                                    current: currentWindow,
                                                    visibleFrame: visibleFrame)
@@ -8123,6 +8177,19 @@ struct MetricsTests {
         } else {
             expect(false, "shelf items must encode and decode")
         }
+
+        // Every field at once, none left at its default. `CodingKeys` is written
+        // out by hand next to the stored properties, and a property missing from
+        // it is silently dropped by both the custom decoder and the synthesized
+        // encoder, so a ninth field added without a case would stop being saved
+        // and read with nothing else complaining.
+        let shelfFullItem = ShelfPersistedItem(id: UUID(), kind: .file, title: "t", text: "x",
+                                               url: "https://example.com/u", path: "/tmp/p",
+                                               bookmark: Data([1]), children: [])
+        let shelfFullRound = (try? JSONEncoder().encode(shelfFullItem))
+            .flatMap { try? JSONDecoder().decode(ShelfPersistedItem.self, from: $0) }
+        expect(shelfFullRound == shelfFullItem,
+               "every persisted shelf field survives an encode and decode round trip")
 
         expect(ShelfPersistenceSupport.sanitized([shelfFile, shelfText, shelfLink]) { _ in true }
                    == [shelfFile, shelfText, shelfLink],
@@ -11030,6 +11097,38 @@ struct MetricsTests {
                                                                              targetIsMinimized: true,
                                                                              ownPID: 99),
                "App Switcher does not restore source after minimize intent within the same app")
+        var minimizeIntentMinimizedReads = 0
+        var minimizeIntentFocusedReads = 0
+        func minimizeIntentMinimized(_ value: Bool) -> Bool {
+            minimizeIntentMinimizedReads += 1
+            return value
+        }
+        func minimizeIntentFocused(_ value: UInt32?) -> UInt32? {
+            minimizeIntentFocusedReads += 1
+            return value
+        }
+        expect(!SwitcherSupport.shouldRestoreSourceAfterTargetMinimizeIntent(
+                    targetPID: 10,
+                    sourcePID: 20,
+                    frontmostPID: 20,
+                    focusedWindowID: minimizeIntentFocused(55),
+                    targetWindowID: 44,
+                    targetIsMinimized: minimizeIntentMinimized(true),
+                    ownPID: 99),
+               "App Switcher stops a minimize restore pulse once the source is already frontmost")
+        expect(minimizeIntentMinimizedReads == 0 && minimizeIntentFocusedReads == 0,
+               "App Switcher reads no window state on a minimize pulse the frontmost check alone settles")
+        expect(SwitcherSupport.shouldRestoreSourceAfterTargetMinimizeIntent(
+                    targetPID: 10,
+                    sourcePID: 20,
+                    frontmostPID: 10,
+                    focusedWindowID: minimizeIntentFocused(55),
+                    targetWindowID: 44,
+                    targetIsMinimized: minimizeIntentMinimized(true),
+                    ownPID: 99),
+               "App Switcher restores the source once the target window reports itself minimized")
+        expect(minimizeIntentMinimizedReads == 1 && minimizeIntentFocusedReads == 0,
+               "App Switcher skips the focused-window read when the target is already minimized")
         expect(SwitcherSupport.shouldStageSourceBehindTarget(targetPID: 10,
                                                              sourcePID: 20,
                                                              sourceWindowID: 44,
@@ -11706,6 +11805,30 @@ struct MetricsTests {
         expect(HomebrewCommandBuilder.upgradeAll(brewPath: brewPath).arguments
                == ["upgrade"],
                "Homebrew update all command upgrades all outdated packages")
+
+        // brew exits non-zero when it could not do all of a run, not only when it
+        // did none of it, so the installed and outdated lists have to be re-read
+        // after a failed operation too. Read from the source: the refresh happens
+        // inside a completion closure that no unit test can drive.
+        let managerSource = (try? String(
+            contentsOfFile: "Sources/Vorssaint/Services/Homebrew/HomebrewManager.swift",
+            encoding: .utf8)) ?? ""
+        expect(!managerSource.isEmpty, "HomebrewManager source is readable for the refresh checks")
+        let managerCode = managerSource
+            .split(separator: "\n", omittingEmptySubsequences: false)
+            .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
+            .joined(separator: "\n")
+        let refreshCalls = managerCode
+            .components(separatedBy: "self.refreshInstalled(clearingError: false)").count - 1
+        expect(refreshCalls == 3,
+               "the cancelled, needs-terminal and failed operation paths all re-read, "
+               + "found \(refreshCalls)")
+        let guardedBannerClears = managerCode
+            .components(separatedBy: "if clearingError { errorMessage = nil }").count - 1
+        expect(guardedBannerClears == 2,
+               "both banner clears in refreshInstalled are behind its parameter, so the reason "
+               + "a failed operation gave survives the refresh that follows it, found "
+               + "\(guardedBannerClears)")
         expect(HomebrewOperation.Action.install.runningSystemImage == "arrow.down.circle.fill",
                "Homebrew install status uses a download icon")
         expect(HomebrewOperation.Action.uninstall.runningSystemImage == "trash.circle.fill",
@@ -12257,7 +12380,7 @@ struct MetricsTests {
         expect(bundleLocalizations.contains("tr"), "Info.plist declares Turkish as a bundle localization")
         expect(bundleLocalizations.contains("ko"), "Info.plist declares Korean as a bundle localization")
         let baseAudioPrompt = infoPlist?["NSAudioCaptureUsageDescription"] as? String ?? ""
-        expect(baseAudioPrompt.contains("Vorssaint taps individual app audio"),
+        expect(baseAudioPrompt.contains("Vorssaint uses each app's audio"),
                "base audio permission prompt is an English fallback")
         let organizerFolderPromptKeys = [
             "NSDesktopFolderUsageDescription", "NSDocumentsFolderUsageDescription",
@@ -12282,7 +12405,7 @@ struct MetricsTests {
         let koreanInfoPlistStrings = (try? String(contentsOfFile: "Resources/ko.lproj/InfoPlist.strings",
                                                   encoding: .utf8)) ?? ""
         expect(koreanInfoPlistStrings.contains("NSAudioCaptureUsageDescription")
-               && koreanInfoPlistStrings.contains("어떤 오디오도 녹음되거나"),
+               && koreanInfoPlistStrings.contains("Mac 밖으로 나가지"),
                "Korean InfoPlist.strings localizes the audio permission prompt")
 
         // MARK: Network speed math
@@ -13016,7 +13139,7 @@ struct MetricsTests {
         for language in AppLanguage.allCases {
             let strings = FeatureStrings.diskImageInstaller(language)
             let values = Mirror(reflecting: strings).children.compactMap { $0.value as? String }
-            expect(values.count == 13 && values.allSatisfy { !$0.isEmpty },
+            expect(values.count == 17 && values.allSatisfy { !$0.isEmpty },
                    "disk image installer has every localized field for \(language.rawValue)")
             expect(values.allSatisfy { !$0.contains("—") },
                    "disk image installer text uses human punctuation for \(language.rawValue)")
@@ -13030,6 +13153,10 @@ struct MetricsTests {
                          "\(language.rawValue) installer kept-download format")
             expectFormat(strings.alreadyInstalledBodyFormat, ["@"],
                          "\(language.rawValue) installer existing-app format")
+            expectFormat(strings.installedKeptDownloadBodyFormat, ["@"],
+                         "\(language.rawValue) installer kept-by-choice format")
+            expectFormat(strings.installingFormat, ["@"],
+                         "\(language.rawValue) installer progress format")
         }
 
         let installerInfo: [String: Any] = [
@@ -13544,6 +13671,8 @@ struct MetricsTests {
         expect(activeSet(.audioCapture) == [.mixer], "the mixer is the only audio capture user")
         expect(activeSet(.audioCapture, available: Set(AppFeature.allCases).subtracting([.mixer])) == [],
                "audio capture reads as unused once the mixer is off in the hub")
+        expect(activeSet(.audioCapture, on: [DefaultsKey.recorderSystemAudio]) == [.mixer, .screenRecorder],
+               "the recorder uses audio capture only while the Mac's sound is a chosen source")
         expect(activeSet(.microphone).isEmpty
                 && activeSet(.microphone, on: [DefaultsKey.recorderMicrophone]) == [.screenRecorder],
                "the recorder uses microphone access only when that optional source is on")
@@ -13896,7 +14025,7 @@ struct MetricsTests {
                    "no em-dash in WhatsApp organizer strings (\(language.rawValue))")
             let recorderValues = Mirror(reflecting: FeatureStrings.recorder(language)).children
                 .compactMap { $0.value as? String }
-            expect(recorderValues.count == 119 && recorderValues.allSatisfy { !$0.isEmpty },
+            expect(recorderValues.count == 126 && recorderValues.allSatisfy { !$0.isEmpty },
                    "every screen recorder string is set for \(language.rawValue)")
             expect(recorderValues.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible screen recorder strings (\(language.rawValue))")
@@ -15147,6 +15276,50 @@ struct MetricsTests {
                                                     appBundleIdentifier: nil,
                                                     appPID: 0) == nil,
                "paused or ownerless metadata degrades to Nothing Playing")
+        let adapterLine = Data("""
+            {"kMRMediaRemoteNowPlayingInfoTitle":"Midnight City","kMRMediaRemoteNowPlayingInfoArtist":"M83",\
+            "kMRMediaRemoteNowPlayingInfoPlaybackRate":1,"artworkBase64":"AQID","pid":42,\
+            "displayID":"com.apple.Music","isPlaying":true}
+            """.utf8)
+        let adapterReply = RadialNowPlayingSupport.adapterReply(from: adapterLine)
+        expect(adapterReply?.info[RadialNowPlayingSupport.titleKey] as? String == "Midnight City"
+                && adapterReply?.info[RadialNowPlayingSupport.artistKey] as? String == "M83"
+                && adapterReply?.info[RadialNowPlayingSupport.artworkDataKey] as? Data == Data([1, 2, 3])
+                && (adapterReply?.info[RadialNowPlayingSupport.playbackRateKey] as? NSNumber)?.doubleValue == 1
+                && adapterReply?.pid == 42
+                && adapterReply?.displayID == "com.apple.Music"
+                && adapterReply?.isPlaying == true,
+               "the Now Playing adapter line is read back into the MediaRemote keys the snapshot builder takes")
+        let adapterPaused = RadialNowPlayingSupport.adapterReply(
+            from: Data(#"{"kMRMediaRemoteNowPlayingInfoTitle":"Midnight City","isPlaying":false}"#.utf8))
+        expect(adapterPaused?.pid == 0 && adapterPaused?.displayID == nil && adapterPaused?.isPlaying == false
+                && RadialNowPlayingSupport.snapshot(
+                    info: adapterPaused?.info ?? [:],
+                    isPlaying: RadialNowPlayingSupport.playbackIsActive(remoteIsPlaying: adapterPaused?.isPlaying,
+                                                                       info: adapterPaused?.info ?? [:]),
+                    appBundleIdentifier: adapterPaused?.displayID,
+                    appPID: adapterPaused?.pid ?? 0) == nil,
+               "a paused adapter reply degrades to Nothing Playing through the same path as before")
+        expect(RadialNowPlayingSupport.adapterReply(from: Data(#"{"error":"MRMediaRemoteGetNowPlayingInfo unavailable"}"#.utf8)) == nil
+                && RadialNowPlayingSupport.adapterReply(from: Data("[1,2]".utf8)) == nil
+                && RadialNowPlayingSupport.adapterReply(from: Data("perl: cannot load".utf8)) == nil
+                && RadialNowPlayingSupport.adapterReply(from: Data(#"{"artworkBase64":"***"}"#.utf8))?
+                    .info[RadialNowPlayingSupport.artworkDataKey] == nil,
+               "an adapter error, a non-object, shell noise or bad base64 never become a snapshot")
+        let adapterAfterWarning = RadialNowPlayingSupport.adapterReply(from: Data("""
+            perl: warning: Setting locale failed.
+            perl: warning: Falling back to the standard locale ("C").
+            {"kMRMediaRemoteNowPlayingInfoTitle":"Midnight City","pid":42,"isPlaying":true}
+
+            """.utf8))
+        expect(adapterAfterWarning?.info[RadialNowPlayingSupport.titleKey] as? String == "Midnight City"
+                && adapterAfterWarning?.pid == 42 && adapterAfterWarning?.isPlaying == true,
+               "a perl warning on the shared stderr pipe ahead of the adapter's JSON line still parses")
+        let nowPlayingBuildScript = (try? String(contentsOfFile: "build.sh", encoding: .utf8)) ?? ""
+        expect(nowPlayingBuildScript.contains("Sources/NowPlayingAdapter/NowPlayingAdapter.swift")
+                && nowPlayingBuildScript.contains("Resources/now-playing.pl")
+                && nowPlayingBuildScript.contains("Contents/Frameworks/$NOW_PLAYING_ADAPTER"),
+               "build.sh compiles the Now Playing adapter and stages the library and its perl loader")
         let radialQuickToggle = RadialMenuItem(kind: .quickToggle,
                                                payload: RadialMenuQuickToggle.darkMode.rawValue)
         expect(RadialMenuSupport.sanitized([radialQuickToggle]) == [radialQuickToggle]
@@ -15319,6 +15492,51 @@ struct MetricsTests {
         expect(samplePNG.map { RadialMenuFaviconFetcher.sourceDimensionsAreSafe($0) } == true
                && !RadialMenuFaviconFetcher.sourceDimensionsAreSafe(Data("not an image".utf8)),
                "favicon decoding accepts bounded images and rejects invalid payloads")
+
+        // The event taps read the cheap answer on every side-button event, so
+        // it has to agree with the full decode, custom icons and all.
+        let iconProfile = RadialMenuProfile(
+            name: "Icons",
+            mouseButton: RadialMenuMouseTrigger.button(6).rawValue,
+            items: [RadialMenuItem(kind: .app,
+                                   payload: "/Applications/Safari.app",
+                                   customIconData: samplePNG)]
+        )
+        let iconProfilesData = RadialMenuSupport.encodeProfiles([iconProfile, profileA])
+        let fullyDecodedButtons = RadialMenuSupport.decodeProfiles(iconProfilesData)
+            .compactMap { RadialMenuMouseTrigger.sanitized($0.mouseButton).buttonNumber }
+        expect(fullyDecodedButtons == [6, MouseButtonShortcutSupport.backButtonNumber]
+                && RadialMenuSupport.claimedMouseButtons(iconProfilesData) == fullyDecodedButtons,
+               "claimed mouse buttons read without the items match the full profile decode")
+
+        let legacyButtonDefaults = UserDefaults(suiteName: "com.vorssaint.tests.radialLegacyButton")!
+        legacyButtonDefaults.removePersistentDomain(forName: "com.vorssaint.tests.radialLegacyButton")
+        legacyButtonDefaults.set(RadialMenuMouseTrigger.forward.rawValue,
+                                 forKey: DefaultsKey.radialMenuMouseButton)
+        expect(RadialMenuSupport.claimedMouseButtons(nil, defaults: legacyButtonDefaults)
+                == [MouseButtonShortcutSupport.forwardButtonNumber]
+                && RadialMenuSupport.claimedMouseButtons(Data("not profiles".utf8),
+                                                         defaults: legacyButtonDefaults)
+                == [MouseButtonShortcutSupport.forwardButtonNumber],
+               "claimed mouse buttons fall back to the legacy button key like the full decode")
+        legacyButtonDefaults.removePersistentDomain(forName: "com.vorssaint.tests.radialLegacyButton")
+
+        // The cheap read and the full decode can disagree on a corrupt blob,
+        // so only one of them may decide whether the click is passed on: once
+        // the button is claimed, nothing past that point hands an event back,
+        // or the down and the up split.
+        let radialServiceCode = ((try? String(
+            contentsOfFile: "Sources/Vorssaint/Services/RadialMenu/RadialMenuService.swift",
+            encoding: .utf8)) ?? "")
+            .components(separatedBy: "\n")
+            .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
+            .joined(separator: "\n")
+        let radialClaimedClick = radialServiceCode
+            .components(separatedBy: "if type == .otherMouseDown {")
+            .dropFirst().first?
+            .components(separatedBy: "private func hotkeyPressed").first ?? ""
+        expect(!radialClaimedClick.isEmpty && !radialClaimedClick.contains("passUnretained"),
+               "a claimed side button keeps both halves of its click whatever the full decode says")
         expect(RadialMenuFaviconFetcher.faviconURL(
             for: "https://example.com:8443/path?q=1#part")?.absoluteString
                 == "https://example.com:8443/favicon.ico"
@@ -16104,6 +16322,15 @@ struct MetricsTests {
                                        hideVorssaintWindows: true,
                                        usesGeometry: false),
                "switching capture mode rebuilds the frozen frame, pointer and window policy")
+        let colorPolicy = ScreenshotSupport.unifiedCapturePolicy(
+            for: .color,
+            screenshotFreeze: false,
+            screenshotIncludePointer: true,
+            screenshotHideVorssaintWindows: true)
+        expect(textPolicy.sharesSource(with: colorPolicy)
+                && !textPolicy.sharesSource(with: recorderPolicy)
+                && !textPolicy.sharesSource(with: liveScreenshotPolicy),
+               "only freeze, pointer and window policy decide whether a mode needs its own photograph")
         expect(ScreenshotSupport.captureGuideIsVisible(pointerOnDisplay: true,
                                                        selectionInProgress: false,
                                                        capturePending: false)
@@ -16129,19 +16356,19 @@ struct MetricsTests {
                     ".opacity(options.selectedTool == .recording ? 1 : 0)"),
                "capture modes reserve the recording controls' height so the chooser never jumps")
         expect(captureSelectionSource.contains("screenCaptureToolDidChange()")
-                && captureSelectionSource.contains("nextPolicy != capturePolicy")
+                && captureSelectionSource.contains("!nextPolicy.sharesSource(with: capturePolicy)")
+                && captureSelectionSource.contains("adoptCapturePolicy(nextPolicy)")
+                && captureSelectionSource.contains("panel.update(frozenImage:")
                 && captureSelectionSource.contains("screenCaptureOptions?.onSelectionChange ="),
-               "capture mode changes stay in place only while their source policy is unchanged")
+               "a capture mode that needs other pixels gets them behind the panels, which stay on screen")
         expect(captureSelectionSource.contains("private var pointerIsInside = false")
                 && !captureSelectionSource.contains("|| bounds.contains(hoverPoint)"),
                "the capture loupe draws on only the display that owns the current pointer")
         let captureServiceSource = (try? String(
             contentsOfFile: "Sources/Vorssaint/Services/QuickTools/ScreenCaptureService.swift",
             encoding: .utf8)) ?? ""
-        expect(captureServiceSource.contains("replaceSelection(options:")
-                && captureServiceSource.contains("selection = nil")
-                && captureServiceSource.contains("controller.cancel()"),
-               "the capture service rebuilds when freeze, pointer or window policy changes")
+        expect(!captureServiceSource.contains("replaceSelection"),
+               "the capture service does not cancel and recreate selection controllers when changing modes")
         // The preview appears unasked for, so presenting it must not take the
         // keyboard away from whatever the person is typing into. Its shortcuts
         // read a local monitor, which is delivered nothing until the panel is
@@ -16961,8 +17188,11 @@ struct MetricsTests {
                 if !pinned { unpinnedBorderlessMenus.append("\(file):\(index + 1)") }
             }
         }
-        expect(unpinnedBorderlessMenus.isEmpty,
-               "every borderless menu keeps its own size: \(unpinnedBorderlessMenus)")
+        // The file count is part of the rule: an enumerator that finds nothing
+        // would leave the list empty and pass while checking no menu at all.
+        expect(!uiFiles.isEmpty && unpinnedBorderlessMenus.isEmpty,
+               "every borderless menu keeps its own size, across \(uiFiles.count) "
+               + "scanned files: \(unpinnedBorderlessMenus)")
 
         // `waitUntilAllOperationsAreFinished` has no deadline, and the window
         // walk that used it runs on the main thread while its operations run on
@@ -18724,6 +18954,11 @@ struct MetricsTests {
         expect(Defaults.registeredDefaults[DefaultsKey.finderCutPasteShowHUD] as? Bool == true
                 && backupKeys.contains(DefaultsKey.finderCutPasteShowHUD),
                "the Finder cut and paste floating panel default is on and travels with settings backup")
+        expect(Defaults.registeredDefaults[DefaultsKey.diskImageInstallerTrashesDownload] as? Bool == true
+                && Defaults.registeredDefaults[DefaultsKey.diskImageInstallerRevealsApp] as? Bool == false
+                && backupKeys.contains(DefaultsKey.diskImageInstallerTrashesDownload)
+                && backupKeys.contains(DefaultsKey.diskImageInstallerRevealsApp),
+               "the disk image installer keeps trashing downloads by default, reveals apps only on request and both choices travel with settings backup")
         expect(backupKeys.contains(DefaultsKey.windowPreviewExcludedApps)
                 && (Defaults.registeredDefaults[DefaultsKey.windowPreviewExcludedApps] as? [String]) == [],
                "the window preview exclusion list starts empty and travels with the settings backup")
@@ -20148,7 +20383,7 @@ struct MetricsTests {
         expect(AppFeature.screenRecorder.group == .tools
                 && AppFeature.screenRecorder.enabledKeys.isEmpty
                 && AppFeature.screenRecorder.permissions
-                    == [.screenRecording, .accessibility, .microphone],
+                    == [.screenRecording, .accessibility, .audioCapture, .microphone],
                "the recorder keeps its optional capture permissions contextual")
         expect(AppFeature.screenRecorder.energyProfile == .idle,
                "the recorder costs nothing between recordings")
@@ -20256,6 +20491,22 @@ struct MetricsTests {
         expect(RecorderSupport.elapsedLabel(seconds: -5) == "0:00",
                "a clock that never went forward still reads as zero")
 
+        expect(RecorderSupport.trustsSystemAudioTap(previously: false, tapHeardSound: true,
+                                                    streamHeardSound: true)
+                && RecorderSupport.trustsSystemAudioTap(previously: false, tapHeardSound: true,
+                                                        streamHeardSound: false),
+               "a tap that heard sound is trusted for the next recording")
+        expect(!RecorderSupport.trustsSystemAudioTap(previously: true, tapHeardSound: false,
+                                                     streamHeardSound: true),
+               "a tap that stayed silent through sound the stream heard loses its trust")
+        expect(RecorderSupport.trustsSystemAudioTap(previously: true, tapHeardSound: false,
+                                                    streamHeardSound: false)
+                && !RecorderSupport.trustsSystemAudioTap(previously: false, tapHeardSound: false,
+                                                         streamHeardSound: false),
+               "a silent recording proves nothing about the tap")
+        expect(!SettingsBackupSupport.exportKeys().contains(DefaultsKey.recorderSystemAudioTapVerified)
+                && SettingsBackupSupport.exportKeys().contains(DefaultsKey.recorderSystemAudio),
+               "the tap grant this Mac gave stays out of the backup while the sound choice travels")
         var pauseTimeline = RecorderPauseTimeline()
         expect(pauseTimeline.pause(at: 3) && !pauseTimeline.pause(at: 4),
                "a recording enters one pause only once")
@@ -20699,6 +20950,40 @@ struct MetricsTests {
         expect(RecorderMotion.ringProgress(at: 2.0, clicks: clicks) == nil,
                "the ring is gone well before the next second")
 
+        // The typing sampler fills an array from an NSEvent monitor callback
+        // while the stop path reads it, so the append has to be under the
+        // lock: an unsynchronised one races the copy-on-write buffer. The
+        // recording's start time is written by `start()` and read from that
+        // same callback, so it belongs under the lock too.
+        let typingSampler = ((try? String(
+            contentsOfFile: "Sources/Vorssaint/Services/Recorder/RecorderTypingTrack.swift",
+            encoding: .utf8)) ?? "")
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }.joined(separator: " ")
+        expect(typingSampler.contains("let lock = NSLock()"),
+               "the typing sampler guards its buffer the way the pointer sampler does")
+        expect(typingSampler.contains("lock.withLock { startedAt = CACurrentMediaTime() }"),
+               "the typing sampler writes the recording's start time under the lock")
+        expect(typingSampler.contains(
+            "lock.withLock { guard let time = pauseClock.eventTime(now, since: startedAt) "
+            + "else { return } times.append(time) }"
+        ), "the typing sampler appends a keystroke time only under the lock")
+        // `RecorderSession.stop()` is nonisolated and async, so its body runs
+        // off the main thread however main-actor the caller was (SE-0338).
+        // Both samplers install and remove AppKit event monitors, so they are
+        // started and stopped back on the main thread.
+        let recorderSessionShape = ((try? String(
+            contentsOfFile: "Sources/Vorssaint/Services/Recorder/ScreenRecorderService.swift",
+            encoding: .utf8)) ?? "")
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }.joined(separator: " ")
+        expect(recorderSessionShape.contains(
+            "await MainActor.run { pointer.start() typing.start() }"
+        ), "the recorder installs its event monitors on the main thread")
+        expect(recorderSessionShape.contains(
+            "await MainActor.run { (pointer.stop(), typing.stop()) }"
+        ), "the recorder removes its event monitors on the main thread")
+
         let uniform = RecorderMotion.resampled(
             [RecorderMotion.Sample(time: 0, point: CGPoint(x: 0, y: 0)),
              RecorderMotion.Sample(time: 1, point: CGPoint(x: 1, y: 1))],
@@ -20818,6 +21103,70 @@ struct MetricsTests {
         expect(RecorderTextOverlay.Anchor.bottom.unitPoint.y == 1
                 && RecorderTextOverlay.Anchor.topLeading.unitPoint == CGPoint(x: 0, y: 0),
                "the nine places mean what they say, counting down from the top")
+
+        // MARK: Screen recorder blur
+
+        let blur = RecorderBlurRegion(start: 2, end: 6,
+                                      rect: CGRect(x: 0.1, y: 0.2, width: 0.3, height: 0.1))
+        expect(blur.covers(2) && blur.covers(4) && blur.covers(6)
+                && !blur.covers(1.99) && !blur.covers(6.01),
+               "a blur hides its area on every frame of its block and never eases in or out")
+        expect(blur.pixelRect(in: CGSize(width: 1000, height: 500))
+                == CGRect(x: 100, y: 350, width: 300, height: 50),
+               "the area is counted from the top like the screen and handed over from the bottom like Core Image")
+        expect(RecorderBlurRegion(start: 1, end: 1.1).sanitized(duration: 10) == nil,
+               "a blur too short to matter is not kept")
+        expect(RecorderBlurRegion(start: 8, end: 30).sanitized(duration: 10)?.end == 10,
+               "a blur that runs past the recording is brought back inside it")
+        let spilled = RecorderBlurRegion(start: 1, end: 3,
+                                         rect: CGRect(x: -0.2, y: 0.9, width: 0.5, height: 0.5))
+            .sanitized(duration: 10)
+        expect(spilled.map { abs($0.x) < 1e-9 && abs($0.y - 0.9) < 1e-9
+                && abs($0.width - 0.3) < 1e-9 && abs($0.height - 0.1) < 1e-9 } == true,
+               "an area drawn past the edge is clamped to the picture instead of reaching outside it")
+        expect(RecorderBlurRegion(start: 1, end: 3,
+                                  rect: CGRect(x: 0.5, y: 0.5, width: 0, height: 0.2))
+                .sanitized(duration: 10) == nil,
+               "a line is not an area and is dropped rather than drawn")
+        let backwards = RecorderBlurRegion.normalizedRect(from: CGPoint(x: 0.8, y: 0.7),
+                                                          to: CGPoint(x: 0.2, y: 0.3))
+        expect(backwards.map { abs($0.minX - 0.2) < 1e-9 && abs($0.minY - 0.3) < 1e-9
+                && abs($0.width - 0.6) < 1e-9 && abs($0.height - 0.4) < 1e-9 } == true,
+               "a drag in any direction produces the same area")
+        expect(RecorderBlurRegion.normalizedRect(from: CGPoint(x: 0.5, y: 0.5),
+                                                 to: CGPoint(x: 0.502, y: 0.9)) == nil,
+               "a drag too thin to be seen leaves the blur where it was")
+        expect(RecorderBlurRegion(start: 0, end: 5).rect == RecorderBlurRegion.defaultRect,
+               "a new blur lands in the middle until its area is drawn")
+        expect(RecorderSupport.blurBlockSize(for: CGSize(width: 300, height: 24)) == 8
+                && RecorderSupport.blurBlockSize(for: CGSize(width: 600, height: 90)) == 30
+                && RecorderSupport.blurBlockSize(for: CGSize(width: 900, height: 900)) == 48,
+               "the mosaic is coarser than one line of text and never turns a big area into four squares")
+        let blurredDocument = RecorderEditDocument.decoded(
+            RecorderEditDocument(blurs: [blur]).encoded())
+        expect(blurredDocument.blurs == [blur],
+               "a blur written next to the recording comes back exactly as it was")
+        expect(RecorderEditDocument().affectsPicture(blurredDocument)
+                && !RecorderEditDocument().affectsTiming(blurredDocument)
+                && blurredDocument.isEdited(duration: 10),
+               "adding a blur redraws the preview without rebuilding the timeline, and counts as an edit")
+        expect(RecorderEditDocument(blurs: [RecorderBlurRegion(start: 4, end: 4.05)])
+                .sanitized(duration: 10).blurs.isEmpty,
+               "a damaged blur is dropped by the same repair that fixes every other field")
+
+        // The stage letterboxes the picture; a point on it has to come off
+        // the empty bands before it means anything in the recording.
+        let stagePoint = RecorderSupport.unitPoint(at: CGPoint(x: 300, y: 250),
+                                                   in: CGSize(width: 500, height: 500),
+                                                   sourceSize: CGSize(width: 1000, height: 500))
+        expect(stagePoint.map { abs($0.x - 0.6) < 1e-9 && abs($0.y - 0.5) < 1e-9 } == true,
+               "a point on the stage maps through the letterbox into the picture's own space")
+        expect(RecorderSupport.unitPoint(at: CGPoint(x: 10, y: 10),
+                                         in: CGSize(width: 500, height: 500),
+                                         sourceSize: CGSize(width: 1000, height: 500))?.y ?? 0 < 0,
+               "a point in the letterbox band comes back outside the picture rather than snapped into it")
+        expect(RecorderSupport.unitPoint(at: .zero, in: .zero, sourceSize: .zero) == nil,
+               "a stage with no size maps nothing")
 
         // MARK: Screen recorder pointer track
 
@@ -22079,6 +22428,110 @@ struct MetricsTests {
                          "\(language.rawValue) quit protection modifier HUD format")
         }
 
+        // Loading the saved shelf keeps "nothing saved", "decoded whole",
+        // "decoded with entries dropped" and "will not decode" apart. Only a
+        // store read whole may be saved over and swept behind.
+        expect(ShelfPersistenceSupport.load(nil) == .items([]),
+               "no saved shelf blob restores as an empty shelf")
+        expect(ShelfPersistenceSupport.load(Data("[]".utf8)) == .items([]),
+               "a saved empty shelf restores as an empty shelf")
+        expect(ShelfPersistenceSupport.load(Data("not json".utf8)) == .unreadable,
+               "an unreadable shelf blob is not an empty shelf")
+        expect(ShelfPersistenceSupport.load(Data(#"{"items":[]}"#.utf8)) == .unreadable,
+               "a shelf blob that is not a list is not an empty shelf")
+
+        // One bad entry drops only itself: an unknown kind (written by a newer
+        // build) and a missing optional field must not cost the whole shelf.
+        // The list that comes back is `.partial`, never `.items`: the dropped
+        // entry's payload file is still on disk and the blob still points at
+        // it, so the caller must not save over the store or sweep behind it.
+        let mixedShelfBlob = Data("""
+        [{"id":"8B3E1C2A-0000-4000-8000-000000000001","kind":"text","title":"keep","text":"body"},
+         {"id":"8B3E1C2A-0000-4000-8000-000000000002","kind":"telepathy","title":"unknown kind"},
+         {"kind":"link","title":"no id","url":"https://example.com"}]
+        """.utf8)
+        var mixedShelfTitles: [String] = []
+        if case let .partial(loaded) = ShelfPersistenceSupport.load(mixedShelfBlob) {
+            mixedShelfTitles = loaded.map(\.title)
+        }
+        expect(mixedShelfTitles == ["keep", "no id"],
+               "an entry with an unknown kind drops itself and the rest load as "
+               + "partial, found \(mixedShelfTitles)")
+        expect(ShelfPersistenceSupport.load(Data(#"[{"kind":"telepathy"}]"#.utf8)) == .unreadable,
+               "a stored list where no entry survives is unreadable, not empty")
+
+        let wholeShelfBlob = Data("""
+        [{"id":"8B3E1C2A-0000-4000-8000-000000000007","kind":"text","title":"a","text":"a"},
+         {"id":"8B3E1C2A-0000-4000-8000-000000000008","kind":"batch","title":"pile","children":[
+           {"id":"8B3E1C2A-0000-4000-8000-000000000009","kind":"text","title":"b","text":"b"}]}]
+        """.utf8)
+        var wholeShelfTitles: [String] = []
+        if case let .items(loaded) = ShelfPersistenceSupport.load(wholeShelfBlob) {
+            wholeShelfTitles = loaded.map(\.title)
+        }
+        expect(wholeShelfTitles == ["a", "pile"],
+               "a store every entry of which decodes loads whole, found \(wholeShelfTitles)")
+
+        // A child that drops itself costs its payload file the same way a
+        // top-level entry does, so the depth it sits at must not change the
+        // answer: the batch survives with its readable children, and the load
+        // is still partial.
+        let batchShelfBlob = Data("""
+        [{"id":"8B3E1C2A-0000-4000-8000-000000000003","kind":"batch","title":"pile","children":[
+           {"id":"8B3E1C2A-0000-4000-8000-000000000004","kind":"text","title":"a","text":"a"},
+           {"id":"8B3E1C2A-0000-4000-8000-000000000005","kind":"telepathy","title":"b"},
+           {"id":"8B3E1C2A-0000-4000-8000-000000000006","kind":"text","title":"c","text":"c"}]}]
+        """.utf8)
+        var batchShelfChildTitles: [String] = []
+        if case let .partial(loaded) = ShelfPersistenceSupport.load(batchShelfBlob) {
+            batchShelfChildTitles = (loaded.first?.children ?? []).map(\.title)
+        }
+        expect(batchShelfChildTitles == ["a", "c"],
+               "a bad child drops itself, its batch survives and the store loads as "
+               + "partial, found \(batchShelfChildTitles)")
+
+        // The sweep decision lives in ShelfService, which `--test` does not
+        // compile, so it is pinned by shape: restore may reach the payload
+        // sweep only past the guard that a store read whole has to pass. A
+        // `.partial` store's dropped entries still own files in that
+        // directory, and the blob it kept still points at them.
+        let restoreItemsBody = ((try? String(
+            contentsOfFile: "Sources/Vorssaint/Services/Shelf/ShelfService.swift",
+            encoding: .utf8)) ?? "")
+            .components(separatedBy: "private func restoreItems()")
+            .dropFirst().first?
+            .components(separatedBy: "\n    private func ").first ?? ""
+        let pastRestoreGuard = restoreItemsBody
+            .components(separatedBy: "guard case .items = store else { return }")
+        expect(pastRestoreGuard.count == 2
+                && !pastRestoreGuard[0].contains("sweepOwnedFiles(")
+                && pastRestoreGuard[1].contains("sweepOwnedFiles("),
+               "restore sweeps the shelf's payload files only for a store it read whole")
+
+        // Guards the class, not the one instance that emptied shelves: the
+        // saved blob may only be read through `load`, which hands the caller a
+        // `.unreadable` case it has to answer for. A bare array decode brings
+        // back the all-or-nothing form, where any single bad entry restores an
+        // empty shelf that is then written back over the real one.
+        // The scan has to report how many files it read: an enumerator that
+        // finds nothing (the tests run from somewhere other than the repo
+        // root) leaves the list empty, and a rule checked against no files at
+        // all passes while guarding nothing.
+        var rawShelfStoreDecoders: [String] = []
+        var scannedShelfStoreFiles = 0
+        if let sources = FileManager.default.enumerator(atPath: "Sources") {
+            for case let path as String in sources where path.hasSuffix(".swift") {
+                let text = (try? String(contentsOfFile: "Sources/" + path, encoding: .utf8)) ?? ""
+                scannedShelfStoreFiles += 1
+                if text.contains("decode([ShelfPersistedItem]") {
+                    rawShelfStoreDecoders.append((path as NSString).lastPathComponent)
+                }
+            }
+        }
+        expect(scannedShelfStoreFiles > 0 && rawShelfStoreDecoders.isEmpty,
+               "the saved shelf is read only through ShelfPersistenceSupport.load, "
+               + "found a bare decode in \(rawShelfStoreDecoders.sorted()) "
+               + "across \(scannedShelfStoreFiles) scanned files")
         // The ranking folds what was typed once and hands the folded letters to
         // every row in the pool. Both readings have to agree, or a name the
         // person gave would rank differently depending on which one asked.
@@ -22118,6 +22571,58 @@ struct MetricsTests {
             expect(stored >= 0 && guarded > stored,
                    "\(pass) stores the whole sample before it decides whether the rows changed")
         }
+
+
+        // The confirmation HUD is a hand-laid AppKit panel, so its width is
+        // pinned as source shape. It used to be a fixed 300pt, which clipped
+        // the longer translations. Sizing it from a separate
+        // NSString measurement of the same text would leave whatever inset
+        // the label's cell adds unaccounted for -- the labels have to be the
+        // ones asked.
+        let quitHUDSource = (try? String(
+            contentsOfFile: "Sources/Vorssaint/UI/QuitProtection/QuitProtectionHUD.swift",
+            encoding: .utf8)) ?? ""
+        expect(quitHUDSource.count > 1_000,
+               "the quit protection HUD source is readable (\(quitHUDSource.count) bytes)")
+        let quitHUDCode = quitHUDSource
+            .split(separator: "\n", omittingEmptySubsequences: false)
+            .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
+            .joined(separator: "\n")
+        expect(quitHUDCode.contains("title.fittingSize.width")
+                && quitHUDCode.contains("detail.fittingSize.width"),
+               "the confirmation HUD takes its width from the labels that draw the text")
+        expect(!quitHUDCode.contains("size(withAttributes:"),
+               "the confirmation HUD does not size itself from a separate text measurement")
+        let quitHUDShow = quitHUDCode
+            .components(separatedBy: "func show(title: String, detail: String) {").last ?? ""
+        let quitHUDShowBody = quitHUDShow.components(separatedBy: "\n    func ").first ?? ""
+        if let filled = quitHUDShowBody.range(of: "content.update("),
+           let sized = quitHUDShowBody.range(of: "fittingSize(content)"),
+           let applied = quitHUDShowBody.range(of: "setContentSize(size)") {
+            expect(filled.lowerBound < sized.lowerBound && sized.lowerBound < applied.lowerBound,
+                   "the confirmation HUD fills its labels, then measures them, then resizes")
+        } else {
+            expect(false,
+                   "the confirmation HUD's show() fills the labels, measures them and resizes")
+        }
+        // MARK: A dropped identifier
+        expect(QuickTogglesSupport.isExcluded(volumeName: "SD Card",
+                                              volumeUUID: "1234-5678-ABCD",
+                                              mountPath: "/Volumes/SD Card",
+                                              excludedVolumes: ["1234-5678-abcd"])
+                && !QuickTogglesSupport.isExcluded(volumeName: "SD Card",
+                                                   volumeUUID: nil,
+                                                   mountPath: "/Volumes/SD Card",
+                                                   excludedVolumes: ["1234-5678-abcd"]),
+               "an excluded volume UUID is honoured only when the caller hands the UUID over")
+        let diskExclusionsListCode = ((try? String(
+            contentsOfFile: "Sources/Vorssaint/UI/Settings/DiskExclusionsList.swift",
+            encoding: .utf8)) ?? "").components(separatedBy: "\n")
+            .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
+            .joined(separator: "\n")
+        expect(diskExclusionsListCode.contains(".volumeUUIDStringKey")
+                && diskExclusionsListCode.contains("QuickTogglesSupport.isExcluded("),
+               "the exclusions picker asks the shared exclusion test, UUID included, not a name-only one")
 
         if failures.isEmpty {
             print("TESTS OK (\(checks) checks)")
