@@ -531,7 +531,7 @@ extension Strings {
         shelfTooltipLinkPlural: "%d link",
         shelfActionOpen: "Apri",
         shelfActionOpenWith: "Apri con",
-        shelfActionAirDrop: "Condividi con AirDrop",
+        shelfActionShare: "Condividi",
 
         breakdownMeasuring: "Misurazione…",
 
@@ -830,9 +830,6 @@ extension Strings {
         supportIntroDoneButton: "Fatto",
         discordIntroTitle: "La community di Vorssaint su Discord è appena nata",
         discordIntroMessage: "La community di Vorssaint è nuova e sta ancora prendendo forma. Entra fin dall’inizio per conoscere altri utenti e contribuire a creare uno spazio accogliente attorno all’app.",
-        discordIntroBenefitHelp: "Ricevi aiuto e condividi i tuoi flussi di lavoro",
-        discordIntroBenefitFeedback: "Segnala bug, richiedi miglioramenti e contribuisci a decidere cosa verrà dopo",
-        discordIntroBenefitPreviews: "Segui lo sviluppo, le anteprime e le novità delle versioni",
         discordIntroJoinButton: "Entra nella community su Discord",
         communityIntroTitle: "Guarda tutto prima degli altri",
         communityIntroMessage: "Chi mi seguiva già su X ha visto molte novità di questo aggiornamento prima di tutti. Lì pubblico anteprime di ciò che arriverà e mostro come funziona, così conosci già le basi prima ancora dell'uscita dell'aggiornamento. Seguimi e scopri cosa arriverà!",
@@ -928,11 +925,17 @@ extension Strings {
         qrResultOpen: "Apri link",
         highlightsTitle: "Novità di questo aggiornamento",
         highlightsTitleClipboardRedesign: "Appunti rinnovati",
+        highlightsTitleWindowLayout: "Disposizione delle finestre",
+        highlightsTitleQuitProtection: "Protezione da ⌘Q e ⌘W",
+        highlightsTitleRecorderBlur: "Sfocatura nella registrazione",
         highlightsCaptionDockPreview: "Dock Preview ora funziona con l'ingrandimento del Dock attivo",
         highlightsCaptionScreenshot: "Lo screenshot ha guadagnato una lente dei pixel e la lettura dei codici QR",
         highlightsCaptionSnippetLibrary: "Un menu di snippet con ricerca digita qualsiasi snippet al cursore",
         highlightsCaptionCapturePalette: "Una sola scorciatoia apre ora una palette mobile per schermate, registrazioni, testo su schermo e colori con i controlli a portata di mano.",
         highlightsCaptionClipboardRedesign: "La cronologia si apre ora come una palette compatta con righe ordinate e un'anteprima su richiesta per leggere o modificare l'elemento completo.",
+        highlightsCaptionWindowLayout: "Posiziona le finestre con l'anello direzionale tramite scorciatoia e puntatore, oppure trascinale sui bordi dello schermo con margini regolabili.",
+        highlightsCaptionQuitProtection: "Evita di chiudere app o finestre per errore tenendo premuto il tasto, con una doppia pressione o un modificatore extra, regolabile per app.",
+        highlightsCaptionRecorderBlur: "Nascondi dati riservati, password e dettagli privati in qualsiasi punto della registrazione video prima di condividerla o esportarla.",
         highlightsConfigure: "Configura",
         highlightsTry: "Prova",
         highlightsSeeAll: "Vedi tutte le modifiche",
@@ -987,6 +990,8 @@ extension Strings {
         switcherScreenPlacementCaption: "Su quale schermo si apre il commutatore quando ne sono collegati più di uno.",
         smoothScrollResponseLabel: "Reattività",
         mouseAccelerationName: "Disattiva l’accelerazione del mouse",
-        mouseAccelerationCaption: "Rimuove l’accelerazione del puntatore per i mouse collegati. L’impostazione precedente viene ripristinata quando disattivi l’opzione o chiudi Vorssaint."
+        mouseAccelerationCaption: "Rimuove l’accelerazione del puntatore per i mouse collegati. L’impostazione precedente viene ripristinata quando disattivi l’opzione o chiudi Vorssaint.",
+        shelfClearOnClose: "Svuota alla chiusura",
+        shelfClearOnCloseCaption: "Svuota lo scaffale solo quando fai clic sul pulsante di chiusura. Se si nasconde automaticamente o viene ridotto, gli elementi restano."
     )
 }

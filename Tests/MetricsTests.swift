@@ -825,6 +825,11 @@ struct MetricsTests {
         }
         expect(laneAnswer == 887, "the queued work runs once the lane comes free")
         expect(laneAnsweredOnMain, "the pasteboard lane answers on the main queue")
+        let pastePlainSource = (try? String(
+            contentsOfFile: "Sources/Vorssaint/Services/QuickTools/PastePlainService.swift",
+            encoding: .utf8)) ?? ""
+        expect(pastePlainSource.contains("GeneralPasteboardAccess.shared.async"),
+               "paste as plain text reads the clipboard on the lane, not on the main thread")
 
         let maxCapacityStringJSON = Data(#"{"SPPowerDataType":[{"sppower_battery_health_info":{"sppower_battery_health_maximum_capacity":"93%"}}]}"#.utf8)
         expect(MaxCapacityProbe.percent(fromSystemProfilerJSON: maxCapacityStringJSON) == 93,
@@ -1608,8 +1613,9 @@ struct MetricsTests {
             encoding: .utf8)) ?? ""
         expect(focusFollowsMouseServiceSource.contains(".leftMouseDragged")
                 && focusFollowsMouseServiceSource.contains(".rightMouseDragged")
-                && focusFollowsMouseServiceSource.contains(".otherMouseDragged"),
-               "focus follows mouse tracks the final pointer position while a button is held")
+                && focusFollowsMouseServiceSource.contains(".otherMouseDragged")
+                && focusFollowsMouseServiceSource.contains("NSEvent.pressedMouseButtons == 0"),
+               "focus follows mouse tracks drags and checks every held mouse button")
         expect(focusFollowsMouseServiceSource.contains("excludesPointerTarget(")
                 && focusFollowsMouseServiceSource.contains(
                     ".focusFollowsMouse, at: evaluation.point"),
@@ -2073,6 +2079,10 @@ struct MetricsTests {
                "external-display Keep Awake is opt-in")
         expect(registeredDefaults[DefaultsKey.keepAwakeConnectedToPower] as? Bool == false,
                "power-connected Keep Awake is opt-in")
+        expect(registeredDefaults[DefaultsKey.keepAwakePauseWhenLocked] as? Bool == false,
+               "pausing Keep Awake on screen lock is opt-in")
+        expect(SettingsBackupSupport.exportKeys().contains(DefaultsKey.keepAwakePauseWhenLocked),
+               "the Keep Awake screen-lock preference follows settings backups")
         expect(registeredDefaults[DefaultsKey.hotkeyEnabled] as? Bool == true,
                "global hotkey is on for clean installs")
         expect(registeredDefaults[DefaultsKey.keepAwakeShortcut] as? String == "control+option+command:40",
@@ -2131,6 +2141,17 @@ struct MetricsTests {
             sessionActive: true,
             automaticSessionActive: false
         ) == .none, "clearing automatic conditions does not end a manual session")
+        expect(KeepAwakeAutomationSupport.isScreenLocked(
+            sessionDictionary: ["CGSSessionScreenIsLocked": true]
+        ), "the Keep Awake lock guard reads a locked session")
+        expect(!KeepAwakeAutomationSupport.isScreenLocked(
+            sessionDictionary: ["CGSSessionScreenIsLocked": false]
+        ), "the Keep Awake lock guard reads an unlocked session")
+        expect(KeepAwakeAutomationSupport.isScreenLocked(
+            sessionDictionary: ["CGSSessionScreenIsLocked": NSNumber(value: true)]
+        ), "the Keep Awake lock guard accepts the session dictionary's numeric bridge")
+        expect(!KeepAwakeAutomationSupport.isScreenLocked(sessionDictionary: nil),
+               "an unreadable lock state does not strand Keep Awake in a pause")
         let sleepDisabledReport = """
         System-wide power settings:
          SleepDisabled\t\t1
@@ -3267,15 +3288,13 @@ struct MetricsTests {
                && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.3.1", lastSeenVersion: nil)
                && !SupportUpdateIntroInfo.shouldShow(appVersion: "3.3.3", lastSeenVersion: nil),
                "support prompt never leaks into another release")
-        expect(SupportUpdateIntroStep.discord.next == .social
-               && SupportUpdateIntroStep.social.next == .support
-               && SupportUpdateIntroStep.support.next == nil,
-               "update intro moves from Discord to social updates and support")
-        expect(SupportUpdateIntroStep.discord.previous == nil
-               && SupportUpdateIntroStep.social.previous == .discord
-               && SupportUpdateIntroStep.support.previous == .social,
+        expect(SupportUpdateIntroStep.support.next == .social
+               && SupportUpdateIntroStep.social.next == nil,
+               "update intro moves from support to social updates")
+        expect(SupportUpdateIntroStep.support.previous == nil
+               && SupportUpdateIntroStep.social.previous == .support,
                "update intro navigates back without closing")
-        expect(SupportUpdateIntroStep.allCases == [.discord, .social, .support],
+        expect(SupportUpdateIntroStep.allCases == [.support, .social],
                "update intro page indicators follow the navigation order")
         expect(AppInfo.discordURL.absoluteString == "https://discord.gg/M6BwWH4BJp",
                "the community action uses the permanent Discord invitation")
@@ -3289,28 +3308,31 @@ struct MetricsTests {
         // decision above is made consciously, never by omission.
         let releasePlist = NSDictionary(contentsOfFile: "Resources/Info.plist")
         let plistVersion = (releasePlist?["CFBundleShortVersionString"] as? String) ?? ""
-        expect(plistVersion == "3.3.3-beta.3",
+        expect(plistVersion == "3.3.3-beta.4",
                "bumping the app version requires re-deciding the support prompt pin above")
         let plistBuild = (releasePlist?["CFBundleVersion"] as? String) ?? ""
-        expect(plistBuild == "82",
+        expect(plistBuild == "83",
                "every app version needs its own incremented bundle build")
         expect(SupportUpdateIntroInfo.releaseVersion == "3.3.2",
                "the support prompt remains deliberately pinned to 3.3.2")
-        // 3.3.2 adds several headline features, so the tour is re-curated
+        // 3.3.3 adds several headline features, so the tour is re-curated
         // around only what this update genuinely introduces.
-        expect(UpdateHighlightsInfo.releaseVersion == "3.3.2",
+        expect(UpdateHighlightsInfo.releaseVersion == "3.3.3",
                "re-decide the highlights tour on a feature release: re-curate its rows and move the pin to the shipping version")
-        expect(UpdateHighlightsInfo.shouldShow(appVersion: "3.3.2", lastSeenVersion: "3.3.1")
-               && UpdateHighlightsInfo.shouldShow(appVersion: "3.3.2", lastSeenVersion: nil),
-               "highlights tour shows once after updating to its pinned release")
-        expect(!UpdateHighlightsInfo.shouldShow(appVersion: "3.3.2", lastSeenVersion: "3.3.2"),
+        expect(UpdateHighlightsInfo.shouldShow(appVersion: "3.3.3", lastSeenVersion: "3.3.2")
+               && UpdateHighlightsInfo.shouldShow(appVersion: "3.3.3-beta.5", lastSeenVersion: "3.3.2")
+               && UpdateHighlightsInfo.shouldShow(appVersion: "3.3.3", lastSeenVersion: nil),
+               "highlights tour shows once after updating to its pinned release or beta")
+        expect(!UpdateHighlightsInfo.shouldShow(appVersion: "3.3.3", lastSeenVersion: "3.3.3")
+               && !UpdateHighlightsInfo.shouldShow(appVersion: "3.3.3-beta.5", lastSeenVersion: "3.3.3"),
                "highlights tour stays hidden after it is seen")
-        expect(!UpdateHighlightsInfo.shouldShow(appVersion: "3.3.1", lastSeenVersion: nil)
-               && !UpdateHighlightsInfo.shouldShow(appVersion: "3.3.3", lastSeenVersion: nil),
+        expect(!UpdateHighlightsInfo.shouldShow(appVersion: "3.3.2", lastSeenVersion: nil)
+               && !UpdateHighlightsInfo.shouldShow(appVersion: "3.3.4", lastSeenVersion: nil),
                "highlights tour never leaks into another release")
-        expect(FileManager.default.fileExists(atPath: "Resources/Images/highlights-capture.png")
-               && FileManager.default.fileExists(atPath: "Resources/Images/highlights-clipboard.png"),
-               "3.3.2 highlights tour includes curated real captures for screenshot palette and clipboard")
+        expect(FileManager.default.fileExists(atPath: "Resources/Images/highlights-windowlayout.png")
+               && FileManager.default.fileExists(atPath: "Resources/Images/highlights-quitprotection.png")
+               && FileManager.default.fileExists(atPath: "Resources/Images/highlights-recorderblur.png"),
+               "3.3.3 highlights tour includes curated real captures for window layout, quit protection and recorder blur")
         expect(registeredDefaults[DefaultsKey.mixerLowerVolumeOnHeadphonesDisconnect] as? Bool == false,
                "headphone disconnect volume lowering is opt-in")
         expect(registeredDefaults[DefaultsKey.mixerHeadphonesDisconnectVolumePercent] as? Int
@@ -3341,6 +3363,9 @@ struct MetricsTests {
                "closing after a drop is new behavior and must arrive off in an update")
         expect(registeredDefaults[DefaultsKey.shelfRemoveAfterDrop] as? Bool == true,
                "shelf removes accepted items after a drop by default")
+        expect(registeredDefaults[DefaultsKey.shelfClearOnClose] as? Bool == false
+                && SettingsBackupSupport.exportKeys().contains(DefaultsKey.shelfClearOnClose),
+               "clearing the shelf on close is opt-in and travels with settings backups")
         expect((registeredDefaults[DefaultsKey.shelfAutomaticExclusions] as? [String])?.isEmpty == true,
                "shelf automatic exclusions start empty")
         expect(registeredDefaults[DefaultsKey.mouseNavigationEnabled] as? Bool == false,
@@ -4830,7 +4855,7 @@ struct MetricsTests {
         let junkCleanerSource = (try? String(
             contentsOfFile: "Sources/Vorssaint/Services/Cleaner/JunkCleaner.swift",
             encoding: .utf8)) ?? ""
-        let cleanSelectedBody = sourceBody(of: junkCleanerSource, from: "func cleanSelected()",
+        let cleanSelectedBody = sourceBody(of: junkCleanerSource, from: "func cleanSelected(",
                                            to: "private static func mayRemove")
         expect(cleanSelectedBody.contains("chosen.contains { $0.category == .leftovers }")
                && cleanSelectedBody.contains("? Self.installedBundleIDs() : []")
@@ -4940,6 +4965,24 @@ struct MetricsTests {
                "device backups joined the cleaner with a stable category id")
         expect(!CleanerPolicy.precheckDeviceBackups,
                "device backups never start checked, they are the user's safety net")
+        // CleanerScheduler and CleanerView are outside this test binary, so
+        // pin escalation at the call sites: the unattended pass must never
+        // reach Finder's administrator prompt, and no default lets a later
+        // automatic caller inherit it.
+        let compact = { (path: String) -> String in
+            ((try? String(contentsOfFile: path, encoding: .utf8)) ?? "")
+                .split(whereSeparator: \.isWhitespace).joined()
+        }
+        let schedulerCode = compact("Sources/Vorssaint/Services/Cleaner/CleanerScheduler.swift")
+        let cleanerViewCode = compact("Sources/Vorssaint/UI/Cleaner/CleanerView.swift")
+        expect(schedulerCode.components(separatedBy: "cleanSelected(").count == 2
+               && schedulerCode.contains("cleanSelected(escalate:false)")
+               && schedulerCode.contains("notifyIfWanted(freed:freed,failed:failed)"),
+               "the scheduled clean never escalates and reports what it left in place")
+        expect(junkCleanerSource.contains("func cleanSelected(escalate: Bool) {")
+               && cleanerViewCode.components(separatedBy: "cleanSelected(").count == 2
+               && cleanerViewCode.contains("cleanSelected(escalate:true)"),
+               "cleanSelected has no default escalation and the manual clean still asks")
         expect(CleanerPolicy.developerJunkPaths.contains("/Library/Developer/Xcode/iOS DeviceSupport")
                && CleanerPolicy.developerJunkPaths.contains("/Library/Developer/Xcode/watchOS DeviceSupport"),
                "stale DeviceSupport symbol caches count as developer junk")
@@ -5418,22 +5461,22 @@ struct MetricsTests {
                         screens: [WindowEdgeSnapScreen] = [snapScreen]) -> WindowEdgeSnapTarget? {
             WindowEdgeSnapSupport.target(at: point, screens: screens)
         }
-        let topSnapFrame = WindowLayoutGeometry.rect(for: .topHalf,
+        let topSnapFrame = WindowLayoutGeometry.rect(for: .maximize,
                                                      current: snapVisibleFrame,
                                                      visibleFrame: snapVisibleFrame)
         expect(snapTarget(CGPoint(x: 720, y: snapVisibleFrame.maxY))
-               == WindowEdgeSnapTarget(action: .topHalf,
+               == WindowEdgeSnapTarget(action: .maximize,
                                        frame: topSnapFrame,
                                        visibleFrame: snapVisibleFrame),
-               "touching the lower edge of the menu bar previews the upper half")
-        expect(snapTarget(CGPoint(x: 720, y: 900))?.action == .topHalf,
-               "the full menu bar band remains a top snap target")
+               "touching the lower edge of the menu bar previews maximize")
+        expect(snapTarget(CGPoint(x: 720, y: 900))?.action == .maximize,
+               "the full menu bar band remains a top snap target for maximize")
         expect(snapTarget(CGPoint(x: 720, y: snapVisibleFrame.maxY - 13)) == nil,
                "the top target does not reach below its activation band")
         expect(snapTarget(CGPoint(x: 0, y: 450))?.action == .leftHalf
                && snapTarget(CGPoint(x: 1440, y: 450))?.action == .rightHalf
                && snapTarget(CGPoint(x: 720, y: 0))?.action == .bottomHalf,
-               "all four straight edges choose their matching halves")
+               "straight edges choose their matching placements")
         expect(snapTarget(CGPoint(x: 0, y: snapVisibleFrame.maxY))?.action == .topLeft
                && snapTarget(CGPoint(x: 1440, y: snapVisibleFrame.maxY))?.action == .topRight
                && snapTarget(CGPoint(x: 0, y: 0))?.action == .bottomLeft
@@ -8162,6 +8205,26 @@ struct MetricsTests {
         expect(dockedWatchdog.contains("updateDockedProximity(")
                 && dockedWatchdog.contains("handleDragForEdge(at:"),
                "the drag watchdog finishes dock and edge dwells after pointer movement stops")
+        let explicitShelfClose = shelfServiceSource
+            .components(separatedBy: "func close()")
+            .dropFirst().first?.components(separatedBy: "\n    func noteInteraction").first ?? ""
+        let ordinaryShelfHide = shelfServiceSource
+            .components(separatedBy: "func hide()")
+            .dropFirst().first?.components(separatedBy: "\n    func close").first ?? ""
+        let shelfViewSource = (try? String(
+            contentsOfFile: "Sources/Vorssaint/UI/Shelf/ShelfView.swift",
+            encoding: .utf8)) ?? ""
+        let dockedShelfViewSource = (try? String(
+            contentsOfFile: "Sources/Vorssaint/UI/Shelf/ShelfDropZoneView.swift",
+            encoding: .utf8)) ?? ""
+        expect(explicitShelfClose.contains("DefaultsKey.shelfClearOnClose")
+                && explicitShelfClose.contains("clear()")
+                && explicitShelfClose.contains("hide()")
+                && !ordinaryShelfHide.contains("DefaultsKey.shelfClearOnClose"),
+               "only an explicit shelf close consults the optional clearing preference")
+        expect(shelfViewSource.contains("onDismiss ?? { shelf.close() }")
+                && dockedShelfViewSource.contains("onDismiss: { shelf.collapseDocked() }"),
+               "the floating close clears when requested while docked collapse keeps items")
 
         let shelfFile = ShelfPersistedItem(id: UUID(), kind: .file, title: "notes.pdf",
                                            path: "/tmp/notes.pdf")
@@ -11791,6 +11854,15 @@ struct MetricsTests {
 
         // MARK: Homebrew command building and parsing
 
+        let homebrewManagerSource = (try? String(
+            contentsOfFile: "Sources/Vorssaint/Services/Homebrew/HomebrewManager.swift",
+            encoding: .utf8)) ?? ""
+        let homebrewRunStreaming = homebrewManagerSource.components(separatedBy: "func runStreaming(")
+            .dropFirst().first?.components(separatedBy: "private func appendLog").first ?? ""
+        expect(homebrewRunStreaming.contains("brewSilenceTimeout")
+                && !homebrewRunStreaming.contains("waitUntilExit"),
+               "Homebrew operations wait on a bounded semaphore, not waitUntilExit")
+
         expect(HomebrewPackageKind.allCases == [.cask, .formula],
                "Homebrew package kinds keep casks before formulae")
         expect(HomebrewCommandBuilder.isValidToken("jq"), "simple Homebrew token is valid")
@@ -12159,6 +12231,11 @@ struct MetricsTests {
             expectFormat(strings.uninstallerSelectedFormat, ["d", "d"], "\(prefix) uninstaller selected format")
             expectFormat(strings.uninstallerFreedFormat, ["@"], "\(prefix) uninstaller freed format")
             expectFormat(strings.shelfSelectedFormat, ["d"], "\(prefix) shelf selection format")
+            expect(!strings.shelfClearOnClose.isEmpty
+                   && !strings.shelfClearOnCloseCaption.isEmpty
+                   && !strings.shelfClearOnClose.contains("—")
+                   && !strings.shelfClearOnCloseCaption.contains("—"),
+                   "\(prefix) shelf clear-on-close labels are present without em dash")
             expectFormat(strings.powerAdapterMaxFormat, ["@"], "\(prefix) adapter max format")
             expectFormat(strings.mixerInputErrorFormat, ["@"], "\(prefix) mixer input error format")
             expect(!strings.mixerSoundEffectsOutputTitle.isEmpty
@@ -12331,9 +12408,6 @@ struct MetricsTests {
                 strings.supportIntroCoffeeButton,
                 strings.discordIntroTitle,
                 strings.discordIntroMessage,
-                strings.discordIntroBenefitHelp,
-                strings.discordIntroBenefitFeedback,
-                strings.discordIntroBenefitPreviews,
                 strings.discordIntroJoinButton,
                 strings.communityIntroTitle,
                 strings.communityIntroMessage,
@@ -14027,7 +14101,7 @@ struct MetricsTests {
                    "no em-dash in visible camera preview strings (\(language.rawValue))")
             let radialMenuValues = Mirror(reflecting: FeatureStrings.radialMenu(language)).children
                 .compactMap { $0.value as? String }
-            expect(radialMenuValues.count == 90 && radialMenuValues.allSatisfy { !$0.isEmpty },
+            expect(radialMenuValues.count == 97 && radialMenuValues.allSatisfy { !$0.isEmpty },
                    "every radial menu string is set for \(language.rawValue)")
             expect(radialMenuValues.allSatisfy { !$0.contains("—") },
                    "no em-dash in visible radial menu strings (\(language.rawValue))")
@@ -14375,6 +14449,10 @@ struct MetricsTests {
             .joined(separator: "\n")
         expect(!brightnessWorkQueueHalf.isEmpty && !brightnessWorkQueueCode.contains("NSScreen"),
                "the brightness work queue resolves display names without touching NSScreen")
+        // Display numbers are reissued after a reconnection, so the gamma
+        // restore before a switch-off must check the monitor like the others.
+        expect(brightnessSource.contains("baseline.fingerprint == Self.displayFingerprint(display.id)"),
+               "the pre-switch-off gamma restore checks the display fingerprint")
 
         let ddcWrite = BrightnessSupport.writePacket(code: 0x10, value: 0x1234)
         let expectedDDCWrite: [UInt8] = [0x84, 0x03, 0x10, 0x12, 0x34, 0x8E]
@@ -15456,6 +15534,19 @@ struct MetricsTests {
                 && decodedProfiles[0].items.count == 4,
                "profile encodes and decodes accurately with trimmed name")
 
+        let renamedPresetProfile = RadialMenuProfilePreset.media.createProfile(name: "Renamed")
+        let presetRoundTrip = RadialMenuSupport.decodeProfiles(
+            RadialMenuSupport.encodeProfiles([renamedPresetProfile]))
+        expect(renamedPresetProfile.preset == RadialMenuProfilePreset.media.rawValue
+                && presetRoundTrip.first?.preset == RadialMenuProfilePreset.media.rawValue,
+               "a wheel keeps the starter set it came from, whatever it is renamed to")
+        let profileWithoutPreset = Data("""
+        [{"id":"\(UUID().uuidString)","name":"Old Wheel","color":"accent",\
+        "shortcut":"","mouseButton":"off","items":[]}]
+        """.utf8)
+        expect(RadialMenuSupport.decodeProfiles(profileWithoutPreset).first?.preset == nil,
+               "a wheel saved before the starter set was recorded decodes without one")
+
         let dupID = UUID()
         let dups = [
             RadialMenuProfile(id: dupID, name: "First"),
@@ -15561,6 +15652,35 @@ struct MetricsTests {
                "claimed mouse buttons fall back to the legacy button key like the full decode")
         legacyButtonDefaults.removePersistentDomain(forName: "com.vorssaint.tests.radialLegacyButton")
 
+        var reorderItems = [
+            RadialMenuItem(kind: .app, name: "A"),
+            RadialMenuItem(kind: .app, name: "B"),
+            RadialMenuItem(kind: .app, name: "C"),
+        ]
+        let itemToMove = reorderItems[0]
+        let targetItem = reorderItems[2]
+        if let from = reorderItems.firstIndex(where: { $0.id == itemToMove.id }),
+           let to = reorderItems.firstIndex(where: { $0.id == targetItem.id }) {
+            reorderItems.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+        }
+        expect(reorderItems.map(\.name) == ["B", "C", "A"],
+               "radial items can be reordered correctly by drag target")
+
+        var swapItems = [
+            RadialMenuItem(kind: .app, name: "A"),
+            RadialMenuItem(kind: .app, name: "B"),
+            RadialMenuItem(kind: .app, name: "C"),
+            RadialMenuItem(kind: .app, name: "D"),
+        ]
+        let firstToSwap = swapItems[0]
+        let secondToSwap = swapItems[2]
+        if let from = swapItems.firstIndex(where: { $0.id == firstToSwap.id }),
+           let to = swapItems.firstIndex(where: { $0.id == secondToSwap.id }) {
+            swapItems.swapAt(from, to)
+        }
+        expect(swapItems.map(\.name) == ["C", "B", "A", "D"],
+               "radial items can be swapped directly without displacing intermediate items")
+
         // The cheap read and the full decode can disagree on a corrupt blob,
         // so only one of them may decide whether the click is passed on: once
         // the button is claimed, nothing past that point hands an event back,
@@ -15577,6 +15697,17 @@ struct MetricsTests {
             .components(separatedBy: "private func hotkeyPressed").first ?? ""
         expect(!radialClaimedClick.isEmpty && !radialClaimedClick.contains("passUnretained"),
                "a claimed side button keeps both halves of its click whatever the full decode says")
+
+        // The tap is the only thing that ends a button-held wheel, so handing
+        // it back on resign has to end the session too; a wheel left open
+        // across the switch would come back in hold phase with no release
+        // coming for it.
+        let radialSessionResign = radialServiceCode
+            .components(separatedBy: "SessionActivity.shared.onChange")
+            .dropFirst().first?
+            .components(separatedBy: "var sessionActive").first ?? ""
+        expect(radialSessionResign.contains("endSession()"),
+               "the radial menu ends its session when the mouse tap is handed back on resign")
         expect(RadialMenuFaviconFetcher.faviconURL(
             for: "https://example.com:8443/path?q=1#part")?.absoluteString
                 == "https://example.com:8443/favicon.ico"
@@ -17855,6 +17986,16 @@ struct MetricsTests {
                 && mouseButtonToggleCode.contains("id: \"\(mouseButtonToggleID).spacesGesture\""),
                "the Command Bar exposes the Spaces gesture as its own localized toggle row")
 
+        let restartAppCode = commandBarCatalogLines.firstIndex {
+            isCodeLine($0) && $0.contains("id: \"action.restartApp\"")
+        }.map {
+            commandBarCatalogLines[$0...].prefix(8).filter(isCodeLine).joined(separator: "\n")
+        } ?? ""
+        expect(restartAppCode.contains("bar.restartAppFormat")
+                && restartAppCode.contains("AppInfo.name")
+                && restartAppCode.contains("FeatureRuntime.shared.relaunchApp()"),
+               "the Command Bar exposes its own localized relaunch action")
+
         func appStorageProperty(_ key: String, in lines: [String]) -> String? {
             guard let line = lines.first(where: {
                 isCodeLine($0) && $0.contains("@AppStorage(\(key))")
@@ -19860,6 +20001,28 @@ struct MetricsTests {
         expect(!CommandBarClipboardAccess.canUseHistory(captureEnabled: false,
                                                         hasSavedItems: false),
                "an empty disabled clipboard still points to setup")
+        let japaneseClipboard = FeatureStrings.clipboard(.ja)
+        let clipboardClearKeywords = [japaneseClipboard.title,
+                                      ClipboardFeatureStrings.enUS.title,
+                                      ClipboardFeatureStrings.enUS.clearRecent]
+            .joined(separator: " ")
+        expect(CommandBarSearch.matches(title: japaneseClipboard.clearRecent,
+                                        keywords: clipboardClearKeywords,
+                                        query: "clear clipboard"),
+               "the clipboard clear action stays findable by its English name in a non-Latin locale")
+        let clipboardActionsCode = commandBarCatalogLines.firstIndex {
+            isCodeLine($0) && $0.contains("if AppFeature.clipboardHistory.isAvailable {")
+        }.map {
+            commandBarCatalogLines[$0...]
+                .prefix { !$0.contains("if AppFeature.textSnippets.isAvailable {") }
+                .filter(isCodeLine)
+                .joined(separator: "\n")
+        } ?? ""
+        expect(clipboardActionsCode.contains("id: \"action.clipboardClearRecent\"")
+                && clipboardActionsCode.contains("title: clipboard.clearRecent")
+                && clipboardActionsCode.contains("confirmationPrompt: clipboard.clearRecent")
+                && clipboardActionsCode.contains("ClipboardHistoryService.shared.clearRecent()"),
+               "the Command Bar clears only unpinned clipboard items after confirmation")
 
         // MARK: Compact mode, what an empty field shows
         expect(CommandBarHome.showsBrowseList(compact: false, hasCategory: false, isPeeking: false),
@@ -20990,6 +21153,111 @@ struct MetricsTests {
         expect(RecorderMotion.ringProgress(at: 2.0, clicks: clicks) == nil,
                "the ring is gone well before the next second")
 
+        // The composer carries one cursor per lookup across its frame loop
+        // instead of rescanning the click list per frame. Every query is
+        // compared bit for bit against the scan it replaced, carried and
+        // fresh, over a list with bursts, held buttons, presses never
+        // released and one at the very end.
+        var scanClicks: [RecorderMotion.Click] = []
+        var scanSeed: UInt64 = 0x9E37_79B9_7F4A_7C15
+        var scanAt: Double = 0.05
+        for step in 0..<300 {
+            scanSeed = scanSeed &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            scanAt += Double((scanSeed >> 33) % 37) / 100 + 0.01
+            scanClicks.append(RecorderMotion.Click(time: scanAt, isDown: true))
+            guard step % 7 != 0 else { continue }
+            scanAt += Double((scanSeed >> 17) % 29) / 100 + 0.005
+            scanClicks.append(RecorderMotion.Click(time: scanAt, isDown: false))
+        }
+        scanAt += 0.5
+        scanClicks.append(RecorderMotion.Click(time: scanAt, isDown: true))
+        func scannedPunch(at time: Double) -> Double {
+            var weight: Double = 0
+            var pressedAt: Double?
+            for click in scanClicks {
+                if click.isDown {
+                    pressedAt = click.time
+                    if time >= click.time - RecorderMotion.pressPunchWindow, time <= click.time {
+                        weight = max(weight, RecorderMotion.smoothstep(
+                            (time - (click.time - RecorderMotion.pressPunchWindow))
+                                / RecorderMotion.pressPunchWindow))
+                    }
+                } else if let down = pressedAt {
+                    if time >= down, time <= click.time { weight = 1 }
+                    if time > click.time, time <= click.time + RecorderMotion.pressPunchWindow {
+                        weight = max(weight, RecorderMotion.smoothstep(
+                            1 - (time - click.time) / RecorderMotion.pressPunchWindow))
+                    }
+                    pressedAt = nil
+                }
+            }
+            if let down = pressedAt, time >= down { weight = 1 }
+            return 1 - (1 - RecorderMotion.pressPunchScale) * min(1, weight)
+        }
+        func scannedRing(at time: Double) -> Double? {
+            var best: Double?
+            for click in scanClicks where click.isDown {
+                let elapsed = time - click.time
+                guard elapsed >= 0, elapsed <= RecorderMotion.ringDuration else { continue }
+                best = min(best ?? elapsed / RecorderMotion.ringDuration,
+                           elapsed / RecorderMotion.ringDuration)
+            }
+            return best
+        }
+        func scannedAnchor(at time: Double) -> Double {
+            var weight: Double = 0
+            var pressedAt: Double?
+            for click in scanClicks {
+                if click.isDown {
+                    pressedAt = click.time
+                } else if let down = pressedAt {
+                    if time >= down, time <= click.time { return 1 }
+                    pressedAt = nil
+                }
+                let distance = abs(time - click.time)
+                guard distance <= RecorderMotion.clickAnchorWindow else { continue }
+                weight = max(weight, RecorderMotion.smoothstep(
+                    1 - distance / RecorderMotion.clickAnchorWindow))
+            }
+            if let down = pressedAt, time >= down { return 1 }
+            return weight
+        }
+        func scannedFocus(at time: Double) -> CGPoint {
+            var current = cluster.first?.center ?? CGPoint(x: 0.5, y: 0.5)
+            for entry in cluster where entry.time <= time { current = entry.center }
+            return current
+        }
+        var punchCursor = 0
+        var ringCursor = 0
+        var anchorCursor = 0
+        var focusCursor = 0
+        var cursorMatches = true
+        let scanFrames = Int((scanAt + 1) * 60)
+        for frame in 0..<scanFrames {
+            let time = Double(frame) / 60
+            let punch = scannedPunch(at: time)
+            let ring = scannedRing(at: time)
+            let anchor = scannedAnchor(at: time)
+            let focus = scannedFocus(at: time)
+            if RecorderMotion.pressScale(at: time, clicks: scanClicks, cursor: &punchCursor)
+                    != punch
+                || RecorderMotion.ringProgress(at: time, clicks: scanClicks, cursor: &ringCursor)
+                    != ring
+                || RecorderMotion.anchorWeight(at: time, clicks: scanClicks, cursor: &anchorCursor)
+                    != anchor
+                || RecorderMotion.focus(at: time, clusters: cluster, cursor: &focusCursor) != focus
+                || RecorderMotion.pressScale(at: time, clicks: scanClicks) != punch
+                || RecorderMotion.ringProgress(at: time, clicks: scanClicks) != ring
+                || RecorderMotion.anchorWeight(at: time, clicks: scanClicks) != anchor
+                || RecorderMotion.focus(at: time, clusters: cluster) != focus {
+                cursorMatches = false
+            }
+        }
+        expect(scanFrames > 5_000 && scanClicks.count > 500,
+               "the cursor comparison covers a long recording and a busy click list")
+        expect(cursorMatches,
+               "carried or fresh, every cursored lookup answers what the full scan answered")
+
         // The typing sampler fills an array from an NSEvent monitor callback
         // while the stop path reads it, so the append has to be under the
         // lock: an unsynchronised one races the copy-on-write buffer. The
@@ -21628,6 +21896,23 @@ struct MetricsTests {
             .split(separator: "\n", omittingEmptySubsequences: false)
             .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
             .joined(separator: "\n")
+        let monitorParts = (commandBarCode
+            .components(separatedBy: "private func installMonitors(for panel: NSPanel)")
+            .last ?? "").components(separatedBy: "\n    private func ")
+        let monitor = monitorParts.first ?? ""
+        expect(monitorParts.count > 1
+                && monitor.contains("? event.charactersIgnoringModifiers")
+                && monitor.contains(": event.characters)?.lowercased()")
+                && monitor.contains("let key = event.charactersIgnoringModifiers?.lowercased()")
+                && !monitor.contains("case kVK_ANSI_Q")
+                && monitor.contains("digitIndex(for: event.keyCode)"),
+               "the Command Bar uses macOS Command letters while Control follows typed letters and digits stay positional")
+        expect(monitor.contains("#selector(NSText.selectAll(_:))")
+                && monitor.contains("#selector(NSText.copy(_:))")
+                && monitor.contains("#selector(NSText.cut(_:))")
+                && monitor.contains("#selector(NSText.paste(_:))")
+                && monitor.contains("NSApp.sendAction"),
+               "the Command Bar sends standard editing commands through its responder chain")
         // Ends on the next declaration rather than naming a neighbour: a
         // rename would find no separator, leave the slice running to end of
         // file, and quietly restore the whole-file search.
@@ -21985,6 +22270,29 @@ struct MetricsTests {
         expect(UninstallerSupport.doneSymbol(hasLeftovers: true)
                 != UninstallerSupport.doneSymbol(hasLeftovers: false),
                "a removal that left something behind does not end on the same mark")
+        // The permission note has to be true when it appears: only sandboxed
+        // container data is gated by Full Disk Access, so a failure list made
+        // of ownership or identity refusals must not offer it.
+        let fdaHome = "/Users/someone"
+        expect(UninstallerSupport.failureNeedsFullDiskAccess(
+                   paths: [fdaHome + "/Library/Containers/com.vendor.editor"]),
+               "a failed container is the case Full Disk Access would have changed")
+        expect(UninstallerSupport.failureNeedsFullDiskAccess(
+                   paths: [fdaHome + "/Library/Application Support/Editor",
+                           fdaHome + "/Library/Group Containers/group.com.vendor.editor",
+                           fdaHome + "/Library/Caches/com.vendor.editor"]),
+               "one failed container among others is enough to offer the permission")
+        expect(UninstallerSupport.failureNeedsFullDiskAccess(
+                   paths: [fdaHome + "/Library/Application Scripts/com.vendor.editor"]),
+               "application scripts sit behind the same permission as containers")
+        expect(!UninstallerSupport.failureNeedsFullDiskAccess(
+                   paths: ["/Applications/Editor.app",
+                           fdaHome + "/Library/Application Support/Editor",
+                           fdaHome + "/Library/Preferences/com.vendor.editor.plist",
+                           "/Library/LaunchAgents/com.vendor.editor.plist"]),
+               "failures outside containers never offer a permission that would not help")
+        expect(!UninstallerSupport.failureNeedsFullDiskAccess(paths: []),
+               "no failure, no permission note")
         // Both done states have to route through that decision and name what
         // survived; neither may spell a tick of its own.
         for path in ["Sources/Vorssaint/UI/Uninstall/UninstallerView.swift",
@@ -22153,6 +22461,21 @@ struct MetricsTests {
         expect(!signingSetupCode.contains("-legacy"),
                "setup-signing.sh avoids the -legacy flag the stock LibreSSL openssl rejects")
 
+        // MARK: The stable identity is judged by whether codesign can sign with it
+        // A find-identity listing names certificates codesign then rejects, and
+        // -v excludes every self-signed one, so neither spelling may decide.
+        let buildScriptCode = buildScript.components(separatedBy: "\n")
+            .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("#") }
+        for (script, code, identity) in [("build.sh", buildScriptCode, "$LEGACY_IDENTITY"),
+                                         ("Tools/setup-signing.sh", signingSetupCode.components(separatedBy: "\n"),
+                                          "$IDENTITY")] {
+            expect(!code.contains { $0.contains("find-identity") && $0.contains(identity) },
+                   "\(script) never decides the stable identity by a find-identity listing")
+            expect(code.contains { $0.contains("cp /bin/echo") }
+                    && code.contains { $0.contains("--sign \"\(identity)\" \"$probe\"") },
+                   "\(script) asks codesign to sign a throwaway copy of /bin/echo with the stable identity")
+        }
+
         // MARK: Modifying mouse taps are handed back across a session switch
         // The tap owners cannot be reached from this list (they need the event
         // chain), so the wiring is pinned as text: each service follows the
@@ -22174,7 +22497,20 @@ struct MetricsTests {
                          "Sources/Vorssaint/Services/MouseNavigation/MouseNavigationService.swift",
                          "Sources/Vorssaint/Services/MouseButtons/MouseButtonShortcutService.swift",
                          "Sources/Vorssaint/Services/MiddleClick/MiddleClickService.swift",
-                         "Sources/Vorssaint/Services/QuitProtection/QuitProtectionService.swift"] {
+                         "Sources/Vorssaint/Services/QuitProtection/QuitProtectionService.swift",
+                         "Sources/Vorssaint/Services/RadialMenu/RadialMenuService.swift",
+                         "Sources/Vorssaint/Services/WindowLayout/WindowLayoutService.swift",
+                         "Sources/Vorssaint/Services/WindowMaximizer.swift",
+                         "Sources/Vorssaint/Services/Finder/FinderCutPaste.swift",
+                         "Sources/Vorssaint/Services/Finder/FinderRenameService.swift",
+                         "Sources/Vorssaint/Services/KeyboardDebounce/KeyboardDebounceService.swift",
+                         "Sources/Vorssaint/Services/SuperKey/SuperKeyService.swift",
+                         "Sources/Vorssaint/Services/ShortcutRecordingTap.swift",
+                         "Sources/Vorssaint/Services/Switcher/AppSwitcher.swift",
+                         "Sources/Vorssaint/Services/Snippets/TextSnippetService.swift",
+                         "Sources/Vorssaint/Services/Audio/PreciseVolumeRollerService.swift",
+                         "Sources/Vorssaint/Services/DockClick/DockClickService.swift",
+                         "Sources/Vorssaint/Services/Display/BrightnessService.swift"] {
             let source = (try? String(contentsOfFile: tapOwner, encoding: .utf8)) ?? ""
             expect(!source.isEmpty, "\(tapOwner) reads back for its session-switch check")
             let code = source.components(separatedBy: "\n")
@@ -22189,8 +22525,10 @@ struct MetricsTests {
             if tapOwner.contains("MouseNavigation")
                 || tapOwner.contains("MouseButtonShortcut")
                 || tapOwner.contains("MiddleClick")
-                || tapOwner.contains("QuitProtection") {
-                expect(code.contains("AXIsProcessTrusted()"),
+                || tapOwner.contains("QuitProtection")
+                || tapOwner.contains("RadialMenu")
+                || tapOwner.contains("ShortcutRecordingTap") {
+                expect(rearm.contains("AXIsProcessTrusted()"),
                        "\(tapOwner) does not keep a modifying tap alive after Accessibility is lost")
             }
             // Switching a tap off leaves the process owning it, which is what
@@ -22399,35 +22737,91 @@ struct MetricsTests {
                                                  exceptions: ["com.example.editor"]),
                "all-except scope protects an unselected bundle")
 
+        expect(QuitProtectionSupport.matchesKey(keyCharacter: "\u{439}", keyCode: 12,
+                                                commandLabel: "Q", shortcut: .quit),
+               "a Cyrillic layout is protected on the key Command-Q quits from, "
+               + "which types \u{439} rather than q")
+        expect(!QuitProtectionSupport.matchesKey(keyCharacter: "'", keyCode: 12,
+                                                 commandLabel: "'", shortcut: .quit),
+               "a Dvorak layout leaves the key Command-Q does not quit from alone")
         expect(QuitProtectionSupport.matchesKey(keyCharacter: "q", keyCode: 0,
-                                                shortcut: .quit),
-               "quit protection prefers the layout-resolved q character")
+                                                commandLabel: nil, shortcut: .quit),
+               "quit protection falls back to the typed character without a layout")
         expect(QuitProtectionSupport.matchesKey(keyCharacter: nil, keyCode: 13,
-                                                shortcut: .close),
-               "quit protection falls back to the W key code without a character")
+                                                commandLabel: nil, shortcut: .close),
+               "quit protection falls back to the W key code with neither a character nor a layout")
         expect(QuitProtectionSupport.isBaseShortcut(keyCharacter: "q", keyCode: 12,
+                                                    commandLabel: "Q",
                                                     command: true, control: false,
                                                     option: false, shift: false, shortcut: .quit),
                "plain Command-Q is recognized")
         expect(!QuitProtectionSupport.isBaseShortcut(keyCharacter: "q", keyCode: 12,
+                                                     commandLabel: "Q",
                                                      command: true, control: false,
                                                      option: false, shift: true, shortcut: .quit),
                "Shift-Command-Q is not mistaken for plain Command-Q")
         expect(QuitProtectionSupport.isExtraShortcut(keyCharacter: "q", keyCode: 12,
+                                                     commandLabel: "Q",
                                                      command: true, control: false,
                                                      option: false, shift: true,
                                                      shortcut: .quit, extraModifier: .shift),
                "Shift-Command-Q is recognized as an extra-modifier confirmation")
         expect(QuitProtectionSupport.isExtraShortcut(keyCharacter: "w", keyCode: 13,
+                                                     commandLabel: "W",
                                                      command: true, control: true,
                                                      option: false, shift: false,
                                                      shortcut: .close, extraModifier: .control),
                "Control-Command-W is recognized as an extra-modifier confirmation")
         expect(!QuitProtectionSupport.isExtraShortcut(keyCharacter: "q", keyCode: 12,
+                                                      commandLabel: "Q",
                                                       command: true, control: false,
                                                       option: true, shift: false,
                                                       shortcut: .quit, extraModifier: .shift),
                "an unrelated modifier combination is not protected")
+
+        // Feeds the matcher what the tap sees for a key on an installed layout:
+        // the bare character the event carries and the Command-table label.
+        func layoutProtects(_ layoutID: String, _ keyCode: Int64,
+                            _ shortcut: QuitProtectionShortcut) -> Bool? {
+            guard let data = testLayoutData(for: layoutID) else { return nil }
+            GlobalShortcut.refreshLayoutLabels(layoutData: data)
+            return QuitProtectionSupport.matchesKey(
+                keyCharacter: GlobalShortcut.layoutKeyLabel(for: keyCode, usesCommand: false),
+                keyCode: keyCode,
+                commandLabel: GlobalShortcut.layoutKeyLabel(for: keyCode, usesCommand: true),
+                shortcut: shortcut)
+        }
+        let usID = "com.apple.keylayout.US"
+        if let quit = layoutProtects(usID, 12, .quit), let close = layoutProtects(usID, 13, .close) {
+            expect(quit && close, "US layout keeps Command-Q and Command-W on their own keys")
+        }
+        let russianID = "com.apple.keylayout.Russian"
+        if let quit = layoutProtects(russianID, 12, .quit),
+           let close = layoutProtects(russianID, 13, .close) {
+            expect(quit && close,
+                   "a Cyrillic layout still quits and closes from the Latin Q and W keys")
+        }
+        let greekID = "com.apple.keylayout.Greek"
+        if let quit = layoutProtects(greekID, 12, .quit), let close = layoutProtects(greekID, 13, .close) {
+            expect(quit && close, "a Greek layout still quits and closes from the Latin Q and W keys")
+        }
+        let dvorakID = "com.apple.keylayout.Dvorak"
+        if let quit = layoutProtects(dvorakID, 7, .quit), let close = layoutProtects(dvorakID, 43, .close),
+           let quote = layoutProtects(dvorakID, 12, .quit) {
+            expect(quit && close && !quote,
+                   "Dvorak moves Command-Q and Command-W to the keys it types q and w on, "
+                   + "and leaves the key that types ' alone")
+        }
+        let dvorakCommandID = "com.apple.keylayout.DVORAK-QWERTYCMD"
+        if let quit = layoutProtects(dvorakCommandID, 12, .quit),
+           let close = layoutProtects(dvorakCommandID, 13, .close) {
+            expect(quit && close, "the Dvorak layout that reverts to QWERTY under Command is followed there")
+        }
+        let frenchID = "com.apple.keylayout.French"
+        if let quit = layoutProtects(frenchID, 0, .quit), let close = layoutProtects(frenchID, 6, .close) {
+            expect(quit && close, "French AZERTY moves Command-Q and Command-W to its own q and w keys")
+        }
+        GlobalShortcut.refreshLayoutLabels()
 
         let quitProtectionKeys = [
             DefaultsKey.quitProtectionQuitEnabled,
@@ -22612,6 +23006,16 @@ struct MetricsTests {
                    "\(pass) stores the whole sample before it decides whether the rows changed")
         }
 
+        // MARK: A sleeping clock
+        for shareService in ["Sources/Vorssaint/Services/QuickTools/ScreenshotShareService.swift",
+                             "Sources/Vorssaint/Services/Recorder/RecordingShareService.swift"] {
+            let shareCode = ((try? String(contentsOfFile: shareService, encoding: .utf8)) ?? "")
+                .components(separatedBy: "\n")
+                .filter { !$0.trimmingCharacters(in: .whitespaces).hasPrefix("//") }
+                .joined(separator: "\n")
+            expect(shareCode.contains("NSWorkspace.didWakeNotification"),
+                   "\(shareService) recomputes share link expiry on wake, which its sleeping clock missed")
+        }
 
         // The confirmation HUD is a hand-laid AppKit panel, so its width is
         // pinned as source shape. It used to be a fixed 300pt, which clipped
