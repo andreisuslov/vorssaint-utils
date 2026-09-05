@@ -45,17 +45,18 @@ enum SwitcherPendingKeyDecision: Equatable {
     case cancelAndSwallow
 }
 
-/// WindowServer identifiers for the app and window switcher actions.
+/// WindowServer identifiers for the app and window switcher actions. Read
+/// them from the table, not from memory: 28 is "save picture of screen as a
+/// file", and mapping the reverse window key there once let a switcher
+/// shortcut on the 3 key switch the macOS screenshot key off.
 enum SwitcherNativeSymbolicHotKey: Int32, CaseIterable, Hashable {
     case commandTab = 1
     case commandShiftTab = 2
     case nextWindow = 27
-    case previousWindow = 28
-}
+    case previousWindow = 220
 
-struct SwitcherNativeHotkeyTransition: Equatable {
-    let suppress: Set<SwitcherNativeSymbolicHotKey>
-    let restore: Set<SwitcherNativeSymbolicHotKey>
+    /// The ids the switcher ever asks the WindowServer about.
+    static let ids = Set(allCases.map(\.rawValue))
 }
 
 /// Which running apps earn an entry of their own when they have no window the
@@ -1163,11 +1164,23 @@ enum SwitcherSupport {
         })
     }
 
-    static func nativeHotkeyTransition(from current: Set<SwitcherNativeSymbolicHotKey>,
-                                       to desired: Set<SwitcherNativeSymbolicHotKey>,
-                                       currentlyEnabled: Set<SwitcherNativeSymbolicHotKey>) -> SwitcherNativeHotkeyTransition {
-        SwitcherNativeHotkeyTransition(suppress: desired.intersection(currentlyEnabled),
-                                       restore: current.subtracting(desired))
+    /// The raw ids the switcher wants switched off, resolved against the live
+    /// table: the shared take-over speaks WindowServer ids, and reading the
+    /// shortcut of each id from the table is what keeps a remapped key — or a
+    /// neighbour such as the screenshot key — from being taken over by guess.
+    static func nativeHotkeyIDs(takeOverSystemShortcuts: Bool,
+                                appsShortcut: GlobalShortcut,
+                                windowShortcut: GlobalShortcut,
+                                liveEntries: [LiveSystemShortcut]) -> Set<Int32> {
+        let nativeShortcuts = Dictionary(
+            liveEntries.compactMap { entry -> (SwitcherNativeSymbolicHotKey, GlobalShortcut)? in
+                SwitcherNativeSymbolicHotKey(rawValue: entry.id).map { ($0, entry.shortcut) }
+            },
+            uniquingKeysWith: { first, _ in first })
+        return Set(nativeHotkeysToSuppress(takeOverSystemShortcuts: takeOverSystemShortcuts,
+                                           appsShortcut: appsShortcut,
+                                           windowShortcut: windowShortcut,
+                                           nativeShortcuts: nativeShortcuts).map(\.rawValue))
     }
 
     /// Mirrors the event tap's `allowingExtraShift` match: Shift reverses a

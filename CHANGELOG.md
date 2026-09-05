@@ -6,16 +6,30 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Summary
+Vorssaint adds edge snap controls and shortcuts for recent captures and keyboard brightness, and refines the radial menu. It adds capture menu and magnifier zoom choices and improves color picking, app icons, readability, localization, mouse reconnection, system shortcut recovery and build checks.
+
 ### Added
+- Each capture tool can hide the mode menu when opened with its keyboard shortcut. Thanks to @EugeneCarldotme.
+- The capture magnifier offers a remembered or chosen starting zoom and step-by-step wheel control. Thanks to @ruvelro.
+- Optional keyboard backlight shortcuts adjust brightness one step at a time, available in Keyboard shortcuts. Thanks to @EugeneCarldotme.
 - Switching Spaces by dragging a button can follow your hand, the way a trackpad swipe does, in Mouse settings.
 - Recent captures can open from their own assignable shortcut without returning to the menu bar panel.
+- Window Layout has a visual map for turning each edge and corner snap area on or off, thanks to @levelupimprovement.
 
 ### Changed
+- Build checks adapt to Macs with larger thread pools. Thanks to @mugurc.
 - The radial menu throws its actions out of the center one after another when it opens and gathers them back in when it closes.
 - The radial menu's highlight sweeps to the pointed slice, and its actions sit on the glass as raised buttons with guides between them.
 - Panel outlines answer the system's Increase Contrast, which they were ignoring while already following reduced motion and transparency.
 
 ### Fixed
+- App Switcher restores native shortcuts after crashes even when disabled, and its reverse window shortcut leaves screenshots available. Thanks to @owendaw.
+- Shortcut recording detects system shortcuts even when they have never been customized. Thanks to @owendaw.
+- Mouse acceleration stays disabled after disconnecting and reconnecting a mouse.
+- The App Switcher shows supported alternate app icons without flickering during navigation. Thanks to @EugeneCarldotme and @hash00.
+- Color picking copies the sampled pixel's correct color and shows matching values in the magnifier. Thanks to @MaksimEgorov.
+- Installing a build you compiled yourself keeps its system permissions across rebuilds, where only the Developer variant was protected. Thanks to @hash00 and @PathGao.
 - The Keep Awake option for no icon shows the crossed-out circle it promised, where the bar across it was never drawn.
 - Saving the scratchpad to a file says so when it cannot be written, where a full disk or a read-only volume ended in silence.
 - Numbers on screen use the decimal mark of your region, where the panel, the menu bar and the editors always wrote a point.
@@ -1763,7 +1777,7 @@ Vorssaint 3.1.0 adds three optional tools: Clipboard History for saving and reus
   default, with a setting to split them into separate CPU°C, GPU°C and BAT°C
   blocks.
 
-![Menu bar temperature metrics](https://raw.githubusercontent.com/vorssaintapp/vorssaint-utils/main/Resources/Images/menu-bar-temperature-metrics.png)
+![Menu bar temperature metrics](https://raw.githubusercontent.com/vorssaint/vorssaint-utils/main/Resources/Images/menu-bar-temperature-metrics.png)
 
 ## [3.0.7] - 2026-06-20
 
